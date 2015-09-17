@@ -19,4 +19,12 @@ public class Seeking implements Serializable {
     public Range getAgeRange() {
         return ageRange;
     }
+
+    @Override
+    public String toString() {
+        return "Seeking{" +
+                "gender=" + gender +
+                ", ageRange=" + ageRange +
+                '}';
+    }
 }

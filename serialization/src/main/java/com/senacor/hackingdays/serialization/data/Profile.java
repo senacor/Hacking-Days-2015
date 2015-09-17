@@ -1,14 +1,16 @@
 package com.senacor.hackingdays.serialization.data;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import java.io.Serializable;
 
-public class DatingProfile implements Serializable {
+public class Profile implements Serializable {
 
     private static final long serialVersionUID = 1;
 
-    private String firstName;
-    private String lastName;
-    private Gender gender;
+    private final String name;
+    private final Gender gender;
     private int age;
     private Location location;
     private RelationShipStatus relationShip;
@@ -16,28 +18,17 @@ public class DatingProfile implements Serializable {
     private Seeking seeking;
     private Activity activity;
 
-    public String getFirstName() {
-        return firstName;
+    public Profile(String name, Gender gender) {
+        this.name = name;
+        this.gender = gender;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public String getName() {
+        return name;
     }
 
     public Gender getGender() {
         return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
     }
 
     public int getAge() {
@@ -78,5 +69,27 @@ public class DatingProfile implements Serializable {
 
     public void setSeeking(Seeking seeking) {
         this.seeking = seeking;
+    }
+
+    public Activity getActivity() {
+        return activity;
+    }
+
+    public void setActivity(Activity activity) {
+        this.activity = activity;
+    }
+
+    @Override
+    public String toString() {
+        return "DatingProfile{" +
+                "name='" + name + '\'' +
+                ", gender=" + gender +
+                ", age=" + age +
+                ", location=" + location +
+                ", relationShip=" + relationShip +
+                ", smoker=" + smoker +
+                ", seeking=" + seeking +
+                ", activity=" + activity +
+                '}';
     }
 }

@@ -1,29 +1,37 @@
 package com.senacor.hackingdays.serialization.data;
 
 import java.io.Serializable;
-import java.time.Instant;
+import java.util.Date;
 
-public class Activity implements Serializable{
+public class Activity implements Serializable {
 
     private static final long serialVersionUID = 1;
 
-    private final Instant lastLogin;
-    private final int loginFrequency;
+    private final Date lastLogin;
+    private final int loginCount;
 
-    public Activity(Instant lastLogin, int loginFrequency) {
+    public Activity(Date lastLogin, int loginCount) {
         this.lastLogin = lastLogin;
-        this.loginFrequency = loginFrequency;
+        this.loginCount = loginCount;
     }
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
 
-    public Instant getLastLogin() {
+    public Date getLastLogin() {
         return lastLogin;
     }
 
-    public int getLoginFrequency() {
-        return loginFrequency;
+    public int getLoginCount() {
+        return loginCount;
+    }
+
+    @Override
+    public String toString() {
+        return "Activity{" +
+                "lastLogin=" + lastLogin +
+                ", loginCount=" + loginCount +
+                '}';
     }
 }
