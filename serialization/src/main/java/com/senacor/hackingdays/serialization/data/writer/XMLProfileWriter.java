@@ -1,8 +1,8 @@
 package com.senacor.hackingdays.serialization.data.writer;
 
 import com.senacor.hackingdays.serialization.data.Activity;
-import com.senacor.hackingdays.serialization.data.Profile;
 import com.senacor.hackingdays.serialization.data.Location;
+import com.senacor.hackingdays.serialization.data.Profile;
 import com.senacor.hackingdays.serialization.data.Range;
 import com.senacor.hackingdays.serialization.data.Seeking;
 import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;

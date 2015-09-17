@@ -5,7 +5,6 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.ReceiveBuilder;
 import com.senacor.hackingdays.serialization.data.Profile;
-import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
 import scala.PartialFunction;
 import scala.runtime.BoxedUnit;
 

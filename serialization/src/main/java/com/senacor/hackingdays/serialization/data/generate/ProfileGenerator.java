@@ -1,8 +1,8 @@
 package com.senacor.hackingdays.serialization.data.generate;
 
 import com.senacor.hackingdays.serialization.data.Activity;
-import com.senacor.hackingdays.serialization.data.Profile;
 import com.senacor.hackingdays.serialization.data.Gender;
+import com.senacor.hackingdays.serialization.data.Profile;
 import com.senacor.hackingdays.serialization.data.Range;
 import com.senacor.hackingdays.serialization.data.RelationShipStatus;
 import com.senacor.hackingdays.serialization.data.Seeking;
