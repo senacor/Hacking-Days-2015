@@ -3,6 +3,8 @@ package com.senacor.hackingdays.actor;
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.Props;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import akka.japi.pf.ReceiveBuilder;
 import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
 import scala.PartialFunction;
@@ -33,6 +35,8 @@ public class ProducerActor extends AbstractActor {
 
     private final static class AckCollector extends AbstractActor {
 
+        private final LoggingAdapter logger = Logging.getLogger(context().system().eventStream(), this);
+
         private final int count;
         private final ActorRef launcher;
         private int acknowledged;
@@ -50,6 +54,7 @@ public class ProducerActor extends AbstractActor {
 
         private void checkForCompletion() {
             acknowledged++;
+//            logger.info(String.format("acked %s profiles", acknowledged));
             if (acknowledged == count) {
                 launcher.tell("completed", launcher);
             }

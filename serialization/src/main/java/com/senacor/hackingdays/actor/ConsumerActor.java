@@ -26,7 +26,7 @@ public class ConsumerActor extends AbstractActor {
 
     private void ack(Profile profile) {
         receivedCount++;
-        logger.info(String.format("received profile # %s for %s", receivedCount, profile.getName()));
+//        logger.info(String.format("received profile # %s for %s", receivedCount, profile.getName()));
         sender().tell("Received", self());
     }
 

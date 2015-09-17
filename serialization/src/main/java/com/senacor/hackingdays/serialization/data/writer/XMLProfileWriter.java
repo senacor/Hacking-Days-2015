@@ -5,11 +5,13 @@ import com.senacor.hackingdays.serialization.data.Location;
 import com.senacor.hackingdays.serialization.data.Profile;
 import com.senacor.hackingdays.serialization.data.Range;
 import com.senacor.hackingdays.serialization.data.Seeking;
-import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;
+import com.senacor.hackingdays.serialization.data.writer.util.IndentingXMLStreamWriter;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,7 +38,7 @@ public class XMLProfileWriter implements Closeable, ProfileWriter {
 
     public XMLProfileWriter(OutputStream os) {
         try {
-            writer = new IndentingXMLStreamWriter(XMLOutputFactory.newInstance().createXMLStreamWriter(os));
+            writer = new IndentingXMLStreamWriter(XMLOutputFactory.newInstance().createXMLStreamWriter(new BufferedOutputStream(os)));
             writer.writeStartDocument("utf-8", "1.0");
             writer.writeStartElement(ROOT_ELEMENT);
         } catch (XMLStreamException e) {
@@ -54,25 +56,25 @@ public class XMLProfileWriter implements Closeable, ProfileWriter {
                 writeElement("smoker", profile.isSmoker());
                 writeElement(profile.getRelationShip());
                     Location location = profile.getLocation();
-                    startElement(location.getClass());
+                        startElement(location.getClass());
                         writeElement("city", location.getCity());
                         writeElement("state", location.getState());
                         writeElement("zip", location.getZip());
                     endElement();
                     Activity activity = profile.getActivity();
-                    startElement(activity.getClass());
+                        startElement(activity.getClass());
                         writeElement("lastLogin", dateFormat.format(activity.getLastLogin()));
                         writeElement("loginCount", activity.getLoginCount());
                     endElement();
                     Seeking seeking = profile.getSeeking();
-                    startElement(seeking.getClass());
-                    writeElement(seeking.getGender());
-                        Range ageRange = seeking.getAgeRange();
+                        startElement(seeking.getClass());
+                        writeElement(seeking.getGender());
+                            Range ageRange = seeking.getAgeRange();
                             startElement(ageRange.getClass());
                             writeElement("min", ageRange.getLower());
                             writeElement("max", ageRange.getUpper());
-                        endElement();
                     endElement();
+                endElement();
             endElement();
 
 

@@ -6,16 +6,19 @@ import akka.actor.Props;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.base.Stopwatch;
+import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
 import org.junit.Test;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 public class ConsumerProducerTest {
 
 
-    public static final int COUNT = 100000;
+    public static final int COUNT = 1_000_000;
 
 
     @Test
@@ -33,6 +36,16 @@ public class ConsumerProducerTest {
         actorSystem.shutdown();
         actorSystem.awaitTermination();
         System.err.println("Sending " + COUNT + " dating profiles took " + stopwatch.elapsed(TimeUnit.MILLISECONDS) + " millis");
+    }
+
+    @Test
+    public void writeXmlFile() throws Exception {
+
+        try(XMLProfileWriter writer = new XMLProfileWriter(new File("src/main/resources/database.xml"))) {
+            ProfileGenerator generator = new ProfileGenerator(1_000_000);
+            generator.stream().forEach(writer::write);
+
+        }
     }
 
 }
