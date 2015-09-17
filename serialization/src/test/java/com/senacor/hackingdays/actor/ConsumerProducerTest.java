@@ -22,7 +22,7 @@ public class ConsumerProducerTest {
     public void sendMessages() throws Exception {
         ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem");
         ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActor.class, () -> new ConsumerActor()), "consumer");
-        ActorRef producer = actorSystem.actorOf(Props.create(ProducerActor.class, () -> new ProducerActor(consumer)));
+        ActorRef producer = actorSystem.actorOf(Props.create(ProducerActor.class, () -> new ProducerActor(consumer)), "producer");
 
         Timeout timeout = Timeout.apply(25, TimeUnit.SECONDS);
 

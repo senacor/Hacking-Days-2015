@@ -12,7 +12,6 @@ public class ProducerActor extends AbstractActor {
 
 
     private final ActorRef consumer;
-    private int acknowledged;
 
     public ProducerActor(ActorRef consumer) {
         this.consumer = consumer;
