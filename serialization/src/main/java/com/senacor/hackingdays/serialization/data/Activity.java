@@ -1,5 +1,7 @@
 package com.senacor.hackingdays.serialization.data;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -10,7 +12,9 @@ public class Activity implements Serializable {
     private final Date lastLogin;
     private final int loginCount;
 
-    public Activity(Date lastLogin, int loginCount) {
+    public Activity(
+            @JsonProperty("lastLogin") Date lastLogin,
+            @JsonProperty("loginCount") int loginCount) {
         this.lastLogin = lastLogin;
         this.loginCount = loginCount;
     }

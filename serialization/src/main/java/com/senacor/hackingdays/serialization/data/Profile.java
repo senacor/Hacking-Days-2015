@@ -1,5 +1,7 @@
 package com.senacor.hackingdays.serialization.data;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import java.io.Serializable;
 
 public class Profile implements Serializable {
@@ -15,7 +17,9 @@ public class Profile implements Serializable {
     private Seeking seeking;
     private Activity activity;
 
-    public Profile(String name, Gender gender) {
+    public Profile(
+            @JsonProperty("name") String name,
+            @JsonProperty("gender") Gender gender) {
         this.name = name;
         this.gender = gender;
     }
