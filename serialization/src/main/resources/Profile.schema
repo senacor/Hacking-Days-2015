@@ -7,11 +7,16 @@ struct ProfileStruct {
   age @0 :UInt32;
   name @1 :Text;
   gender @2 :Gender;
-  location @3 :Location;
-  relationShip @4 :RelationShipStatus;
-  smoker @5 :Bool;
-  seeking @6 :Seeking;
-  activity @7 :Activity;
+  relationShip @3 :RelationShipStatus;
+  smoker @4 :Bool;
+  locationState @5 :Text;
+  locationCity @6 :Text;
+  locationZip @7 :Text;
+  seekingGender @8 :Gender;
+  seekingRangeLower @9 :UInt32;
+  seekingRangeUpper @10 :UInt32;
+  activityLastLogin @11 :UInt64;
+  activityLoginCount @12 :UInt32;
 
   enum Gender {
       male @0;
@@ -19,11 +24,6 @@ struct ProfileStruct {
       disambiguous @2;
     }
 
-  struct Location {
-  state @0 :Text;
-  city @1 :Text;
-  zip @2 :Text;
-  }
 
   enum RelationShipStatus {
       divorced @0;
@@ -31,20 +31,7 @@ struct ProfileStruct {
       single @2;
     }
 
-  struct Seeking {
-  gender @0 :Gender;
-  ageRange @1 :Range;
-  }
 
-  struct Range {
-  lower @0 :UInt32;
-  upper @1 :UInt32;
-  }
-
-  struct Activity {
-  lastLogin @0 :UInt64;
-  loginCount @1 :UInt32;
-  }
 
 
 

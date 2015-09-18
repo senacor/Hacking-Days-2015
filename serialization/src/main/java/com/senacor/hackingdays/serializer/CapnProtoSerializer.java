@@ -12,6 +12,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Date;
 
+@SuppressWarnings("unused")
 public class CapnProtoSerializer extends JSerializer {
 
     private String toCamel(String in) {
@@ -21,10 +22,7 @@ public class CapnProtoSerializer extends JSerializer {
     }
 
 
-    private final ExtendedActorSystem actorSystem;
-
     public CapnProtoSerializer(ExtendedActorSystem actorSystem) {
-        this.actorSystem = actorSystem;
     }
 
     @Override
@@ -33,8 +31,7 @@ public class CapnProtoSerializer extends JSerializer {
         if (!Profile.class.getName().equals(manifest.getName())) {
             throw new RuntimeException("no clue how to de-serialize a " + manifest.getName());
         }
-        org.capnproto.MessageReader message =
-                null;
+        org.capnproto.MessageReader message;
         try {
             ByteArrayInputStream in = new ByteArrayInputStream(bytes);
             ReadableByteChannel inch = Channels.newChannel(in);
@@ -45,17 +42,17 @@ public class CapnProtoSerializer extends JSerializer {
                     message.getRoot(CapnProtoProfile.ProfileStruct.factory);
 
             Profile profile = new Profile(capnProfile.getName().toString(), Gender.valueOf(toCamel(capnProfile.getGender().name())));
-            Range seekingRange = new Range(capnProfile.getSeeking().getAgeRange().getLower(),capnProfile.getSeeking().getAgeRange().getUpper());
-            Seeking seek = new Seeking(Gender.valueOf(toCamel(capnProfile.getSeeking().getGender().name())),seekingRange);
+            Range seekingRange = new Range(capnProfile.getSeekingRangeLower(),capnProfile.getSeekingRangeUpper());
+            Seeking seek = new Seeking(Gender.valueOf(toCamel(capnProfile.getGender().name())),seekingRange);
             profile.setSeeking(seek);
             profile.setRelationShip(RelationShipStatus.valueOf(toCamel(capnProfile.getRelationShip().name())));
-            Location loc = new Location(capnProfile.getLocation().getState().toString(),capnProfile.getLocation().getCity().toString(),capnProfile.getLocation().getZip().toString());
+            Location loc = new Location(capnProfile.getLocationState().toString(),capnProfile.getLocationCity().toString(),capnProfile.getLocationZip().toString());
 
             profile.setLocation(loc);
 
               profile.setAge(capnProfile.getAge());
-            Date lastlog = new Date(capnProfile.getActivity().getLastLogin());
-            Activity act = new Activity(lastlog,capnProfile.getActivity().getLoginCount());
+            Date lastlog = new Date(capnProfile.getActivityLastLogin());
+            Activity act = new Activity(lastlog,capnProfile.getActivityLoginCount());
             profile.setActivity(act);
 
 
@@ -85,23 +82,19 @@ public class CapnProtoSerializer extends JSerializer {
             capnProtoProfile.setGender(CapnProtoProfile.ProfileStruct.Gender.valueOf(gender.name().toUpperCase()));
             capnProtoProfile.setName(profile.getName());
             capnProtoProfile.setAge(profile.getAge());
-            capnProtoProfile.initLocation();
             Location loc = profile.getLocation();
-            capnProtoProfile.getLocation().setCity(loc.getCity());
-            capnProtoProfile.getLocation().setState(loc.getState());
-            capnProtoProfile.getLocation().setZip(loc.getZip());
+            capnProtoProfile.setLocationCity(loc.getCity());
+            capnProtoProfile.setLocationState(loc.getState());
+            capnProtoProfile.setLocationZip(loc.getZip());
             capnProtoProfile.setRelationShip(CapnProtoProfile.ProfileStruct.RelationShipStatus.valueOf(profile.getRelationShip().name().toUpperCase()));
             capnProtoProfile.setSmoker(profile.isSmoker());
             Seeking seek = profile.getSeeking();
-            capnProtoProfile.initSeeking();
-            capnProtoProfile.getSeeking().initAgeRange();
-            capnProtoProfile.getSeeking().getAgeRange().setLower(seek.getAgeRange().getLower());
-            capnProtoProfile.getSeeking().getAgeRange().setUpper(seek.getAgeRange().getUpper());
-            capnProtoProfile.getSeeking().setGender(CapnProtoProfile.ProfileStruct.Gender.valueOf(profile.getSeeking().getGender().name().toUpperCase()));
+            capnProtoProfile.setSeekingRangeLower(seek.getAgeRange().getLower());
+            capnProtoProfile.setSeekingRangeUpper(seek.getAgeRange().getUpper());
+            capnProtoProfile.setSeekingGender(CapnProtoProfile.ProfileStruct.Gender.valueOf(profile.getSeeking().getGender().name().toUpperCase()));
             Activity act = profile.getActivity();
-            capnProtoProfile.initActivity();
-            capnProtoProfile.getActivity().setLastLogin(profile.getActivity().getLastLogin().getTime());
-            capnProtoProfile.getActivity().setLoginCount(act.getLoginCount());
+            capnProtoProfile.setActivityLastLogin(profile.getActivity().getLastLogin().getTime());
+            capnProtoProfile.setActivityLoginCount(act.getLoginCount());
 
             //  System.out.println("filled profile after " + stopwatch.elapsed(TimeUnit.MILLISECONDS));
 
