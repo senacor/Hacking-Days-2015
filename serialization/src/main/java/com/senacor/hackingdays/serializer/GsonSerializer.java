@@ -84,7 +84,7 @@ public class GsonSerializer extends JSerializer {
 
 	@Override
 	public boolean includeManifest() {
-		return false;
+		return true;
 	}
 
 	@Override
