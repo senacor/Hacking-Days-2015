@@ -33,11 +33,11 @@ public class ProducerActor extends AbstractActor {
     private void sendMessagesToConsumer(int count, Class<?> profileClass) {
         ActorRef collector = context().actorOf(AckCollector.props(count, sender()), "collector");
 
-        if (profileClass.equals(Profile.class)) {
+        if (profileClass.equals(Profile.class) || profileClass.equals(ProfileGenerator.class)) {
             ProfileGenerator.newInstance(count).forEach(profile -> consumer.tell(profile, collector));
-        } else if (profileClass.equals(ProfileProtos.Profile.class)) {
+        } else if (profileClass.equals(ProfileProtos.Profile.class) || profileClass.equals(ProfileProtoGenerator.class)) {
             ProfileProtoGenerator.newInstance(count).forEach(profile -> consumer.tell(profile, collector));
-        } else if (profileClass.equals(com.senacor.hackingdays.serialization.data.thrift.Profile.class)) {
+        } else if (profileClass.equals(com.senacor.hackingdays.serialization.data.thrift.Profile.class) || profileClass.equals(ProfileGeneratorThrift.class)) {
             ProfileGeneratorThrift.newInstance(count).forEach(profile -> consumer.tell(profile, collector));
         }
     }
