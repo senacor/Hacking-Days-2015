@@ -42,7 +42,7 @@ public class DisruptorTest {
         // Get the ring buffer from the Disruptor to be used for publishing.
         RingBuffer<DisruptorEnvelope> ringBuffer = disruptor.getRingBuffer();
 
-        ProfileGenerator profiles = new ProfileGenerator(SAMPLE_SIZE);
+        ProfileGenerator profiles = ProfileGenerator.newInstance(SAMPLE_SIZE);
 
         stopwatch.start();
         profiles.forEach(profile -> ringBuffer.publishEvent((envelope, sequence) -> envelope.setProfile(profile)));
@@ -66,7 +66,7 @@ public class DisruptorTest {
         QueueConsumer consumer = new QueueConsumer(queue, latch);
 
         Stopwatch stopwatch = Stopwatch.createStarted();
-        new ProfileGenerator(SAMPLE_SIZE).forEach(profile -> executor.execute(() -> publisher.publish(profile)));
+        ProfileGenerator.newInstance(SAMPLE_SIZE).forEach(profile -> executor.execute(() -> publisher.publish(profile)));
 
 
         IntStream.range(1, 10).forEach(i -> executor.execute(() -> consumer.poll()));
