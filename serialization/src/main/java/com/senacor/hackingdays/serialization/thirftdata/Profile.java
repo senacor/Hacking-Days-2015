@@ -54,10 +54,18 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
   }
 
   public String name; // required
-  public int gender; // required
+  /**
+   * 
+   * @see com.senacor.hackingdays.serialization.thirftdata.Gender
+   */
+  public Gender gender; // required
   public int age; // required
   public Location location; // required
-  public int relationShip; // required
+  /**
+   * 
+   * @see RelationShipStatus
+   */
+  public RelationShipStatus relationShip; // required
   public boolean smoker; // required
   public Seeking seeking; // required
   public Activity activity; // required
@@ -65,9 +73,17 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     NAME((short)1, "name"),
+    /**
+     * 
+     * @see com.senacor.hackingdays.serialization.thirftdata.Gender
+     */
     GENDER((short)2, "gender"),
     AGE((short)3, "age"),
     LOCATION((short)4, "location"),
+    /**
+     * 
+     * @see RelationShipStatus
+     */
     RELATION_SHIP((short)5, "relationShip"),
     SMOKER((short)6, "smoker"),
     SEEKING((short)7, "seeking"),
@@ -142,10 +158,8 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
   }
 
   // isset id assignments
-  private static final int __GENDER_ISSET_ID = 0;
-  private static final int __AGE_ISSET_ID = 1;
-  private static final int __RELATIONSHIP_ISSET_ID = 2;
-  private static final int __SMOKER_ISSET_ID = 3;
+  private static final int __AGE_ISSET_ID = 0;
+  private static final int __SMOKER_ISSET_ID = 1;
   private byte __isset_bitfield = 0;
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
@@ -153,13 +167,13 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
     tmpMap.put(_Fields.NAME, new org.apache.thrift.meta_data.FieldMetaData("name", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.GENDER, new org.apache.thrift.meta_data.FieldMetaData("gender", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+        new org.apache.thrift.meta_data.EnumMetaData(org.apache.thrift.protocol.TType.ENUM, Gender.class)));
     tmpMap.put(_Fields.AGE, new org.apache.thrift.meta_data.FieldMetaData("age", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
     tmpMap.put(_Fields.LOCATION, new org.apache.thrift.meta_data.FieldMetaData("location", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "Location")));
     tmpMap.put(_Fields.RELATION_SHIP, new org.apache.thrift.meta_data.FieldMetaData("relationShip", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+        new org.apache.thrift.meta_data.EnumMetaData(org.apache.thrift.protocol.TType.ENUM, RelationShipStatus.class)));
     tmpMap.put(_Fields.SMOKER, new org.apache.thrift.meta_data.FieldMetaData("smoker", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
     tmpMap.put(_Fields.SEEKING, new org.apache.thrift.meta_data.FieldMetaData("seeking", org.apache.thrift.TFieldRequirementType.DEFAULT, 
@@ -175,10 +189,10 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
 
   public Profile(
     String name,
-    int gender,
+    Gender gender,
     int age,
     Location location,
-    int relationShip,
+    RelationShipStatus relationShip,
     boolean smoker,
     Seeking seeking,
     Activity activity)
@@ -186,12 +200,10 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
     this();
     this.name = name;
     this.gender = gender;
-    setGenderIsSet(true);
     this.age = age;
     setAgeIsSet(true);
     this.location = location;
     this.relationShip = relationShip;
-    setRelationShipIsSet(true);
     this.smoker = smoker;
     setSmokerIsSet(true);
     this.seeking = seeking;
@@ -206,12 +218,16 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
     if (other.isSetName()) {
       this.name = other.name;
     }
-    this.gender = other.gender;
+    if (other.isSetGender()) {
+      this.gender = other.gender;
+    }
     this.age = other.age;
     if (other.isSetLocation()) {
       this.location = other.location;
     }
-    this.relationShip = other.relationShip;
+    if (other.isSetRelationShip()) {
+      this.relationShip = other.relationShip;
+    }
     this.smoker = other.smoker;
     if (other.isSetSeeking()) {
       this.seeking = other.seeking;
@@ -228,13 +244,11 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
   @Override
   public void clear() {
     this.name = null;
-    setGenderIsSet(false);
-    this.gender = 0;
+    this.gender = null;
     setAgeIsSet(false);
     this.age = 0;
     this.location = null;
-    setRelationShipIsSet(false);
-    this.relationShip = 0;
+    this.relationShip = null;
     setSmokerIsSet(false);
     this.smoker = false;
     this.seeking = null;
@@ -265,27 +279,36 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
     }
   }
 
-  public int getGender() {
+  /**
+   * 
+   * @see com.senacor.hackingdays.serialization.thirftdata.Gender
+   */
+  public Gender getGender() {
     return this.gender;
   }
 
-  public Profile setGender(int gender) {
+  /**
+   * 
+   * @see com.senacor.hackingdays.serialization.thirftdata.Gender
+   */
+  public Profile setGender(Gender gender) {
     this.gender = gender;
-    setGenderIsSet(true);
     return this;
   }
 
   public void unsetGender() {
-    __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __GENDER_ISSET_ID);
+    this.gender = null;
   }
 
   /** Returns true if field gender is set (has been assigned a value) and false otherwise */
   public boolean isSetGender() {
-    return EncodingUtils.testBit(__isset_bitfield, __GENDER_ISSET_ID);
+    return this.gender != null;
   }
 
   public void setGenderIsSet(boolean value) {
-    __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __GENDER_ISSET_ID, value);
+    if (!value) {
+      this.gender = null;
+    }
   }
 
   public int getAge() {
@@ -335,27 +358,36 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
     }
   }
 
-  public int getRelationShip() {
+  /**
+   * 
+   * @see RelationShipStatus
+   */
+  public RelationShipStatus getRelationShip() {
     return this.relationShip;
   }
 
-  public Profile setRelationShip(int relationShip) {
+  /**
+   * 
+   * @see RelationShipStatus
+   */
+  public Profile setRelationShip(RelationShipStatus relationShip) {
     this.relationShip = relationShip;
-    setRelationShipIsSet(true);
     return this;
   }
 
   public void unsetRelationShip() {
-    __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __RELATIONSHIP_ISSET_ID);
+    this.relationShip = null;
   }
 
   /** Returns true if field relationShip is set (has been assigned a value) and false otherwise */
   public boolean isSetRelationShip() {
-    return EncodingUtils.testBit(__isset_bitfield, __RELATIONSHIP_ISSET_ID);
+    return this.relationShip != null;
   }
 
   public void setRelationShipIsSet(boolean value) {
-    __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __RELATIONSHIP_ISSET_ID, value);
+    if (!value) {
+      this.relationShip = null;
+    }
   }
 
   public boolean isSmoker() {
@@ -443,7 +475,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
       if (value == null) {
         unsetGender();
       } else {
-        setGender((Integer)value);
+        setGender((Gender)value);
       }
       break;
 
@@ -467,7 +499,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
       if (value == null) {
         unsetRelationShip();
       } else {
-        setRelationShip((Integer)value);
+        setRelationShip((RelationShipStatus)value);
       }
       break;
 
@@ -577,12 +609,12 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
         return false;
     }
 
-    boolean this_present_gender = true;
-    boolean that_present_gender = true;
+    boolean this_present_gender = true && this.isSetGender();
+    boolean that_present_gender = true && that.isSetGender();
     if (this_present_gender || that_present_gender) {
       if (!(this_present_gender && that_present_gender))
         return false;
-      if (this.gender != that.gender)
+      if (!this.gender.equals(that.gender))
         return false;
     }
 
@@ -604,12 +636,12 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
         return false;
     }
 
-    boolean this_present_relationShip = true;
-    boolean that_present_relationShip = true;
+    boolean this_present_relationShip = true && this.isSetRelationShip();
+    boolean that_present_relationShip = true && that.isSetRelationShip();
     if (this_present_relationShip || that_present_relationShip) {
       if (!(this_present_relationShip && that_present_relationShip))
         return false;
-      if (this.relationShip != that.relationShip)
+      if (!this.relationShip.equals(that.relationShip))
         return false;
     }
 
@@ -652,10 +684,10 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
     if (present_name)
       list.add(name);
 
-    boolean present_gender = true;
+    boolean present_gender = true && (isSetGender());
     list.add(present_gender);
     if (present_gender)
-      list.add(gender);
+      list.add(gender.getValue());
 
     boolean present_age = true;
     list.add(present_age);
@@ -667,10 +699,10 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
     if (present_location)
       list.add(location);
 
-    boolean present_relationShip = true;
+    boolean present_relationShip = true && (isSetRelationShip());
     list.add(present_relationShip);
     if (present_relationShip)
-      list.add(relationShip);
+      list.add(relationShip.getValue());
 
     boolean present_smoker = true;
     list.add(present_smoker);
@@ -785,11 +817,11 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
     return _Fields.findByThriftId(fieldId);
   }
 
-  public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+  public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
     schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
   }
 
-  public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+  public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
     schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
   }
 
@@ -807,7 +839,11 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
     first = false;
     if (!first) sb.append(", ");
     sb.append("gender:");
-    sb.append(this.gender);
+    if (this.gender == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.gender);
+    }
     first = false;
     if (!first) sb.append(", ");
     sb.append("age:");
@@ -823,7 +859,11 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
     first = false;
     if (!first) sb.append(", ");
     sb.append("relationShip:");
-    sb.append(this.relationShip);
+    if (this.relationShip == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.relationShip);
+    }
     first = false;
     if (!first) sb.append(", ");
     sb.append("smoker:");
@@ -849,7 +889,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
     return sb.toString();
   }
 
-  public void validate() throws org.apache.thrift.TException {
+  public void validate() throws TException {
     // check for required fields
     // check for sub-struct validity
   }
@@ -857,7 +897,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
     try {
       write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-    } catch (org.apache.thrift.TException te) {
+    } catch (TException te) {
       throw new java.io.IOException(te);
     }
   }
@@ -867,7 +907,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
       // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
       __isset_bitfield = 0;
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-    } catch (org.apache.thrift.TException te) {
+    } catch (TException te) {
       throw new java.io.IOException(te);
     }
   }
@@ -880,7 +920,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
 
   private static class ProfileStandardScheme extends StandardScheme<Profile> {
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot, Profile struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot, Profile struct) throws TException {
       org.apache.thrift.protocol.TField schemeField;
       iprot.readStructBegin();
       while (true)
@@ -900,7 +940,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
             break;
           case 2: // GENDER
             if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
-              struct.gender = iprot.readI32();
+              struct.gender = Gender.findByValue(iprot.readI32());
               struct.setGenderIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
@@ -925,7 +965,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
             break;
           case 5: // RELATION_SHIP
             if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
-              struct.relationShip = iprot.readI32();
+              struct.relationShip = com.senacor.hackingdays.serialization.thirftdata.RelationShipStatus.findByValue(iprot.readI32());
               struct.setRelationShipIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
@@ -968,7 +1008,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
       struct.validate();
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot, Profile struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot, Profile struct) throws TException {
       struct.validate();
 
       oprot.writeStructBegin(STRUCT_DESC);
@@ -977,9 +1017,11 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
         oprot.writeString(struct.name);
         oprot.writeFieldEnd();
       }
-      oprot.writeFieldBegin(GENDER_FIELD_DESC);
-      oprot.writeI32(struct.gender);
-      oprot.writeFieldEnd();
+      if (struct.gender != null) {
+        oprot.writeFieldBegin(GENDER_FIELD_DESC);
+        oprot.writeI32(struct.gender.getValue());
+        oprot.writeFieldEnd();
+      }
       oprot.writeFieldBegin(AGE_FIELD_DESC);
       oprot.writeI32(struct.age);
       oprot.writeFieldEnd();
@@ -988,9 +1030,11 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
         struct.location.write(oprot);
         oprot.writeFieldEnd();
       }
-      oprot.writeFieldBegin(RELATION_SHIP_FIELD_DESC);
-      oprot.writeI32(struct.relationShip);
-      oprot.writeFieldEnd();
+      if (struct.relationShip != null) {
+        oprot.writeFieldBegin(RELATION_SHIP_FIELD_DESC);
+        oprot.writeI32(struct.relationShip.getValue());
+        oprot.writeFieldEnd();
+      }
       oprot.writeFieldBegin(SMOKER_FIELD_DESC);
       oprot.writeBool(struct.smoker);
       oprot.writeFieldEnd();
@@ -1019,7 +1063,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
   private static class ProfileTupleScheme extends TupleScheme<Profile> {
 
     @Override
-    public void write(org.apache.thrift.protocol.TProtocol prot, Profile struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol prot, Profile struct) throws TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
       BitSet optionals = new BitSet();
       if (struct.isSetName()) {
@@ -1051,7 +1095,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
         oprot.writeString(struct.name);
       }
       if (struct.isSetGender()) {
-        oprot.writeI32(struct.gender);
+        oprot.writeI32(struct.gender.getValue());
       }
       if (struct.isSetAge()) {
         oprot.writeI32(struct.age);
@@ -1060,7 +1104,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
         struct.location.write(oprot);
       }
       if (struct.isSetRelationShip()) {
-        oprot.writeI32(struct.relationShip);
+        oprot.writeI32(struct.relationShip.getValue());
       }
       if (struct.isSetSmoker()) {
         oprot.writeBool(struct.smoker);
@@ -1074,7 +1118,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
     }
 
     @Override
-    public void read(org.apache.thrift.protocol.TProtocol prot, Profile struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol prot, Profile struct) throws TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       BitSet incoming = iprot.readBitSet(8);
       if (incoming.get(0)) {
@@ -1082,7 +1126,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
         struct.setNameIsSet(true);
       }
       if (incoming.get(1)) {
-        struct.gender = iprot.readI32();
+        struct.gender = Gender.findByValue(iprot.readI32());
         struct.setGenderIsSet(true);
       }
       if (incoming.get(2)) {
@@ -1095,7 +1139,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
         struct.setLocationIsSet(true);
       }
       if (incoming.get(4)) {
-        struct.relationShip = iprot.readI32();
+        struct.relationShip = com.senacor.hackingdays.serialization.thirftdata.RelationShipStatus.findByValue(iprot.readI32());
         struct.setRelationShipIsSet(true);
       }
       if (incoming.get(5)) {

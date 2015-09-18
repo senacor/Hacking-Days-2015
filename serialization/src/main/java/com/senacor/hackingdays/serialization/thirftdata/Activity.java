@@ -341,11 +341,11 @@ public class Activity implements org.apache.thrift.TBase<Activity, Activity._Fie
     return _Fields.findByThriftId(fieldId);
   }
 
-  public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+  public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
     schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
   }
 
-  public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+  public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
     schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
   }
 
@@ -365,7 +365,7 @@ public class Activity implements org.apache.thrift.TBase<Activity, Activity._Fie
     return sb.toString();
   }
 
-  public void validate() throws org.apache.thrift.TException {
+  public void validate() throws TException {
     // check for required fields
     // check for sub-struct validity
   }
@@ -373,7 +373,7 @@ public class Activity implements org.apache.thrift.TBase<Activity, Activity._Fie
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
     try {
       write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-    } catch (org.apache.thrift.TException te) {
+    } catch (TException te) {
       throw new java.io.IOException(te);
     }
   }
@@ -383,7 +383,7 @@ public class Activity implements org.apache.thrift.TBase<Activity, Activity._Fie
       // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
       __isset_bitfield = 0;
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-    } catch (org.apache.thrift.TException te) {
+    } catch (TException te) {
       throw new java.io.IOException(te);
     }
   }
@@ -396,7 +396,7 @@ public class Activity implements org.apache.thrift.TBase<Activity, Activity._Fie
 
   private static class ActivityStandardScheme extends StandardScheme<Activity> {
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot, Activity struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot, Activity struct) throws TException {
       org.apache.thrift.protocol.TField schemeField;
       iprot.readStructBegin();
       while (true)
@@ -433,7 +433,7 @@ public class Activity implements org.apache.thrift.TBase<Activity, Activity._Fie
       struct.validate();
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot, Activity struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot, Activity struct) throws TException {
       struct.validate();
 
       oprot.writeStructBegin(STRUCT_DESC);
@@ -458,7 +458,7 @@ public class Activity implements org.apache.thrift.TBase<Activity, Activity._Fie
   private static class ActivityTupleScheme extends TupleScheme<Activity> {
 
     @Override
-    public void write(org.apache.thrift.protocol.TProtocol prot, Activity struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol prot, Activity struct) throws TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
       BitSet optionals = new BitSet();
       if (struct.isSetLastLoginTimestamp()) {
@@ -477,7 +477,7 @@ public class Activity implements org.apache.thrift.TBase<Activity, Activity._Fie
     }
 
     @Override
-    public void read(org.apache.thrift.protocol.TProtocol prot, Activity struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol prot, Activity struct) throws TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       BitSet incoming = iprot.readBitSet(2);
       if (incoming.get(0)) {

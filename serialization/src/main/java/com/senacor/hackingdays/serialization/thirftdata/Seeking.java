@@ -47,11 +47,19 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
     schemes.put(TupleScheme.class, new SeekingTupleSchemeFactory());
   }
 
-  public int gender; // required
+  /**
+   * 
+   * @see com.senacor.hackingdays.serialization.thirftdata.Gender
+   */
+  public Gender gender; // required
   public Range ageRange; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+    /**
+     * 
+     * @see com.senacor.hackingdays.serialization.thirftdata.Gender
+     */
     GENDER((short)1, "gender"),
     AGE_RANGE((short)2, "ageRange");
 
@@ -112,13 +120,11 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
   }
 
   // isset id assignments
-  private static final int __GENDER_ISSET_ID = 0;
-  private byte __isset_bitfield = 0;
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.GENDER, new org.apache.thrift.meta_data.FieldMetaData("gender", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+        new org.apache.thrift.meta_data.EnumMetaData(org.apache.thrift.protocol.TType.ENUM, Gender.class)));
     tmpMap.put(_Fields.AGE_RANGE, new org.apache.thrift.meta_data.FieldMetaData("ageRange", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Range.class)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -129,12 +135,11 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
   }
 
   public Seeking(
-    int gender,
+    Gender gender,
     Range ageRange)
   {
     this();
     this.gender = gender;
-    setGenderIsSet(true);
     this.ageRange = ageRange;
   }
 
@@ -142,8 +147,9 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
    * Performs a deep copy on <i>other</i>.
    */
   public Seeking(Seeking other) {
-    __isset_bitfield = other.__isset_bitfield;
-    this.gender = other.gender;
+    if (other.isSetGender()) {
+      this.gender = other.gender;
+    }
     if (other.isSetAgeRange()) {
       this.ageRange = new Range(other.ageRange);
     }
@@ -155,32 +161,40 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
 
   @Override
   public void clear() {
-    setGenderIsSet(false);
-    this.gender = 0;
+    this.gender = null;
     this.ageRange = null;
   }
 
-  public int getGender() {
+  /**
+   * 
+   * @see com.senacor.hackingdays.serialization.thirftdata.Gender
+   */
+  public Gender getGender() {
     return this.gender;
   }
 
-  public Seeking setGender(int gender) {
+  /**
+   * 
+   * @see com.senacor.hackingdays.serialization.thirftdata.Gender
+   */
+  public Seeking setGender(Gender gender) {
     this.gender = gender;
-    setGenderIsSet(true);
     return this;
   }
 
   public void unsetGender() {
-    __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __GENDER_ISSET_ID);
+    this.gender = null;
   }
 
   /** Returns true if field gender is set (has been assigned a value) and false otherwise */
   public boolean isSetGender() {
-    return EncodingUtils.testBit(__isset_bitfield, __GENDER_ISSET_ID);
+    return this.gender != null;
   }
 
   public void setGenderIsSet(boolean value) {
-    __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __GENDER_ISSET_ID, value);
+    if (!value) {
+      this.gender = null;
+    }
   }
 
   public Range getAgeRange() {
@@ -213,7 +227,7 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
       if (value == null) {
         unsetGender();
       } else {
-        setGender((Integer)value);
+        setGender((Gender)value);
       }
       break;
 
@@ -268,12 +282,12 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
     if (that == null)
       return false;
 
-    boolean this_present_gender = true;
-    boolean that_present_gender = true;
+    boolean this_present_gender = true && this.isSetGender();
+    boolean that_present_gender = true && that.isSetGender();
     if (this_present_gender || that_present_gender) {
       if (!(this_present_gender && that_present_gender))
         return false;
-      if (this.gender != that.gender)
+      if (!this.gender.equals(that.gender))
         return false;
     }
 
@@ -293,10 +307,10 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
   public int hashCode() {
     List<Object> list = new ArrayList<Object>();
 
-    boolean present_gender = true;
+    boolean present_gender = true && (isSetGender());
     list.add(present_gender);
     if (present_gender)
-      list.add(gender);
+      list.add(gender.getValue());
 
     boolean present_ageRange = true && (isSetAgeRange());
     list.add(present_ageRange);
@@ -341,11 +355,11 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
     return _Fields.findByThriftId(fieldId);
   }
 
-  public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+  public void read(org.apache.thrift.protocol.TProtocol iprot) throws TException {
     schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
   }
 
-  public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+  public void write(org.apache.thrift.protocol.TProtocol oprot) throws TException {
     schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
   }
 
@@ -355,7 +369,11 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
     boolean first = true;
 
     sb.append("gender:");
-    sb.append(this.gender);
+    if (this.gender == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.gender);
+    }
     first = false;
     if (!first) sb.append(", ");
     sb.append("ageRange:");
@@ -369,7 +387,7 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
     return sb.toString();
   }
 
-  public void validate() throws org.apache.thrift.TException {
+  public void validate() throws TException {
     // check for required fields
     // check for sub-struct validity
     if (ageRange != null) {
@@ -380,17 +398,15 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
     try {
       write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-    } catch (org.apache.thrift.TException te) {
+    } catch (TException te) {
       throw new java.io.IOException(te);
     }
   }
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     try {
-      // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
-      __isset_bitfield = 0;
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-    } catch (org.apache.thrift.TException te) {
+    } catch (TException te) {
       throw new java.io.IOException(te);
     }
   }
@@ -403,7 +419,7 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
 
   private static class SeekingStandardScheme extends StandardScheme<Seeking> {
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot, Seeking struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot, Seeking struct) throws TException {
       org.apache.thrift.protocol.TField schemeField;
       iprot.readStructBegin();
       while (true)
@@ -415,7 +431,7 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
         switch (schemeField.id) {
           case 1: // GENDER
             if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
-              struct.gender = iprot.readI32();
+              struct.gender = Gender.findByValue(iprot.readI32());
               struct.setGenderIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
@@ -441,13 +457,15 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
       struct.validate();
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot, Seeking struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot, Seeking struct) throws TException {
       struct.validate();
 
       oprot.writeStructBegin(STRUCT_DESC);
-      oprot.writeFieldBegin(GENDER_FIELD_DESC);
-      oprot.writeI32(struct.gender);
-      oprot.writeFieldEnd();
+      if (struct.gender != null) {
+        oprot.writeFieldBegin(GENDER_FIELD_DESC);
+        oprot.writeI32(struct.gender.getValue());
+        oprot.writeFieldEnd();
+      }
       if (struct.ageRange != null) {
         oprot.writeFieldBegin(AGE_RANGE_FIELD_DESC);
         struct.ageRange.write(oprot);
@@ -468,7 +486,7 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
   private static class SeekingTupleScheme extends TupleScheme<Seeking> {
 
     @Override
-    public void write(org.apache.thrift.protocol.TProtocol prot, Seeking struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol prot, Seeking struct) throws TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
       BitSet optionals = new BitSet();
       if (struct.isSetGender()) {
@@ -479,7 +497,7 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
       }
       oprot.writeBitSet(optionals, 2);
       if (struct.isSetGender()) {
-        oprot.writeI32(struct.gender);
+        oprot.writeI32(struct.gender.getValue());
       }
       if (struct.isSetAgeRange()) {
         struct.ageRange.write(oprot);
@@ -487,11 +505,11 @@ public class Seeking implements org.apache.thrift.TBase<Seeking, Seeking._Fields
     }
 
     @Override
-    public void read(org.apache.thrift.protocol.TProtocol prot, Seeking struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol prot, Seeking struct) throws TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       BitSet incoming = iprot.readBitSet(2);
       if (incoming.get(0)) {
-        struct.gender = iprot.readI32();
+        struct.gender = Gender.findByValue(iprot.readI32());
         struct.setGenderIsSet(true);
       }
       if (incoming.get(1)) {

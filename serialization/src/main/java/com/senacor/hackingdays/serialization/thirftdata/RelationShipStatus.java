@@ -11,14 +11,14 @@ import java.util.Map;
 import java.util.HashMap;
 import org.apache.thrift.TEnum;
 
-public enum Gender implements TEnum {
-  Male(0),
-  Female(1),
-  Disambiguous(2);
+public enum RelationShipStatus implements TEnum {
+  Divorced(0),
+  Maried(1),
+  Single(2);
 
   private final int value;
 
-  private Gender(int value) {
+  private RelationShipStatus(int value) {
     this.value = value;
   }
 
@@ -33,14 +33,14 @@ public enum Gender implements TEnum {
    * Find a the enum type by its integer value, as defined in the Thrift IDL.
    * @return null if the value is not found.
    */
-  public static Gender findByValue(int value) { 
+  public static RelationShipStatus findByValue(int value) { 
     switch (value) {
       case 0:
-        return Male;
+        return Divorced;
       case 1:
-        return Female;
+        return Maried;
       case 2:
-        return Disambiguous;
+        return Single;
       default:
         return null;
     }
