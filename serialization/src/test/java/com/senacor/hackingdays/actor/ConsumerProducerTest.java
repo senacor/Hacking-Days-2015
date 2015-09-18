@@ -14,6 +14,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
+import com.senacor.hackingdays.serialization.data.Activity;
+import com.senacor.hackingdays.serialization.data.Location;
+import com.senacor.hackingdays.serialization.data.Seeking;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,7 +71,8 @@ public class ConsumerProducerTest {
         stopwatch.stop();
         shutdown(actorSystem);
         System.err.println(
-            String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+        String.format("Sending %s dating profiles with %25s took %4s millis.", COUNT, serializerName,
+            stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
     private void shutdown(ActorSystem actorSystem) {
@@ -90,7 +94,8 @@ public class ConsumerProducerTest {
         Await.result(ask, timeout.duration());
         stopwatch.stop();
         shutdown(actorSystem);
-        System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+    System.err.println(String.format("Sending %s dating profiles with %25s took %4s millis.", COUNT, serializerName,
+        stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
   @Test
@@ -107,7 +112,8 @@ public class ConsumerProducerTest {
     Await.result(ask, timeout.duration());
     stopwatch.stop();
     shutdown(actorSystem);
-    System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+    System.err.println(String.format("Sending %s dating profiles with %25s took %4s millis.", COUNT, serializerName,
+        stopwatch.elapsed(TimeUnit.MILLISECONDS)));
   }
 
     @Test
@@ -120,7 +126,7 @@ public class ConsumerProducerTest {
         Thread.sleep(200);
         shutdown(actorSystem);
 
-        System.err.println(String.format("Serializing a Profile with %s weights %s bytes.", serializerName, length));
+    System.err.println(String.format("Serializing a Profile with %25s weights %4s bytes.", serializerName, length));
     }
 
     @Test
@@ -149,22 +155,26 @@ public class ConsumerProducerTest {
         shutdown(actorSystem);
 
         Assert.assertNotNull(output);
-        Assert.assertNotNull(output.getActivity());
-        Assert.assertNotNull(output.getLocation());
-        Assert.assertNotNull(output.getSeeking());
+        Activity activity = output.getActivity();
+        Assert.assertNotNull(activity);
+        Location location = output.getLocation();
+        Assert.assertNotNull(location);
+        Seeking seeking = output.getSeeking();
+        Assert.assertNotNull(seeking);
+        Assert.assertNotNull(output.getName());
 
-        Assert.assertEquals(input.getActivity().getLastLogin(), output.getActivity().getLastLogin());
-        Assert.assertEquals(input.getActivity().getLoginCount(), output.getActivity().getLoginCount());
+        Assert.assertEquals(input.getActivity().getLastLogin(), activity.getLastLogin());
+        Assert.assertEquals(input.getActivity().getLoginCount(), activity.getLoginCount());
         Assert.assertEquals(input.getAge(), output.getAge());
         Assert.assertEquals(input.getGender(), output.getGender());
-        Assert.assertEquals(input.getLocation().getCity(), output.getLocation().getCity());
-        Assert.assertEquals(input.getLocation().getState(), output.getLocation().getState());
-        Assert.assertEquals(input.getLocation().getZip(), output.getLocation().getZip());
+        Assert.assertEquals(input.getLocation().getCity(), location.getCity());
+        Assert.assertEquals(input.getLocation().getState(), location.getState());
+        Assert.assertEquals(input.getLocation().getZip(), location.getZip());
         Assert.assertEquals(input.getName(), output.getName());
         Assert.assertEquals(input.getRelationShip(), output.getRelationShip());
-        Assert.assertEquals(input.getSeeking().getAgeRange().getLower(), output.getSeeking().getAgeRange().getLower());
-        Assert.assertEquals(input.getSeeking().getAgeRange().getUpper(), output.getSeeking().getAgeRange().getUpper());
-        Assert.assertEquals(input.getSeeking().getGender(), output.getSeeking().getGender());
+        Assert.assertEquals(input.getSeeking().getAgeRange().getLower(), seeking.getAgeRange().getLower());
+        Assert.assertEquals(input.getSeeking().getAgeRange().getUpper(), seeking.getAgeRange().getUpper());
+        Assert.assertEquals(input.getSeeking().getGender(), seeking.getGender());
     }
 
 	static Object[] serializers() throws IOException {

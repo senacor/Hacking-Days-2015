@@ -13,6 +13,6 @@ public class ConsumerLauncher {
     public static void main(String[] args) {
         ActorSystem actorSystem = ActorSystem.create("consumer-actorsystem", createConfig("java", "akka.serialization.JavaSerializer", "application-remote.conf"));
         ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActor.class, () -> new ConsumerActor()), "consumer");
-        System.out.println("Startet consumer " + consumer);
+        System.out.println("Started consumer " + consumer);
     }
 }
