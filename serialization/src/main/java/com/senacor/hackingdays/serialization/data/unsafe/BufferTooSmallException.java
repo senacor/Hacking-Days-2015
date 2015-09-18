@@ -8,14 +8,11 @@
  * $Date: $ 
  * $Author: $ 
  */
-package com.senacor.hackingdays.serialization.data;
+package com.senacor.hackingdays.serialization.data.unsafe;
 
 /**
  * @author ccharles
  * @version $LastChangedVersion$
  */
-public interface UnsafeSerializable {
-
-  void serializeUnsafe(final UnsafeMemory memory);
-
+public class BufferTooSmallException extends Exception {
 }
