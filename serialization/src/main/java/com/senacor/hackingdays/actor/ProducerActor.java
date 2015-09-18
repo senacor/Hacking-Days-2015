@@ -6,6 +6,9 @@ import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.ReceiveBuilder;
+import akka.serialization.Serialization;
+import akka.serialization.SerializationExtension;
+import com.senacor.hackingdays.serialization.data.generate.DataGenerator;
 import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
 import scala.PartialFunction;
 import scala.runtime.BoxedUnit;
@@ -22,13 +25,23 @@ public class ProducerActor extends AbstractActor {
 
     private PartialFunction<Object, BoxedUnit> messageHandler() {
         return ReceiveBuilder
-                .match(GenerateMessages.class, msg -> sendMessagesToConsumer(msg.getCount()))
+                .match(GenerateMessages.class, msg -> sendMessagesToConsumer(msg.getCount(), msg.getGenerator()))
                 .build();
     }
 
-    private void sendMessagesToConsumer(int count) {
+    private void sendMessagesToConsumer(int count, Class<DataGenerator> generatorClazz) {
         ActorRef collector = context().actorOf(AckCollector.props(count, sender()), "collector");
-        ProfileGenerator.newInstance(count).stream().forEach(profile -> consumer.tell(profile, collector));
+
+        if (generatorClazz != null) {
+          try {
+            DataGenerator generator = generatorClazz.newInstance();
+            generator.doEach(count, profile -> consumer.tell(profile, collector));
+          } catch (InstantiationException|IllegalAccessException e) {
+            throw new RuntimeException(e);
+          }
+        } else {
+          ProfileGenerator.newInstance(count).stream().forEach(profile -> consumer.tell(profile, collector));
+        }
     }
 
 

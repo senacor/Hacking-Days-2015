@@ -20,16 +20,34 @@ public class ConsumerActor extends AbstractActor {
 
     private PartialFunction<Object, BoxedUnit> messageHandler() {
         return ReceiveBuilder
-                .match(Profile.class, profile -> ack(profile))
+                .match(com.senacor.hackingdays.serialization.data.Profile.class, profile -> ack(profile))
+                .match(com.senacor.hackingdays.serialization.data.thrift.Profile.class, profile -> ack(profile))
+                .match(com.senacor.hackingdays.serialization.data.proto.ProfileProtos.class, profile -> ack(profile))
                 .build();
     }
 
-    private void ack(Profile profile) {
+    private void ack(com.senacor.hackingdays.serialization.data.Profile profile) {
         receivedCount++;
 //        if (receivedCount % 100 == 0) {
 //            logger.info(String.format("received profile # %s for %s", receivedCount, profile.getName()));
 //        }
         sender().tell("Received", self());
+    }
+
+    private void ack(com.senacor.hackingdays.serialization.data.thrift.Profile profile) {
+      receivedCount++;
+  //        if (receivedCount % 100 == 0) {
+  //            logger.info(String.format("received profile # %s for %s", receivedCount, profile.getName()));
+  //        }
+      sender().tell("Received", self());
+    }
+
+    private void ack(com.senacor.hackingdays.serialization.data.proto.ProfileProtos profile) {
+      receivedCount++;
+      //        if (receivedCount % 100 == 0) {
+      //            logger.info(String.format("received profile # %s for %s", receivedCount, profile.getName()));
+      //        }
+      sender().tell("Received", self());
     }
 
 }

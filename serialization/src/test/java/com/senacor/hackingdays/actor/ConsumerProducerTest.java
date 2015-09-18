@@ -14,6 +14,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
+import com.senacor.hackingdays.serialization.data.generate.ProfileGeneratorThrift;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,36 +74,36 @@ public class ConsumerProducerTest {
     @Test
     @Parameters(method = "serializerProtoBuf")
     public void sendMessagesProtoBuf(String serializerName, String fqcn) throws Exception {
-        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem-protobuf", createConfig(serializerName, fqcn));
+        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem-actorsystem", createConfig(serializerName, fqcn));
         ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActorProto.class, () -> new ConsumerActorProto()), "consumer");
         ActorRef producer = actorSystem.actorOf(Props.create(ProducerActorProto.class, () -> new ProducerActorProto(consumer)), "producer");
 
         Timeout timeout = Timeout.apply(25, TimeUnit.SECONDS);
 
         Stopwatch stopwatch = Stopwatch.createStarted();
-        Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT), timeout);
+        Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT, ProducerActorProto.class), timeout);
         Await.result(ask, timeout.duration());
         stopwatch.stop();
         shutdown(actorSystem);
         System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
-  @Test
-  @Parameters(method = "serializerThrift")
-  public void sendMessagesThrift(String serializerName, String fqcn) throws Exception {
-    ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem-thrift", createConfig(serializerName, fqcn));
-    ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActorThrift.class, () -> new ConsumerActorThrift()), "consumer");
-    ActorRef producer = actorSystem.actorOf(Props.create(ProducerActorThrift.class, () -> new ProducerActorThrift(consumer)), "producer");
+    @Test
+    @Parameters(method = "serializerThrift")
+    public void sendMessagesThrift(String serializerName, String fqcn) throws Exception {
+      ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem-actorsystem", createConfig(serializerName, fqcn));
+      ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActorThrift.class, () -> new ConsumerActorThrift()), "consumer");
+      ActorRef producer = actorSystem.actorOf(Props.create(ProducerActorThrift.class, () -> new ProducerActorThrift(consumer)), "producer");
 
-    Timeout timeout = Timeout.apply(25, TimeUnit.SECONDS);
+      Timeout timeout = Timeout.apply(25, TimeUnit.SECONDS);
 
-    Stopwatch stopwatch = Stopwatch.createStarted();
-    Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT), timeout);
-    Await.result(ask, timeout.duration());
-    stopwatch.stop();
-    shutdown(actorSystem);
-    System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
-  }
+      Stopwatch stopwatch = Stopwatch.createStarted();
+      Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT, ProfileGeneratorThrift.class), timeout);
+      Await.result(ask, timeout.duration());
+      stopwatch.stop();
+      shutdown(actorSystem);
+      System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+    }
 
     @Test
     @Parameters(method = "serializers")
@@ -120,9 +121,9 @@ public class ConsumerProducerTest {
     @Test
     @Parameters(method = "serializers")
     public void assertFields(String serializerName, String fqcn) throws Exception {
-        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
+        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem-thrift", createConfig(serializerName, fqcn));
 
-        Serializer serializer = SerializationExtension.get(actorSystem).serializerFor(Profile.class);
+        Serializer serializer = SerializationExtension.get(actorSystem).serializerFor(com.senacor.hackingdays.serialization.data.thrift.Profile.class);
 
         Profile input = ProfileGenerator.newProfile();
         Profile output = (Profile) serializer.fromBinary(serializer.toBinary(input), Profile.class);
@@ -147,6 +148,37 @@ public class ConsumerProducerTest {
         Assert.assertEquals(input.getSeeking().getAgeRange().getUpper(), output.getSeeking().getAgeRange().getUpper());
         Assert.assertEquals(input.getSeeking().getGender(), output.getSeeking().getGender());
     }
+
+  @Test
+  @Parameters(method = "serializerThrift")
+  public void assertFieldsThrift(String serializerName, String fqcn) throws Exception {
+    ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
+
+    Serializer serializer = SerializationExtension.get(actorSystem).serializerFor(Profile.class);
+
+    Profile input = ProfileGenerator.newProfile();
+    Profile output = (Profile) serializer.fromBinary(serializer.toBinary(input), Profile.class);
+
+    shutdown(actorSystem);
+
+    Assert.assertNotNull(output);
+    Assert.assertNotNull(output.getActivity());
+    Assert.assertNotNull(output.getLocation());
+    Assert.assertNotNull(output.getSeeking());
+
+    Assert.assertEquals(input.getActivity().getLastLogin(), output.getActivity().getLastLogin());
+    Assert.assertEquals(input.getActivity().getLoginCount(), output.getActivity().getLoginCount());
+    Assert.assertEquals(input.getAge(), output.getAge());
+    Assert.assertEquals(input.getGender(), output.getGender());
+    Assert.assertEquals(input.getLocation().getCity(), output.getLocation().getCity());
+    Assert.assertEquals(input.getLocation().getState(), output.getLocation().getState());
+    Assert.assertEquals(input.getLocation().getZip(), output.getLocation().getZip());
+    Assert.assertEquals(input.getName(), output.getName());
+    Assert.assertEquals(input.getRelationShip(), output.getRelationShip());
+    Assert.assertEquals(input.getSeeking().getAgeRange().getLower(), output.getSeeking().getAgeRange().getLower());
+    Assert.assertEquals(input.getSeeking().getAgeRange().getUpper(), output.getSeeking().getAgeRange().getUpper());
+    Assert.assertEquals(input.getSeeking().getGender(), output.getSeeking().getGender());
+  }
 
 	static Object[] serializers() throws IOException {
 

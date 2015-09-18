@@ -9,9 +9,8 @@ import com.senacor.hackingdays.serialization.data.Seeking;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -24,7 +23,7 @@ import static com.senacor.hackingdays.serialization.data.RelationShipStatus.Divo
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 
-public class ProfileGenerator implements Iterable<Profile> {
+public class ProfileGenerator implements Iterable<Profile>, DataGenerator {
 
     private final static NameSupplier femaleNames = NameSupplier.forGender(Female);
     private final static NameSupplier maleNames = NameSupplier.forGender(Male);
@@ -99,7 +98,12 @@ public class ProfileGenerator implements Iterable<Profile> {
         }
     }
 
-    public static class Builder {
+  @Override
+  public void doEach(int size, Consumer consumer) {
+    new Builder(size).build().iterator().forEachRemaining(o -> consumer.accept(o));
+  }
+
+  public static class Builder {
 
         private Supplier<Integer> ageFunction = ProfileGenerator::randomAge;
         private Supplier<Gender> genderFunction = ProfileGenerator::randomGender;
