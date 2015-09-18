@@ -4,10 +4,14 @@ import static com.senacor.hackingdays.config.ConfigHelper.*;
 import static junitparams.JUnitParamsRunner.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
@@ -83,6 +87,23 @@ public class ConsumerProducerTest {
         System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
+  @Test
+  @Parameters(method = "serializerThrift")
+  public void sendMessagesThrift(String serializerName, String fqcn) throws Exception {
+    ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem-thrift", createConfig(serializerName, fqcn));
+    ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActorThrift.class, () -> new ConsumerActorThrift()), "consumer");
+    ActorRef producer = actorSystem.actorOf(Props.create(ProducerActorThrift.class, () -> new ProducerActorThrift(consumer)), "producer");
+
+    Timeout timeout = Timeout.apply(25, TimeUnit.SECONDS);
+
+    Stopwatch stopwatch = Stopwatch.createStarted();
+    Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT), timeout);
+    Await.result(ask, timeout.duration());
+    stopwatch.stop();
+    shutdown(actorSystem);
+    System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+  }
+
     @Test
     @Parameters(method = "serializers")
     public void calculateObjectSize(String serializerName, String fqcn) throws Exception {
@@ -129,11 +150,18 @@ public class ConsumerProducerTest {
 
 	static Object[] serializers() throws IOException {
 
-		final List<Class<?>> testExceptions = Arrays.asList(ProtoBufSerilalizer.class);
+		final List<Class<ProtoBufSerilalizer>> testExceptions = Arrays.asList(ProtoBufSerilalizer.class);
 
 		Set<ClassInfo> classInfos = ClassPath.from(Serializer.class.getClassLoader())
 				.getTopLevelClasses("com.senacor.hackingdays.serializer");
-		Set<Object[]> resultSet = new HashSet<Object[]>();
+		Set<Object[]> resultSet = new TreeSet<>(new Comparator<Object[]>() {
+
+			@Override
+			public int compare(Object[] o1, Object[] o2) {
+				return o1[0].toString().compareTo(o2[0].toString()) ;
+			}
+			
+		});
 
 		resultSet.add($(JavaSerializer.class.getSimpleName(), JavaSerializer.class.getCanonicalName()));
 
@@ -152,6 +180,18 @@ public class ConsumerProducerTest {
         return $(
                 $("protoBuf", "com.senacor.hackingdays.serializer.ProtoBufSerilalizer")
         );
+    }
+
+    @SuppressWarnings("unusedDeclaration")
+    static Object[] serializerThrift() {
+      return $(
+              $("thrifttuple", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTTuple"),
+              $("thriftbinary", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTBinary"),
+              $("thriftcompact", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTCompact"),
+              $("thriftjson", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTJSON"),
+              $("thriftsimplejson", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTSimpleJSON"),
+              $("thrifttuple", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTTuple")
+      );
     }
 
 
