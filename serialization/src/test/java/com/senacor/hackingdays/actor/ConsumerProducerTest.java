@@ -16,6 +16,8 @@ import akka.util.Timeout;
 import com.google.common.base.Stopwatch;
 import com.senacor.hackingdays.serialization.data.Profile;
 import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.data.generate.ProfileProtoGenerator;
+import com.senacor.hackingdays.serialization.data.proto.ProfileProtos;
 import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -75,6 +77,20 @@ public class ConsumerProducerTest {
 
         Profile p = ProfileGenerator.newInstance(1).iterator().next();
         int length = SerializationExtension.get(actorSystem).serializerFor(Profile.class).toBinary(p).length;
+        Thread.sleep(1000);
+        actorSystem.shutdown();
+        actorSystem.awaitTermination();
+
+        System.err.println(String.format("Serializing a Profile with %s took %s bytes.", serializerName, length));
+    }
+
+    @Test
+    @Parameters(method = "serializerProtoBuf")
+    public void calculateObjectSizeProtoBuf(String serializerName, String fqcn) throws Exception {
+        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
+
+        ProfileProtos.Profile p = ProfileProtoGenerator.newInstance(1).iterator().next();
+        int length = SerializationExtension.get(actorSystem).serializerFor(ProfileProtos.Profile.class).toBinary(p).length;
         Thread.sleep(1000);
         actorSystem.shutdown();
         actorSystem.awaitTermination();
