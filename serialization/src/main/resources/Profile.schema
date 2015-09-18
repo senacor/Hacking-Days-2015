@@ -1,7 +1,7 @@
 @0x9eb32e19f86ee174;
 using Java = import "java.capnp";
-$Java.package("com.senacor.hackingdays.serialization.data");
-$Java.outerClassname("Profile");
+$Java.package("com.senacor.hackingdays.serializer");
+$Java.outerClassname("CapnProtoProfile");
 
 struct ProfileStruct {
   age @0 :UInt32;
@@ -42,15 +42,10 @@ struct ProfileStruct {
   }
 
   struct Activity {
-  lastLogin @0 :Date;
+  lastLogin @0 :UInt64;
   loginCount @1 :UInt32;
   }
 
 
-struct Date {
-  year @0 :UInt32;
-  month @1 :UInt32;
-  day @2 :UInt32;
-}
 
 }

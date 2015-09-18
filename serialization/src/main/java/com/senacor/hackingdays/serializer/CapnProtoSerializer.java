@@ -54,8 +54,7 @@ public class CapnProtoSerializer extends JSerializer {
             profile.setLocation(loc);
 
               profile.setAge(capnProfile.getAge());
-            CapnProtoProfile.ProfileStruct.Date.Reader llCap = capnProfile.getActivity().getLastLogin();
-            Date lastlog = new Date(llCap.getDay(),llCap.getMonth(),llCap.getYear());
+            Date lastlog = new Date(capnProfile.getActivity().getLastLogin());
             Activity act = new Activity(lastlog,capnProfile.getActivity().getLoginCount());
             profile.setActivity(act);
 
@@ -101,10 +100,7 @@ public class CapnProtoSerializer extends JSerializer {
             capnProtoProfile.getSeeking().setGender(CapnProtoProfile.ProfileStruct.Gender.valueOf(profile.getGender().name().toUpperCase()));
             Activity act = profile.getActivity();
             capnProtoProfile.initActivity();
-            capnProtoProfile.getActivity().initLastLogin();
-            capnProtoProfile.getActivity().getLastLogin().setDay(act.getLastLogin().getDay());
-            capnProtoProfile.getActivity().getLastLogin().setMonth(act.getLastLogin().getMonth());
-            capnProtoProfile.getActivity().getLastLogin().setYear(act.getLastLogin().getYear());
+            capnProtoProfile.getActivity().setLastLogin(profile.getActivity().getLastLogin().getTime());
             capnProtoProfile.getActivity().setLoginCount(act.getLoginCount());
 
             //  System.out.println("filled profile after " + stopwatch.elapsed(TimeUnit.MILLISECONDS));
