@@ -1,10 +1,9 @@
 package com.senacor.hackingdays.serializer;
 
-import java.nio.charset.Charset;
-
+import akka.serialization.JSerializer;
 import com.google.gson.Gson;
 
-import akka.serialization.JSerializer;
+import java.nio.charset.Charset;
 
 public class GsonSerializer extends JSerializer {
 
