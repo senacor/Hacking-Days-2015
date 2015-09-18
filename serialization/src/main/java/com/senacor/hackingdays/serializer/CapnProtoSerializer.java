@@ -22,7 +22,7 @@ public class CapnProtoSerializer extends JSerializer {
 
     @Override
     public Object fromBinaryJava(byte[] bytes, Class<?> manifest) {
-        try {
+
 
             if (!CapnProtoProfile.class.getName().equals(manifest.getName())){
                 throw  new RuntimeException("no clue how to de-serialize a "+manifest.getName());
@@ -34,10 +34,7 @@ public class CapnProtoSerializer extends JSerializer {
             Profile profile = new Profile(name,gender);
 
                 return profile;
-        } catch (IOException e) {
-            actorSystem.log().error("Error during serialization: {}", e);
-            throw new UncheckedIOException(e);
-        }
+
     }
 
     @Override
