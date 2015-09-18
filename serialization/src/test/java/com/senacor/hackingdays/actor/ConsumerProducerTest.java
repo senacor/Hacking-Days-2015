@@ -65,7 +65,8 @@ public class ConsumerProducerTest {
         stopwatch.stop();
         shutdown(actorSystem);
         System.err.println(
-            String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+        String.format("Sending %s dating profiles with %25s took %4s millis.", COUNT, serializerName,
+            stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
     private void shutdown(ActorSystem actorSystem) {
@@ -87,7 +88,8 @@ public class ConsumerProducerTest {
         Await.result(ask, timeout.duration());
         stopwatch.stop();
         shutdown(actorSystem);
-        System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+    System.err.println(String.format("Sending %s dating profiles with %25s took %4s millis.", COUNT, serializerName,
+        stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
   @Test
@@ -104,7 +106,8 @@ public class ConsumerProducerTest {
     Await.result(ask, timeout.duration());
     stopwatch.stop();
     shutdown(actorSystem);
-    System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+    System.err.println(String.format("Sending %s dating profiles with %25s took %4s millis.", COUNT, serializerName,
+        stopwatch.elapsed(TimeUnit.MILLISECONDS)));
   }
 
     @Test
@@ -117,7 +120,7 @@ public class ConsumerProducerTest {
         Thread.sleep(200);
         shutdown(actorSystem);
 
-        System.err.println(String.format("Serializing a Profile with %s weights %s bytes.", serializerName, length));
+    System.err.println(String.format("Serializing a Profile with %25s weights %4s bytes.", serializerName, length));
     }
 
     @Test
