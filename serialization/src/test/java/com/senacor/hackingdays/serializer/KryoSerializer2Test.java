@@ -19,13 +19,13 @@ import com.senacor.hackingdays.serialization.data.Seeking;
 /**
  * @author Alasdair Collinson, Senacor Technologies AG
  */
-public class KryoSerializerTest {
+public class KryoSerializer2Test {
 
 	private static final String NAME = "Hans Mueller";
 
 	private Profile profile;
 
-	private KryoSerializer2 kryoSerializer2;
+	private KryoSerializer kryoSerializer;
 
 
 	@Before
@@ -43,16 +43,16 @@ public class KryoSerializerTest {
 		profile.setRelationShip(RelationShipStatus.Maried);
 		profile.setSeeking(new Seeking(Gender.Female, new Range(21, 30)));
 
-		kryoSerializer2 = new KryoSerializer2();
+		kryoSerializer = new KryoSerializer();
 	}
 
     @Test
     public void inputAndOutputAreSame() {
-        final byte[] binaryProfile = kryoSerializer2.toBinary(profile);
+        final byte[] binaryProfile = kryoSerializer.toBinary(profile);
 
 //        System.out.println("Profile binary: " + Arrays.toString(binaryProfile));
 
-        Profile outputElement = (Profile) kryoSerializer2.fromBinary(binaryProfile, Profile.class);
+        Profile outputElement = (Profile) kryoSerializer.fromBinary(binaryProfile, Profile.class);
 
         assertThat(outputElement.getName(), is(profile.getName()));
         assertThat(outputElement.getGender(), is(profile.getGender()));
