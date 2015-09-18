@@ -12,6 +12,8 @@ import com.senacor.hackingdays.serialization.data.Range;
  */
 public class RangeSerializer extends Serializer<Range> {
 
+        public final static RangeSerializer INSTANCE = new RangeSerializer();
+
         public void write (Kryo kryo, Output output, Range range) {
             output.writeByte(range.getLower());
             output.writeByte(range.getUpper());
