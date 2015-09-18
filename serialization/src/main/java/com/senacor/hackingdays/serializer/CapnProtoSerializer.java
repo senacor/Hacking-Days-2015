@@ -15,8 +15,7 @@ public class CapnProtoSerializer extends JSerializer {
 
     private String toCamel(String in) {
         String out = in.toLowerCase();
-        out = String.valueOf(out.charAt(0)) + in.substring(1);
-        System.out.println("cc from " + in + " to " + out);
+        out = String.valueOf(in.charAt(0)) + out.substring(1);
         return out;
     }
 
@@ -30,7 +29,7 @@ public class CapnProtoSerializer extends JSerializer {
     @Override
     public Object fromBinaryJava(byte[] bytes, Class<?> manifest) {
 
-        if (!CapnProtoProfile.class.getName().equals(manifest.getName())) {
+        if (!Profile.class.getName().equals(manifest.getName())) {
             throw new RuntimeException("no clue how to de-serialize a " + manifest.getName());
         }
         org.capnproto.MessageReader message =
