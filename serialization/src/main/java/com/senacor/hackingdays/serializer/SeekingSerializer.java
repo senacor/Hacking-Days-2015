@@ -15,13 +15,13 @@ import com.senacor.hackingdays.serialization.data.Seeking;
 public class SeekingSerializer extends Serializer<Seeking> {
 
         public void write (Kryo kryo, Output output, Seeking seeking) {
-            kryo.writeObject(output, seeking.getGender());
-            kryo.writeObject(output, seeking.getAgeRange());
+            kryo.writeObjectOrNull(output, seeking.getGender(), Gender.class);
+            kryo.writeObjectOrNull(output, seeking.getAgeRange(), Range.class);
         }
 
         public Seeking read (Kryo kryo, Input input, Class<Seeking> type) {
-            return new Seeking(kryo.readObject(input, Gender.class),
-                               kryo.readObject(input, Range.class)
+            return new Seeking(kryo.readObjectOrNull(input, Gender.class),
+                               kryo.readObjectOrNull(input, Range.class)
             );
         }
 }

@@ -14,12 +14,12 @@ import com.senacor.hackingdays.serialization.data.Activity;
 public class ActivitySerializer extends Serializer<Activity> {
     @Override
     public void write(Kryo kryo, Output output, Activity object) {
-        kryo.writeObject(output, object.getLastLogin());
+        kryo.writeObjectOrNull(output, object.getLastLogin(), Date.class);
         output.writeInt(object.getLoginCount());
     }
 
     @Override
     public Activity read(Kryo kryo, Input input, Class type) {
-        return new Activity(kryo.readObject(input, Date.class), input.readInt());
+        return new Activity(kryo.readObjectOrNull(input, Date.class), input.readInt());
     }
 }

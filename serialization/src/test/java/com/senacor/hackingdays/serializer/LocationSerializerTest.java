@@ -7,22 +7,23 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.senacor.hackingdays.serialization.data.Location;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 /**
  * @author Alasdair Collinson, Senacor Technologies AG
  */
+@RunWith(JUnitParamsRunner.class)
 public class LocationSerializerTest {
 
-    private static final String STATE = "State";
-    private static final String CITY = "City";
-    private static final String ZIP = "Zip";
-
     @Test
-    public void inputAndOutputAreSame() {
-        Location inputElement = new Location(STATE, CITY, ZIP);
+    @Parameters({"State, City, Zip", "null, null, null"})
+    public void inputAndOutputAreSame(String state, String city, String zip) {
+        Location inputElement = new Location(state, city, zip);
         Kryo kryo = Mockito.mock(Kryo.class);
 
         LocationSerializer serializer = new LocationSerializer();

@@ -18,10 +18,18 @@ import com.senacor.hackingdays.serialization.data.Gender;
 public class GenderSerializer extends Serializer<Gender> {
 
         public void write (Kryo kryo, Output output, Gender object) {
-            output.writeByte(object.ordinal());
+            if(object != null) {
+                output.writeByte(object.ordinal());
+            } else {
+                output.writeByte(-1);
+            }
         }
 
         public Gender read (Kryo kryo, Input input, Class<Gender> type) {
-            return Gender.values()[input.readByte()];
+            byte ordinal = input.readByte();
+            if(ordinal >= 0) {
+                return Gender.values()[ordinal];
+            }
+            return null;
         }
 }
