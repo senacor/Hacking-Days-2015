@@ -1,6 +1,6 @@
 package com.senacor.hackingdays.actor;
 
-import static com.senacor.hackingdays.config.ConfigHelper.*;
+import static com.senacor.hackingdays.config.ConfigHelper.createConfig;
 import static junitparams.JUnitParamsRunner.*;
 
 import java.io.File;
@@ -27,8 +27,7 @@ import scala.concurrent.Future;
 @RunWith(JUnitParamsRunner.class)
 public class ConsumerProducerTest {
 
-
-    public static final int COUNT = 100000;
+    public static final int COUNT = 100_000;
 
     @Test
     @Parameters(method = "serializers")
@@ -45,7 +44,8 @@ public class ConsumerProducerTest {
         stopwatch.stop();
         actorSystem.shutdown();
         actorSystem.awaitTermination();
-        System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+        System.err.println(
+            String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
     @SuppressWarnings("unusedDeclaration")
@@ -56,15 +56,32 @@ public class ConsumerProducerTest {
                 $("gson", "com.senacor.hackingdays.serializer.GsonSerializer"),
                 $("gson2", "com.senacor.hackingdays.serializer.GsonSerializer2"),
                 $("xml", "com.senacor.hackingdays.serializer.XStreamXMLSerializer"),
-                $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer")
+                $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer"),
+                $("kryo", "com.senacor.hackingdays.serializer.KryoSerializer")
         );
     }
+//    private Config overrideConfig(String serializerName, String fqcn) {
+//        String configSnippet = String.format("akka {\n" +
+//            "  actor {\n" +
+//            "    serializers {\n" +
+//            "      %s = \"%s\"\n" +
+//            "    }\n" +
+//            "\n" +
+//            "    serialization-bindings {\n" +
+//            "      \"com.senacor.hackingdays.serialization.data.Profile\" = %s\n" +
+//            "    }\n" +
+//            "  }\n" +
+//            "}", serializerName, fqcn, serializerName);
+//
+//        Config overrides = ConfigFactory.parseString(configSnippet);
+//        return overrides.withFallback(ConfigFactory.load());
+//    }
 
     @Test
     @Ignore
     public void writeXmlFile() throws Exception {
 
-        try(XMLProfileWriter writer = new XMLProfileWriter(new File("src/main/resources/database.xml"))) {
+        try (XMLProfileWriter writer = new XMLProfileWriter(new File("src/main/resources/database.xml"))) {
             ProfileGenerator generator = ProfileGenerator.newInstance(1_000_000);
             generator.stream().forEach(writer::write);
 
