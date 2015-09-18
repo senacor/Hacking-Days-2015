@@ -1,6 +1,7 @@
 package com.senacor.hackingdays.serialization.data;
 
 import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.thirftdata.Profile;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;

@@ -1,11 +1,15 @@
 package com.senacor.hackingdays.serialization.data.generate;
 
-import com.senacor.hackingdays.serialization.data.Activity;
-import com.senacor.hackingdays.serialization.data.Gender;
-import com.senacor.hackingdays.serialization.data.Profile;
-import com.senacor.hackingdays.serialization.data.Range;
-import com.senacor.hackingdays.serialization.data.RelationShipStatus;
-import com.senacor.hackingdays.serialization.data.Seeking;
+
+import com.senacor.hackingdays.serialization.thirftdata.*;
+
+import static com.senacor.hackingdays.serialization.thirftdata.Gender.Disambiguous;
+import static com.senacor.hackingdays.serialization.thirftdata.Gender.Female;
+import static com.senacor.hackingdays.serialization.thirftdata.Gender.Male;
+
+import static com.senacor.hackingdays.serialization.thirftdata.RelationshipStatus.Divorced;
+import static com.senacor.hackingdays.serialization.thirftdata.RelationshipStatus.Single;
+import static com.senacor.hackingdays.serialization.thirftdata.RelationshipStatus.Maried;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -17,10 +21,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static com.senacor.hackingdays.serialization.data.Gender.Disambiguous;
-import static com.senacor.hackingdays.serialization.data.Gender.Female;
-import static com.senacor.hackingdays.serialization.data.Gender.Male;
-import static com.senacor.hackingdays.serialization.data.RelationShipStatus.Divorced;
+
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 
@@ -35,8 +36,8 @@ public class ProfileGenerator implements Iterable<Profile> {
 
     private final int sampleSize;
     private final Supplier<Integer> ageFunction;
-    private final Supplier<Gender> genderFunction;
-    private final Function<Gender, String> nameFunction;
+    private final Supplier<Integer> genderFunction;
+    private final Function<Integer, String> nameFunction;
 
     public static ProfileGenerator newInstance(int sampleSize) {
         return new Builder(sampleSize).build();
@@ -46,7 +47,7 @@ public class ProfileGenerator implements Iterable<Profile> {
         return newInstance(1).generateProfile();
     }
 
-    private ProfileGenerator(int size, Supplier<Integer> ageFunction, Supplier<Gender> genderFunction, Function<Gender, String> nameFunction, Supplier<Activity> activityFunction, Supplier<RelationShipStatus> relationShipStatusFunction) {
+    private ProfileGenerator(int size, Supplier<Integer> ageFunction, Supplier<Integer> genderFunction, Function<Integer, String> nameFunction, Supplier<Activity> activityFunction, Supplier<Integer> bla) {
         this.sampleSize = size;
         this.ageFunction = ageFunction;
         this.genderFunction = genderFunction;
@@ -74,8 +75,11 @@ public class ProfileGenerator implements Iterable<Profile> {
     }
 
     private Profile generateProfile() {
-        Gender gender = genderFunction.get();
-        Profile profile = new Profile(nameFunction.apply(gender), gender);
+        int gender = genderFunction.get();
+        Profile profile = new Profile();
+        profile.setName(nameFunction.apply(gender));
+        profile.setGender(gender);
+
         profile.setAge(ageFunction.get());
         profile.setLocation(locationSupplier.get());
         profile.setRelationShip(randomRelationShipStatus());
@@ -85,15 +89,22 @@ public class ProfileGenerator implements Iterable<Profile> {
         return profile;
     }
 
+    private static Profile createProfile(String name, int gender) {
+      Profile profile = new Profile();
+      profile.setName(name);
+      profile.setGender(gender);
+      return profile;
+    }
 
-    private static Profile initialProfile(Gender gender) {
+
+    private static Profile initialProfile(int gender) {
         switch (gender) {
             case Male:
-                return new Profile(maleNames.get(), gender);
+                return createProfile(maleNames.get(), gender);
             case Female:
-                return new Profile(femaleNames.get(), gender);
+                return createProfile(femaleNames.get(), gender);
             case Disambiguous:
-                return new Profile(transgenderNames.get(), gender);
+                return createProfile(transgenderNames.get(), gender);
             default:
                 throw new AssertionError();
         }
@@ -102,9 +113,9 @@ public class ProfileGenerator implements Iterable<Profile> {
     public static class Builder {
 
         private Supplier<Integer> ageFunction = ProfileGenerator::randomAge;
-        private Supplier<Gender> genderFunction = ProfileGenerator::randomGender;
-        private Function<Gender, String> nameFunction = defaultNameFunction();
-        private Supplier<RelationShipStatus> relationShipStatusFunction = ProfileGenerator::randomRelationShipStatus;
+        private Supplier<Integer> genderFunction = ProfileGenerator::randomGender;
+        private Function<Integer, String> nameFunction = defaultNameFunction();
+        private Supplier<Integer> relationShipStatusFunction = ProfileGenerator::randomRelationShipStatus;
         private Supplier<Activity> activityFunction = ProfileGenerator::randomActivity;
         private final int size;
 
@@ -118,16 +129,16 @@ public class ProfileGenerator implements Iterable<Profile> {
         }
 
 
-        public Builder withGender(Supplier<Gender> genderFunction) {
+        public Builder withGender(Supplier<Integer> genderFunction) {
             this.genderFunction = genderFunction;
             return this;
         }
-        public Builder withName(Function<Gender, String> nameFunction) {
+        public Builder withName(Function<Integer, String> nameFunction) {
             this.nameFunction = nameFunction;
             return this;
         }
 
-        public Builder withRelationShipStatus(Supplier<RelationShipStatus> relationShipStatusFunction) {
+        public Builder withRelationShipStatus(Supplier<Integer> relationShipStatusFunction) {
             this.relationShipStatusFunction = relationShipStatusFunction;
             return this;
         }
@@ -142,7 +153,7 @@ public class ProfileGenerator implements Iterable<Profile> {
         }
 
     }
-    private static final  Function<Gender, String> defaultNameFunction() {
+    private static final  Function<Integer, String> defaultNameFunction() {
         return gender -> {
             switch (gender) {
                 case Male:
@@ -158,21 +169,28 @@ public class ProfileGenerator implements Iterable<Profile> {
     }
 
     private static int randomAge() {
-        return random.nextInt(Range.MAX_AGE - Range.MIN_AGE) + Range.MIN_AGE;
+        return random.nextInt(RangeConstants.MAX_AGE - RangeConstants.MIN_AGE) + RangeConstants.MIN_AGE;
     }
 
-    private static Gender randomGender() {
+    private static int randomGender() {
         int i = random.nextInt(100);
         return i < 45 ? Gender.Male : i > 95 ? Gender.Disambiguous : Female;
 
     }
 
+    private static Activity createActivity(Date lastLogin, int frequency) {
+      Activity activity = new Activity();
+      activity.setLastLoginTimestamp(lastLogin.getTime());
+      activity.setLoginCount(frequency);
+
+      return activity;
+    }
 
     private static Activity randomActivity() {
         int frequency = random.nextInt(10);
         long toEpochMilli = NOW.minus(random.nextInt(1_000_000), ChronoUnit.MINUTES).toEpochMilli();
         Date lastLogin = new Date(toEpochMilli);
-        return new Activity(lastLogin, frequency);
+        return createActivity(lastLogin, frequency);
     }
 
     private static Seeking randomSeeking() {
@@ -181,9 +199,9 @@ public class ProfileGenerator implements Iterable<Profile> {
         return new Seeking(randomGender(), new Range(min(bound1, bound2), max(bound1, bound2)));
     }
 
-    private static RelationShipStatus randomRelationShipStatus() {
+    private static int randomRelationShipStatus() {
         int i = random.nextInt(100);
-        return i < 35 ? Divorced : i > 65 ? RelationShipStatus.Maried : RelationShipStatus.Single;
+        return i < 35 ? Divorced : i > 65 ? RelationshipStatus.Maried : RelationshipStatus.Single;
     }
 
 

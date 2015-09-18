@@ -7,7 +7,6 @@ import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.base.Stopwatch;
 import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
-import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import junitparams.JUnitParamsRunner;
@@ -55,7 +54,7 @@ public class ConsumerProducerTest {
                 "    }\n" +
                 "\n" +
                 "    serialization-bindings {\n" +
-                "      \"com.senacor.hackingdays.serialization.data.Profile\" = %s\n" +
+                "      \"com.senacor.hackingdays.serialization.thirftdata.Profile\" = %s\n" +
                 "    }\n" +
                 "  }\n" +
                 "}", serializerName, fqcn, serializerName);
@@ -67,8 +66,9 @@ public class ConsumerProducerTest {
     @SuppressWarnings("unusedDeclaration")
     static Object[] serializers() {
         return $(
+                $("thrift", "com.senacor.hackingdays.serializer.ThriftSerializer"),
                 $("java", "akka.serialization.JavaSerializer"),
-                $("json", "com.senacor.hackingdays.serializer.JacksonSerializer"),
+                /* $("json", "com.senacor.hackingdays.serializer.JacksonSerializer"),  */
                 $("gson", "com.senacor.hackingdays.serializer.GsonSerializer")
         );
     }
@@ -76,12 +76,12 @@ public class ConsumerProducerTest {
     @Test
     @Ignore
     public void writeXmlFile() throws Exception {
-
+        /*
         try(XMLProfileWriter writer = new XMLProfileWriter(new File("src/main/resources/database.xml"))) {
             ProfileGenerator generator = ProfileGenerator.newInstance(1_000_000);
             generator.stream().forEach(writer::write);
 
-        }
+        } */
     }
 
 }
