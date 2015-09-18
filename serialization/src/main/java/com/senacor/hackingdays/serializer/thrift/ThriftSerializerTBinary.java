@@ -21,7 +21,7 @@ public class ThriftSerializerTBinary extends JSerializer {
 
   @Override
   public int identifier() {
-    return 4711;
+    return 9876;
   }
 
   @Override

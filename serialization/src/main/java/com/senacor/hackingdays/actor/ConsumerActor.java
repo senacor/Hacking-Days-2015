@@ -21,6 +21,7 @@ public class ConsumerActor extends AbstractActor {
 
     private PartialFunction<Object, BoxedUnit> messageHandler() {
         return ReceiveBuilder
+                .match(Object.class, profile -> ack(profile))
                 .match(Profile.class, profile -> ack(profile))
                 .match(ProfileProtos.Profile.class, profile -> ack(profile))
                 .match(com.senacor.hackingdays.serialization.data.thrift.Profile.class, profile -> ack(profile))
