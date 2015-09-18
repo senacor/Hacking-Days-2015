@@ -8,7 +8,6 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.esotericsoftware.minlog.Log;
 import com.senacor.hackingdays.serialization.data.Activity;
 import com.senacor.hackingdays.serialization.data.Gender;
 import com.senacor.hackingdays.serialization.data.Location;
@@ -31,7 +30,7 @@ public class ReflectionKryoSerializerTest {
 
 	@Before
 	public void setup() {
-		Log.set(Log.LEVEL_TRACE);
+//		Log.set(Log.LEVEL_TRACE);
 
 //		System.out.println("NAME (chars): " + Arrays.toString(NAME.toCharArray()));
 //		System.out.println("NAME (bytes): " + Arrays.toString(NAME.getBytes(StandardCharsets.UTF_8)));
