@@ -59,6 +59,18 @@
     <dependencies>
 
         <dependency>
+            <groupId>com.senacor.hackingdays</groupId>
+            <artifactId>serialization-frenzy</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>18.0</version>
