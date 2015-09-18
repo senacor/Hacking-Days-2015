@@ -20,6 +20,7 @@ import scala.concurrent.Future;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import static com.senacor.hackingdays.config.ConfigHelper.createConfig;
 import static junitparams.JUnitParamsRunner.$;
 
 @RunWith(JUnitParamsRunner.class)
@@ -69,7 +70,9 @@ public class ConsumerProducerTest {
                 $("thrift", "com.senacor.hackingdays.serializer.ThriftSerializer"),
                 $("java", "akka.serialization.JavaSerializer"),
                 /* $("json", "com.senacor.hackingdays.serializer.JacksonSerializer"),  */
-                $("gson", "com.senacor.hackingdays.serializer.GsonSerializer")
+                $("gson", "com.senacor.hackingdays.serializer.GsonSerializer"),
+                $("gson2", "com.senacor.hackingdays.serializer.GsonSerializer2"),
+                $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer")
         );
     }
 
