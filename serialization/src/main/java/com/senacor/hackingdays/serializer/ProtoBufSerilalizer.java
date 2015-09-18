@@ -1,24 +1,33 @@
 package com.senacor.hackingdays.serializer;
 
 import akka.serialization.JSerializer;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.senacor.hackingdays.serialization.data.proto.ProfileProtos;
+import com.google.protobuf.Message;
 
 public class ProtoBufSerilalizer extends JSerializer {
 
+    private static final Class[] CLASSES = new Class[]{byte[].class};
+
     @Override
-    public Object fromBinaryJava(byte[] bytes, Class<?> manifest) {
+    public Object fromBinaryJava(byte[] bytes, Class<?> clazz) {
         try {
-            return ProfileProtos.Profile.parseFrom(bytes);
-        } catch (InvalidProtocolBufferException e) {
+            return clazz.getDeclaredMethod("parseFrom", CLASSES)
+                    .invoke(null, new Object[]{bytes});
+        } catch (Exception e) {
             throw new IllegalStateException("Error on deserialize ProfileProtos.Profile", e);
         }
     }
 
     @Override
     public byte[] toBinary(Object o) {
-        ProfileProtos.Profile profile = (ProfileProtos.Profile) o;
-        return profile.toByteArray();
+        if (o instanceof Message) {
+            Message var3 = (Message) o;
+            byte[] var4 = var3.toByteArray();
+            return var4;
+        } else {
+            throw new IllegalArgumentException((new StringBuilder())
+                    .append("Can\'t serialize a non-protobuf message using protobuf [").
+                            append(o).append("]").toString());
+        }
     }
 
     @Override
