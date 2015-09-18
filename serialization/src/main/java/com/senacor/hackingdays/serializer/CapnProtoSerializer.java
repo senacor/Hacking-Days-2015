@@ -97,7 +97,7 @@ public class CapnProtoSerializer extends JSerializer {
             capnProtoProfile.getSeeking().initAgeRange();
             capnProtoProfile.getSeeking().getAgeRange().setLower(seek.getAgeRange().getLower());
             capnProtoProfile.getSeeking().getAgeRange().setUpper(seek.getAgeRange().getUpper());
-            capnProtoProfile.getSeeking().setGender(CapnProtoProfile.ProfileStruct.Gender.valueOf(profile.getGender().name().toUpperCase()));
+            capnProtoProfile.getSeeking().setGender(CapnProtoProfile.ProfileStruct.Gender.valueOf(profile.getSeeking().getGender().name().toUpperCase()));
             Activity act = profile.getActivity();
             capnProtoProfile.initActivity();
             capnProtoProfile.getActivity().setLastLogin(profile.getActivity().getLastLogin().getTime());
