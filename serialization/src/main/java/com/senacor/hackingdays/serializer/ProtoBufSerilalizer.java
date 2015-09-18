@@ -2,6 +2,9 @@ package com.senacor.hackingdays.serializer;
 
 import akka.serialization.JSerializer;
 import com.google.protobuf.Message;
+import com.senacor.hackingdays.serialization.data.proto.ProfileProtos;
+
+import java.lang.reflect.Method;
 
 public class ProtoBufSerilalizer extends JSerializer {
 
@@ -37,6 +40,6 @@ public class ProtoBufSerilalizer extends JSerializer {
 
     @Override
     public boolean includeManifest() {
-        return false;
+        return true;
     }
 }
