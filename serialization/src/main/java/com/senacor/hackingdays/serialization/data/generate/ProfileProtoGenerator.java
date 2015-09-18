@@ -20,7 +20,7 @@ import static com.senacor.hackingdays.serialization.data.proto.ProfileProtos.Rel
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 
-public class ProfileProtoGenerator implements Iterable<ProfileProtos.Profile>, DataGenerator {
+public class ProfileProtoGenerator implements Iterable<ProfileProtos.Profile> {
 
     private final static NameSupplier femaleNames = NameSupplier.forGender(Female);
     private final static NameSupplier maleNames = NameSupplier.forGender(Male);
@@ -102,11 +102,6 @@ public class ProfileProtoGenerator implements Iterable<ProfileProtos.Profile>, D
             default:
                 throw new AssertionError();
         }
-    }
-
-    @Override
-    public void doEach(int size, Consumer consumer) {
-      iterator().forEachRemaining(o -> consumer.accept(o));
     }
 
     public static class Builder {

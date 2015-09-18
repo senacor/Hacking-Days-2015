@@ -23,7 +23,7 @@ import static com.senacor.hackingdays.serialization.data.RelationShipStatus.Divo
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 
-public class ProfileGenerator implements Iterable<Profile>, DataGenerator {
+public class ProfileGenerator implements Iterable<Profile> {
 
     private final static NameSupplier femaleNames = NameSupplier.forGender(Female);
     private final static NameSupplier maleNames = NameSupplier.forGender(Male);
@@ -97,11 +97,6 @@ public class ProfileGenerator implements Iterable<Profile>, DataGenerator {
                 throw new AssertionError();
         }
     }
-
-  @Override
-  public void doEach(int size, Consumer consumer) {
-    new Builder(size).build().iterator().forEachRemaining(o -> consumer.accept(o));
-  }
 
   public static class Builder {
 
