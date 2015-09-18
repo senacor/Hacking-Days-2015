@@ -28,7 +28,7 @@ import scala.concurrent.Future;
 public class ConsumerProducerTest {
 
 
-    public static final int COUNT = 100000;
+    public static final int COUNT = 1_000_000;
 
     @Test
     @Parameters(method = "serializers")
