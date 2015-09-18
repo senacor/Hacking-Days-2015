@@ -1,7 +1,7 @@
 package com.senacor.hackingdays.actor;
 
 import static com.senacor.hackingdays.config.ConfigHelper.createConfig;
-import static junitparams.JUnitParamsRunner.*;
+import static junitparams.JUnitParamsRunner.$;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -11,13 +11,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.base.Stopwatch;
+import com.senacor.hackingdays.serialization.data.Profile;
 import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
 import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.pattern.Patterns;
+import akka.serialization.SerializationExtension;
 import akka.util.Timeout;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -27,7 +32,7 @@ import scala.concurrent.Future;
 @RunWith(JUnitParamsRunner.class)
 public class ConsumerProducerTest {
 
-    public static final int COUNT = 100_000;
+    public static final int COUNT = 1_000_000;
 
     @Test
     @Parameters(method = "serializers")
@@ -64,6 +69,20 @@ public class ConsumerProducerTest {
         actorSystem.shutdown();
         actorSystem.awaitTermination();
         System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+    }
+
+    @Test
+    @Parameters(method = "serializers")
+    public void calculateObjectSize(String serializerName, String fqcn) throws Exception {
+        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
+
+        Profile p = ProfileGenerator.newInstance(1).iterator().next();
+        int length = SerializationExtension.get(actorSystem).serializerFor(Profile.class).toBinary(p).length;
+        Thread.sleep(1000);
+        actorSystem.shutdown();
+        actorSystem.awaitTermination();
+
+        System.err.println(String.format("Serializing a Profile with %s took %s bytes.", serializerName, length));
     }
 
     @SuppressWarnings("unusedDeclaration")

@@ -54,9 +54,9 @@ public class ProducerActor extends AbstractActor {
 
         private void checkForCompletion() {
             acknowledged++;
-            if (acknowledged % 100 == 0) {
-                logger.info(String.format("acked %s profiles", acknowledged));
-            }
+//            if (acknowledged % 100 == 0) {
+//                logger.info(String.format("acked %s profiles", acknowledged));
+//            }
             if (acknowledged == count) {
                 launcher.tell("completed", launcher);
             }
