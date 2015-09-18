@@ -44,7 +44,7 @@ public class MulitpleConsumerLauncher {
             ActorSystem actorSystem = ActorSystem.create("consumer-actorsystem", mergedConfig);
 
             ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActor.class, ConsumerActor::new), "consumer");
-            System.out.println("Startet consumer " + consumer);
+            System.out.println("Started consumer " + consumer);
 
         });
     }
