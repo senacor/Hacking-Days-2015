@@ -11,10 +11,11 @@ public class XStreamXMLSerializer extends JSerializer {
 
 	private static final XStream xStream = new XStream();
 	private static final Charset CHARSET = Charsets.UTF_8;
+	private static final int IDENTIFIER =  XStreamXMLSerializer.class.hashCode();
 
 	@Override
 	public int identifier() {
-		return XStreamXMLSerializer.class.hashCode();
+		return IDENTIFIER;
 	}
 
 	@Override

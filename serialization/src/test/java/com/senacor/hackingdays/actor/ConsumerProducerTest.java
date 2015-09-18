@@ -48,6 +48,24 @@ public class ConsumerProducerTest {
             String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
+    @Test
+    @Parameters(method = "serializerProtoBuf")
+    public void sendMessagesProtoBuf(String serializerName, String fqcn) throws Exception {
+        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem-protobuf", createConfig(serializerName, fqcn));
+        ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActorProto.class, () -> new ConsumerActorProto()), "consumer");
+        ActorRef producer = actorSystem.actorOf(Props.create(ProducerActorProto.class, () -> new ProducerActorProto(consumer)), "producer");
+
+        Timeout timeout = Timeout.apply(25, TimeUnit.SECONDS);
+
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT), timeout);
+        Await.result(ask, timeout.duration());
+        stopwatch.stop();
+        actorSystem.shutdown();
+        actorSystem.awaitTermination();
+        System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+    }
+
     @SuppressWarnings("unusedDeclaration")
     static Object[] serializers() {
         return $(
@@ -76,6 +94,13 @@ public class ConsumerProducerTest {
 //        Config overrides = ConfigFactory.parseString(configSnippet);
 //        return overrides.withFallback(ConfigFactory.load());
 //    }
+
+    @SuppressWarnings("unusedDeclaration")
+    static Object[] serializerProtoBuf() {
+        return $(
+                $("protoBuf", "com.senacor.hackingdays.serializer.ProtoBufSerilalizer")
+        );
+    }
 
     @Test
     @Ignore

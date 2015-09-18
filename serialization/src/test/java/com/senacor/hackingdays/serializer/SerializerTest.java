@@ -28,7 +28,12 @@ public class SerializerTest {
 	}
 
 	public static Object[] serializers() {
-		return $($(GsonSerializer.class), $(GsonSerializer2.class), $(XStreamXMLSerializer.class));
+		return $( //
+				$(com.senacor.hackingdays.serializer.GsonSerializer.class), //
+				$(com.senacor.hackingdays.serializer.GsonSerializer2.class), //
+				$(com.senacor.hackingdays.serializer.XStreamXMLSerializer.class), //
+				$(com.senacor.hackingdays.serializer.FastSerializer.class) //
+		);
 	}
 
 }
