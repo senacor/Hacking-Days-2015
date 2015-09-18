@@ -23,7 +23,7 @@ import com.senacor.hackingdays.serialization.data.Range;
 import com.senacor.hackingdays.serialization.data.RelationShipStatus;
 import com.senacor.hackingdays.serialization.data.Seeking;
 
-public class ProfileGenerator implements Iterable<Profile>, DataGenerator {
+public class ProfileGenerator implements Iterable<Profile> {
 
     private final static NameSupplier femaleNames = NameSupplier.forGender(Female);
     private final static NameSupplier maleNames = NameSupplier.forGender(Male);
@@ -98,11 +98,6 @@ public class ProfileGenerator implements Iterable<Profile>, DataGenerator {
                 throw new AssertionError();
         }
     }
-
-  @Override
-  public void doEach(int size, Consumer consumer) {
-    new Builder(size).build().iterator().forEachRemaining(o -> consumer.accept(o));
-  }
 
   public static class Builder {
 

@@ -22,12 +22,12 @@ public class ThriftSerializerTTuple extends JSerializer {
 
   @Override
   public int identifier() {
-    return 4711;
+    return 34567;
   }
 
   @Override
   public boolean includeManifest() {
-    return false;
+    return true;
   }
 
   @Override

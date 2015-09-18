@@ -20,7 +20,7 @@ import com.senacor.hackingdays.serialization.data.thrift.RangeConstants;
 import com.senacor.hackingdays.serialization.data.thrift.RelationShipStatus;
 import com.senacor.hackingdays.serialization.data.thrift.Seeking;
 
-public class ProfileGeneratorThrift implements Iterable<Profile>, DataGenerator {
+public class ProfileGeneratorThrift implements Iterable<Profile> {
 
     private final static NameSupplierThrift femaleNames = NameSupplierThrift.forGender(Gender.Female);
     private final static NameSupplierThrift maleNames = NameSupplierThrift.forGender(Gender.Male);
@@ -105,10 +105,6 @@ public class ProfileGeneratorThrift implements Iterable<Profile>, DataGenerator 
         }
     }
 
-    @Override
-    public void doEach(int size, Consumer consumer) {
-      iterator().forEachRemaining(o -> consumer.accept(o));
-    }
 
     public static class Builder {
 

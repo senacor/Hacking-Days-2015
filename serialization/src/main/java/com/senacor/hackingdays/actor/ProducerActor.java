@@ -6,14 +6,16 @@ import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.ReceiveBuilder;
-import com.senacor.hackingdays.serialization.data.generate.DataGenerator;
+import com.senacor.hackingdays.serialization.data.Profile;
 import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.data.generate.ProfileGeneratorThrift;
+import com.senacor.hackingdays.serialization.data.generate.ProfileProtoGenerator;
+import com.senacor.hackingdays.serialization.data.proto.ProfileProtos;
 import scala.PartialFunction;
 import scala.runtime.BoxedUnit;
 
-import java.lang.reflect.InvocationTargetException;
-
 public class ProducerActor extends AbstractActor {
+
 
     private final ActorRef consumer;
 
@@ -24,22 +26,19 @@ public class ProducerActor extends AbstractActor {
 
     private PartialFunction<Object, BoxedUnit> messageHandler() {
         return ReceiveBuilder
-                .match(GenerateMessages.class, msg -> sendMessagesToConsumer(msg.getCount(), msg.getGenerator()))
+                .match(GenerateMessages.class, msg -> sendMessagesToConsumer(msg.getCount(), msg.getProfileClass()))
                 .build();
     }
 
-    private void sendMessagesToConsumer(int count, Class<DataGenerator> generatorClazz) {
+    private void sendMessagesToConsumer(int count, Class<?> profileClass) {
         ActorRef collector = context().actorOf(AckCollector.props(count, sender()), "collector");
 
-        if (generatorClazz != null) {
-          try {
-            DataGenerator generator = (DataGenerator) generatorClazz.getMethod("newInstance", Integer.TYPE).invoke(null, count);
-            generator.doEach(count, profile -> consumer.tell(profile, collector));
-          } catch (IllegalAccessException|NoSuchMethodException|InvocationTargetException e) {
-            throw new RuntimeException(e);
-          }
-        } else {
-          ProfileGenerator.newInstance(count).stream().forEach(profile -> consumer.tell(profile, collector));
+        if (profileClass.equals(Profile.class)) {
+            ProfileGenerator.newInstance(count).forEach(profile -> consumer.tell(profile, collector));
+        } else if (profileClass.equals(ProfileProtos.Profile.class)) {
+            ProfileProtoGenerator.newInstance(count).forEach(profile -> consumer.tell(profile, collector));
+        } else if (profileClass.equals(com.senacor.hackingdays.serialization.data.thrift.Profile.class)) {
+            ProfileGeneratorThrift.newInstance(count).forEach(profile -> consumer.tell(profile, collector));
         }
     }
 
