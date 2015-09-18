@@ -19,7 +19,7 @@ public class Hessian2Serializer extends JSerializer {
 
 	@Override
 	public int identifier() {
-		return new Random().nextInt();
+		return 1234567890;
 	}
 
 

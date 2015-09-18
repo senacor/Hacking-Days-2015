@@ -20,7 +20,7 @@ public class DeflatingHessian2Serializer extends JSerializer {
 
 	@Override
 	public int identifier() {
-		return new Random().nextInt();
+		return 368763241;
 	}
 
 
