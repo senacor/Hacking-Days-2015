@@ -8,7 +8,7 @@
  * $Date: $ 
  * $Author: $ 
  */
-package com.senacor.hackingdays.serialization.data;
+package com.senacor.hackingdays.serialization.data.unsafe;
 
 import sun.misc.Unsafe;
 
@@ -21,46 +21,44 @@ import java.lang.reflect.Field;
  * @author ccharles
  * @version $LastChangedVersion$
  */
-public class UnsafeMemory
-{
+public class UnsafeMemory {
   private static final Unsafe unsafe;
-  static
-  {
-    try
-    {
+
+  static {
+    try {
       Field field = Unsafe.class.getDeclaredField("theUnsafe");
       field.setAccessible(true);
-      unsafe = (Unsafe)field.get(null);
-    }
-    catch (Exception e)
-    {
+      unsafe = (Unsafe) field.get(null);
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
   private static final long byteArrayOffset = unsafe.arrayBaseOffset(byte[].class);
+
   private static final long longArrayOffset = unsafe.arrayBaseOffset(long[].class);
+
   private static final long doubleArrayOffset = unsafe.arrayBaseOffset(double[].class);
 
   private static final int SIZE_OF_BOOLEAN = 1;
+
   private static final int SIZE_OF_INT = 4;
+
   private static final int SIZE_OF_LONG = 8;
 
   private int pos = 0;
+
   private byte[] buffer;
 
-  public UnsafeMemory(final byte[] buffer)
-  {
-    if (null == buffer)
-    {
+  public UnsafeMemory(final byte[] buffer) {
+    if (null == buffer) {
       throw new NullPointerException("buffer cannot be null");
     }
 
     this.buffer = buffer;
   }
 
-  public void reset()
-  {
+  public void reset() {
     this.pos = 0;
   }
 
@@ -68,61 +66,66 @@ public class UnsafeMemory
     this.buffer = buffer;
   }
 
-  public void putBoolean(final boolean value)
-  {
+  public void putBoolean(final boolean value) throws BufferTooSmallException {
+    if (pos + SIZE_OF_BOOLEAN > buffer.length) {
+      throw new BufferTooSmallException();
+    }
     unsafe.putBoolean(buffer, byteArrayOffset + pos, value);
     pos += SIZE_OF_BOOLEAN;
   }
 
-  public boolean getBoolean()
-  {
+  public boolean getBoolean() {
     boolean value = unsafe.getBoolean(buffer, byteArrayOffset + pos);
     pos += SIZE_OF_BOOLEAN;
 
     return value;
   }
 
-  public void putInt(final int value)
-  {
+  public void putInt(final int value) throws BufferTooSmallException {
+    if (pos + SIZE_OF_INT > buffer.length) {
+      throw new BufferTooSmallException();
+    }
     unsafe.putInt(buffer, byteArrayOffset + pos, value);
     pos += SIZE_OF_INT;
   }
 
-  public int getInt()
-  {
+  public int getInt() {
     int value = unsafe.getInt(buffer, byteArrayOffset + pos);
     pos += SIZE_OF_INT;
 
     return value;
   }
 
-  public void putLong(final long value)
-  {
+  public void putLong(final long value) throws BufferTooSmallException {
+    if (pos + SIZE_OF_LONG > buffer.length) {
+      throw new BufferTooSmallException();
+    }
     unsafe.putLong(buffer, byteArrayOffset + pos, value);
     pos += SIZE_OF_LONG;
   }
 
-  public long getLong()
-  {
+  public long getLong() {
     long value = unsafe.getLong(buffer, byteArrayOffset + pos);
     pos += SIZE_OF_LONG;
 
     return value;
   }
 
-  public void putLongArray(final long[] values)
-  {
+  public void putLongArray(final long[] values) throws BufferTooSmallException {
     putInt(values.length);
 
     long bytesToCopy = values.length << 3;
+    if (pos + bytesToCopy > buffer.length) {
+      throw new BufferTooSmallException();
+    }
+
     unsafe.copyMemory(values, longArrayOffset,
                       buffer, byteArrayOffset + pos,
                       bytesToCopy);
     pos += bytesToCopy;
   }
 
-  public long[] getLongArray()
-  {
+  public long[] getLongArray() {
     int arraySize = getInt();
     long[] values = new long[arraySize];
 
@@ -135,19 +138,20 @@ public class UnsafeMemory
     return values;
   }
 
-  public void putByteArray(final byte[] values)
-  {
+  public void putByteArray(final byte[] values) throws BufferTooSmallException {
     putInt(values.length);
 
     long bytesToCopy = values.length;
+    if (pos + bytesToCopy > buffer.length) {
+      throw new BufferTooSmallException();
+    }
     unsafe.copyMemory(values, byteArrayOffset,
                       buffer, byteArrayOffset + pos,
                       bytesToCopy);
     pos += bytesToCopy;
   }
 
-  public byte[] getByteArray()
-  {
+  public byte[] getByteArray() {
     int arraySize = getInt();
     byte[] values = new byte[arraySize];
 
@@ -160,19 +164,20 @@ public class UnsafeMemory
     return values;
   }
 
-  public void putDoubleArray(final double[] values)
-  {
+  public void putDoubleArray(final double[] values) throws BufferTooSmallException {
     putInt(values.length);
 
     long bytesToCopy = values.length << 3;
+    if (pos + bytesToCopy > buffer.length) {
+      throw new BufferTooSmallException();
+    }
     unsafe.copyMemory(values, doubleArrayOffset,
                       buffer, byteArrayOffset + pos,
                       bytesToCopy);
     pos += bytesToCopy;
   }
 
-  public double[] getDoubleArray()
-  {
+  public double[] getDoubleArray() {
     int arraySize = getInt();
     double[] values = new double[arraySize];
 
