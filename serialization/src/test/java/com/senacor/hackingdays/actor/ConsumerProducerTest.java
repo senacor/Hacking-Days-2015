@@ -1,5 +1,19 @@
 package com.senacor.hackingdays.actor;
 
+import static com.senacor.hackingdays.config.ConfigHelper.*;
+import static junitparams.JUnitParamsRunner.*;
+
+import java.io.File;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import com.google.common.base.Stopwatch;
+import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
+
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
@@ -14,17 +28,8 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
-
-import java.io.File;
-import java.util.concurrent.TimeUnit;
-
-import static com.senacor.hackingdays.config.ConfigHelper.createConfig;
-import static junitparams.JUnitParamsRunner.$;
 
 @RunWith(JUnitParamsRunner.class)
 public class ConsumerProducerTest {
@@ -65,6 +70,24 @@ public class ConsumerProducerTest {
         System.err.println(String.format("Serializing a Profile with %s took %s bytes.", serializerName, length));
     }
 
+    @Test
+    @Parameters(method = "serializerProtoBuf")
+    public void sendMessagesProtoBuf(String serializerName, String fqcn) throws Exception {
+        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem-protobuf", createConfig(serializerName, fqcn));
+        ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActorProto.class, () -> new ConsumerActorProto()), "consumer");
+        ActorRef producer = actorSystem.actorOf(Props.create(ProducerActorProto.class, () -> new ProducerActorProto(consumer)), "producer");
+
+        Timeout timeout = Timeout.apply(25, TimeUnit.SECONDS);
+
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT), timeout);
+        Await.result(ask, timeout.duration());
+        stopwatch.stop();
+        actorSystem.shutdown();
+        actorSystem.awaitTermination();
+        System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+    }
+
     @SuppressWarnings("unusedDeclaration")
     static Object[] serializers() {
         return $(
@@ -72,7 +95,15 @@ public class ConsumerProducerTest {
                 $("json", "com.senacor.hackingdays.serializer.JacksonSerializer"),
                 $("gson", "com.senacor.hackingdays.serializer.GsonSerializer"),
                 $("gson2", "com.senacor.hackingdays.serializer.GsonSerializer2"),
+                $("xml", "com.senacor.hackingdays.serializer.XStreamXMLSerializer"),
                 $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer")
+        );
+    }
+
+    @SuppressWarnings("unusedDeclaration")
+    static Object[] serializerProtoBuf() {
+        return $(
+                $("protoBuf", "com.senacor.hackingdays.serializer.ProtoBufSerilalizer")
         );
     }
 
@@ -80,7 +111,7 @@ public class ConsumerProducerTest {
     @Ignore
     public void writeXmlFile() throws Exception {
 
-        try(XMLProfileWriter writer = new XMLProfileWriter(new File("src/main/resources/database.xml"))) {
+        try (XMLProfileWriter writer = new XMLProfileWriter(new File("src/main/resources/database.xml"))) {
             ProfileGenerator generator = ProfileGenerator.newInstance(1_000_000);
             generator.stream().forEach(writer::write);
 
