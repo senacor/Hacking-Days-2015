@@ -48,6 +48,24 @@ public class ConsumerProducerTest {
         System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
+    @Test
+    @Parameters(method = "serializerProtoBuf")
+    public void sendMessagesProtoBuf(String serializerName, String fqcn) throws Exception {
+        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem-protobuf", createConfig(serializerName, fqcn));
+        ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActorProto.class, () -> new ConsumerActorProto()), "consumer");
+        ActorRef producer = actorSystem.actorOf(Props.create(ProducerActorProto.class, () -> new ProducerActorProto(consumer)), "producer");
+
+        Timeout timeout = Timeout.apply(25, TimeUnit.SECONDS);
+
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT), timeout);
+        Await.result(ask, timeout.duration());
+        stopwatch.stop();
+        actorSystem.shutdown();
+        actorSystem.awaitTermination();
+        System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+    }
+
     @SuppressWarnings("unusedDeclaration")
     static Object[] serializers() {
         return $(
@@ -61,11 +79,18 @@ public class ConsumerProducerTest {
         );
     }
 
+    @SuppressWarnings("unusedDeclaration")
+    static Object[] serializerProtoBuf() {
+        return $(
+                $("protoBuf", "com.senacor.hackingdays.serializer.ProtoBufSerilalizer")
+        );
+    }
+
     @Test
     @Ignore
     public void writeXmlFile() throws Exception {
 
-        try(XMLProfileWriter writer = new XMLProfileWriter(new File("src/main/resources/database.xml"))) {
+        try (XMLProfileWriter writer = new XMLProfileWriter(new File("src/main/resources/database.xml"))) {
             ProfileGenerator generator = ProfileGenerator.newInstance(1_000_000);
             generator.stream().forEach(writer::write);
 
