@@ -16,24 +16,24 @@ public class ProfileSerializer extends Serializer<Profile> {
   @Override
   public void write(Kryo kryo, Output output, Profile profile) {
     output.writeString(profile.getName());
-    kryo.writeObject(output, profile.getGender());
-    kryo.writeObject(output, profile.getActivity());
+    kryo.writeObjectOrNull(output, profile.getGender(), Gender.class);
+    kryo.writeObjectOrNull(output, profile.getActivity(), Activity.class);
     output.writeInt(profile.getAge());
-    kryo.writeObject(output, profile.getLocation());
-    kryo.writeObject(output, profile.getRelationShip());
-    kryo.writeObject(output, profile.getSeeking());
+    kryo.writeObjectOrNull(output, profile.getLocation(), Location.class);
+    kryo.writeObjectOrNull(output, profile.getRelationShip(), RelationShipStatus.class);
+    kryo.writeObjectOrNull(output, profile.getSeeking(), Seeking.class);
     output.writeBoolean(profile.isSmoker());
     
   }
 
   @Override
   public Profile read(Kryo kryo, Input input, Class<Profile> type) {
-    Profile profile = new Profile(input.readString(), kryo.readObject(input, Gender.class));
-    profile.setActivity(kryo.readObject(input, Activity.class));
+    Profile profile = new Profile(input.readString(), kryo.readObjectOrNull(input, Gender.class));
+    profile.setActivity(kryo.readObjectOrNull(input, Activity.class));
     profile.setAge(input.readInt());
-    profile.setLocation(kryo.readObject(input, Location.class));
-    profile.setRelationShip(kryo.readObject(input, RelationShipStatus.class));
-    profile.setSeeking(kryo.readObject(input, Seeking.class));
+    profile.setLocation(kryo.readObjectOrNull(input, Location.class));
+    profile.setRelationShip(kryo.readObjectOrNull(input, RelationShipStatus.class));
+    profile.setSeeking(kryo.readObjectOrNull(input, Seeking.class));
     profile.setSmoker(input.readBoolean());
     return profile;
   }

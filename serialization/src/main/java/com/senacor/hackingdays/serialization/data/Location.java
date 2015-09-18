@@ -4,7 +4,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.Serializable;
 
-public class Location implements Serializable {
+public class Location implements Serializable, UnsafeSerializable {
 
     private static final long serialVersionUID = 1;
 
@@ -41,4 +41,18 @@ public class Location implements Serializable {
                 ", zip='" + zip + '\'' +
                 '}';
     }
+
+  @Override
+  public void serializeUnsafe(UnsafeMemory memory) {
+    memory.putByteArray(state.getBytes());
+    memory.putByteArray(city.getBytes());
+    memory.putByteArray(zip.getBytes());
+  }
+
+  public static Location deserializeUnsafe(final UnsafeMemory memory) {
+    final String state = new String(memory.getByteArray());
+    final String city = new String(memory.getByteArray());
+    final String zip = new String(memory.getByteArray());
+    return new Location(state, city, zip);
+  }
 }

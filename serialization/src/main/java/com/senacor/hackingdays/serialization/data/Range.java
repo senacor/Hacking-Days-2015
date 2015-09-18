@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class Range implements Serializable {
+public class Range implements Serializable, UnsafeSerializable {
     private static final long serialVersionUID = 1;
 
     public static final int MAX_AGE = 75;
@@ -58,5 +58,17 @@ public class Range implements Serializable {
                 "lower=" + lower +
                 ", upper=" + upper +
                 '}';
+    }
+
+    @Override
+    public void serializeUnsafe(UnsafeMemory memory) {
+        memory.putInt(lower);
+        memory.putInt(upper);
+    }
+
+    public static Range deserializeUnsafe(UnsafeMemory memory) {
+        final int lower = memory.getInt();
+        final int upper = memory.getInt();
+        return new Range(lower, upper);
     }
 }
