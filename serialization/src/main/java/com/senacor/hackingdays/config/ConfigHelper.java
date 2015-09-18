@@ -20,9 +20,11 @@ public class ConfigHelper {
                 "\n" +
                 "    serialization-bindings {\n" +
                 "      \"com.senacor.hackingdays.serialization.data.Profile\" = %s\n" +
+                "      \"com.senacor.hackingdays.serialization.data.thrift.Profile\" = %s\n" +
+                "      \"com.google.protobuf.GeneratedMessage\" = %s\n" +
                 "    }\n" +
                 "  }\n" +
-                "}", serializerName, fqcn, serializerName);
+                "}", serializerName, fqcn, serializerName, serializerName, serializerName);
 
         Config overrides = ConfigFactory.parseString(configSnippet);
         return overrides.withFallback(ConfigFactory.load(confName));
