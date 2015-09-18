@@ -66,7 +66,8 @@ public class ConsumerProducerTest {
 
     @SuppressWarnings("unusedDeclaration")
     static Object[] serializers() {
-        return $($("java", "akka.serialization.JavaSerializer"), $("json", "com.senacor.hackingdays.serializer.JacksonSerializer"));
+        return $($("java", "akka.serialization.JavaSerializer"), $("json", "com.senacor.hackingdays.serializer.JacksonSerializer"),
+            $("kryo", "com.senacor.hackingdays.serializer.KryoSerializer"));
     }
 
     @Test
