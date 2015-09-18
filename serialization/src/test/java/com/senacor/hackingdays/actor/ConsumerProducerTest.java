@@ -37,7 +37,7 @@ import scala.concurrent.Future;
 @RunWith(JUnitParamsRunner.class)
 public class ConsumerProducerTest {
 
-    public static final int COUNT = 100_000;
+    public static final int COUNT = 1;
     
 	private static boolean isSerializer(Class<?> cls) {
 		return Serializer.class.isAssignableFrom(cls);
@@ -146,7 +146,7 @@ public class ConsumerProducerTest {
 
 	static Object[] serializers() throws IOException {
 
-		final List<Class<?>> testExceptions = Arrays.asList(ProtoBufSerilalizer.class);
+		final List<Class<ProtoBufSerilalizer>> testExceptions = Arrays.asList(ProtoBufSerilalizer.class);
 
 		Set<ClassInfo> classInfos = ClassPath.from(Serializer.class.getClassLoader())
 				.getTopLevelClasses("com.senacor.hackingdays.serializer");
