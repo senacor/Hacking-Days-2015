@@ -12,7 +12,8 @@ import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.base.Stopwatch;
 import com.senacor.hackingdays.actor.GenerateMessages;
-import com.senacor.hackingdays.actor.ProducerActorProto;
+import com.senacor.hackingdays.actor.ProducerActor;
+import com.senacor.hackingdays.serialization.data.generate.ProfileProtoGenerator;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -30,7 +31,7 @@ public class ProducerLauncherProto {
 
         ActorRef remoteConsumer = findRemoteConsumer(actorSystem);
 
-        ActorRef producer = actorSystem.actorOf(Props.create(ProducerActorProto.class, () -> new ProducerActorProto(remoteConsumer)), "producer");
+        ActorRef producer = actorSystem.actorOf(Props.create(ProducerActor.class, () -> new ProducerActor(remoteConsumer)), "producer");
         System.out.println("Started producer " + producer);
 
         sendDataAndWaitForCompletion(producer);
@@ -39,7 +40,7 @@ public class ProducerLauncherProto {
     private static void sendDataAndWaitForCompletion(ActorRef producer) throws Exception {
         Timeout timeout = Timeout.apply(50, TimeUnit.SECONDS);
         Stopwatch stopwatch = Stopwatch.createStarted();
-        Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT), timeout);
+        Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT, ProfileProtoGenerator.class), timeout);
         Await.result(ask, timeout.duration());
         stopwatch.stop();
         System.err
