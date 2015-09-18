@@ -7,6 +7,11 @@ public class ConfigHelper {
 
 
     public static Config createConfig(String serializerName, String fqcn) {
+        return createConfig(serializerName, fqcn, "application.conf");
+    }
+
+
+    public static Config createConfig(String serializerName, String fqcn, String confName) {
         String configSnippet = String.format("akka {\n" +
                 "  actor {\n" +
                 "    serializers {\n" +
@@ -20,6 +25,6 @@ public class ConfigHelper {
                 "}", serializerName, fqcn, serializerName);
 
         Config overrides = ConfigFactory.parseString(configSnippet);
-        return overrides.withFallback(ConfigFactory.load());
+        return overrides.withFallback(ConfigFactory.load(confName));
     }
 }

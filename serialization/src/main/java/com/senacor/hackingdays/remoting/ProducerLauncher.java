@@ -24,7 +24,7 @@ public class ProducerLauncher {
     private static final int COUNT = 1000;
 
     public static void main(String[] args) throws Exception {
-        ActorSystem actorSystem = ActorSystem.create("producer-actorsystem", createConfig("java", "akka.serialization.JavaSerializer"));
+        ActorSystem actorSystem = ActorSystem.create("producer-actorsystem", createConfig("java", "akka.serialization.JavaSerializer", "application-remote.conf"));
 
         //TODO edit IP here
         ActorRef remoteConsumer = findRemoteConsumer(actorSystem);
