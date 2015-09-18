@@ -32,7 +32,6 @@ public class ProducerActor extends AbstractActor {
     }
 
 
-
     private final static class AckCollector extends AbstractActor {
 
         private final LoggingAdapter logger = Logging.getLogger(context().system().eventStream(), this);
@@ -46,6 +45,7 @@ public class ProducerActor extends AbstractActor {
             this.launcher = launcher;
             receive(messageHandler());
         }
+
         private PartialFunction<Object, BoxedUnit> messageHandler() {
             return ReceiveBuilder
                     .matchEquals("Received", msg -> checkForCompletion())
@@ -54,7 +54,9 @@ public class ProducerActor extends AbstractActor {
 
         private void checkForCompletion() {
             acknowledged++;
-//            logger.info(String.format("acked %s profiles", acknowledged));
+            if (acknowledged % 100 == 0) {
+                logger.info(String.format("acked %s profiles", acknowledged));
+            }
             if (acknowledged == count) {
                 launcher.tell("completed", launcher);
             }
