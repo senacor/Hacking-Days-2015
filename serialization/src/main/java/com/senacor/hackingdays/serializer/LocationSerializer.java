@@ -12,7 +12,11 @@ import com.senacor.hackingdays.serialization.data.Location;
 public class LocationSerializer extends Serializer<Location> {
 
     public final static LocationSerializer INSTANCE = new LocationSerializer();
-    
+
+    {
+        setAcceptsNull(true);
+    }
+
     @Override
     public void write(Kryo kryo, Output output, Location object) {
         output.writeString(object.getState());
