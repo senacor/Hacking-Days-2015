@@ -7,6 +7,7 @@ import akka.serialization.JSerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.senacor.hackingdays.serialization.data.Location;
 import com.senacor.hackingdays.serialization.data.Range;
 
 public class KryoSerializer extends JSerializer {
@@ -15,6 +16,7 @@ public class KryoSerializer extends JSerializer {
 
     public KryoSerializer() {
         kryo.addDefaultSerializer(Range.class, new RangeSerializer());
+        kryo.addDefaultSerializer(Location.class, new LocationSerializer());
     }
 
     @Override
