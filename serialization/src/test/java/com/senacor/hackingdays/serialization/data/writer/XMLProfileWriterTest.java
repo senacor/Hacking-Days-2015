@@ -1,6 +1,8 @@
 package com.senacor.hackingdays.serialization.data.writer;
 
 import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.data.reader.ProfileReader;
+import com.senacor.hackingdays.serialization.data.reader.XMLProfileReader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -28,7 +30,6 @@ public class XMLProfileWriterTest {
 
         try (ProfileReader reader = new XMLProfileReader(file)) {
             reader.stream().forEach(System.out::println);
-
         } catch (Exception e) {
             e.printStackTrace();
             fail();

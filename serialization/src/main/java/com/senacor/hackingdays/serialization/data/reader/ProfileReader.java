@@ -1,4 +1,4 @@
-package com.senacor.hackingdays.serialization.data.writer;
+package com.senacor.hackingdays.serialization.data.reader;
 
 import com.senacor.hackingdays.serialization.data.Profile;
 
