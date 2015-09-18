@@ -8,9 +8,10 @@ import org.nustaq.serialization.FSTConfiguration;
  * Created by hmarginean on 18/09/15.
  */
 public class FastSerializer extends JSerializer {
-    static FSTConfiguration conf = FSTConfiguration.createFastBinaryConfiguration();
+    static FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
     static {
         conf.registerClass(Activity.class,Gender.class, Location.class, Profile.class, Range.class, RelationShipStatus.class, Seeking.class);
+        conf.setShareReferences(false);
     }
 
 
