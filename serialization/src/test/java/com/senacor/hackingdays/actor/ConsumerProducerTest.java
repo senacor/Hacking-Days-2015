@@ -69,9 +69,7 @@ public class ConsumerProducerTest {
     static Object[] serializers() {
         return $(
                 $("java", "akka.serialization.JavaSerializer"),
-                $("json", "com.senacor.hackingdays.serializer.JacksonSerializer"),
-                $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer")
-
+                $("json", "com.senacor.hackingdays.serializer.JacksonSerializer")
         );
     }
 
