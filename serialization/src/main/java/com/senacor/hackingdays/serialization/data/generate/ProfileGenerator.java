@@ -1,15 +1,11 @@
 package com.senacor.hackingdays.serialization.data.generate;
 
-
-import com.senacor.hackingdays.serialization.thirftdata.*;
-
-import static com.senacor.hackingdays.serialization.thirftdata.Gender.Disambiguous;
-import static com.senacor.hackingdays.serialization.thirftdata.Gender.Female;
-import static com.senacor.hackingdays.serialization.thirftdata.Gender.Male;
-
-import static com.senacor.hackingdays.serialization.thirftdata.RelationShipStatus.Divorced;
-import static com.senacor.hackingdays.serialization.thirftdata.RelationShipStatus.Single;
-import static com.senacor.hackingdays.serialization.thirftdata.RelationShipStatus.Maried;
+import com.senacor.hackingdays.serialization.data.Activity;
+import com.senacor.hackingdays.serialization.data.Gender;
+import com.senacor.hackingdays.serialization.data.Profile;
+import com.senacor.hackingdays.serialization.data.Range;
+import com.senacor.hackingdays.serialization.data.RelationShipStatus;
+import com.senacor.hackingdays.serialization.data.Seeking;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -21,7 +17,10 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-
+import static com.senacor.hackingdays.serialization.data.Gender.Disambiguous;
+import static com.senacor.hackingdays.serialization.data.Gender.Female;
+import static com.senacor.hackingdays.serialization.data.Gender.Male;
+import static com.senacor.hackingdays.serialization.data.RelationShipStatus.Divorced;
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 
@@ -47,7 +46,7 @@ public class ProfileGenerator implements Iterable<Profile> {
         return newInstance(1).generateProfile();
     }
 
-    private ProfileGenerator(int size, Supplier<Integer> ageFunction, Supplier<Gender> genderFunction, Function<Gender, String> nameFunction, Supplier<Activity> activityFunction, Supplier<RelationShipStatus> bla) {
+    private ProfileGenerator(int size, Supplier<Integer> ageFunction, Supplier<Gender> genderFunction, Function<Gender, String> nameFunction, Supplier<Activity> activityFunction, Supplier<RelationShipStatus> relationShipStatusFunction) {
         this.sampleSize = size;
         this.ageFunction = ageFunction;
         this.genderFunction = genderFunction;
@@ -76,10 +75,7 @@ public class ProfileGenerator implements Iterable<Profile> {
 
     private Profile generateProfile() {
         Gender gender = genderFunction.get();
-        Profile profile = new Profile();
-        profile.setName(nameFunction.apply(gender));
-        profile.setGender(gender);
-
+        Profile profile = new Profile(nameFunction.apply(gender), gender);
         profile.setAge(ageFunction.get());
         profile.setLocation(locationSupplier.get());
         profile.setRelationShip(randomRelationShipStatus());
@@ -89,22 +85,15 @@ public class ProfileGenerator implements Iterable<Profile> {
         return profile;
     }
 
-    private static Profile createProfile(String name, Gender gender) {
-      Profile profile = new Profile();
-      profile.setName(name);
-      profile.setGender(gender);
-      return profile;
-    }
-
 
     private static Profile initialProfile(Gender gender) {
-        switch (gender.getValue()) {
-            case 0:
-                return createProfile(maleNames.get(), gender);
-            case 1:
-                return createProfile(femaleNames.get(), gender);
-            case 2:
-                return createProfile(transgenderNames.get(), gender);
+        switch (gender) {
+            case Male:
+                return new Profile(maleNames.get(), gender);
+            case Female:
+                return new Profile(femaleNames.get(), gender);
+            case Disambiguous:
+                return new Profile(transgenderNames.get(), gender);
             default:
                 throw new AssertionError();
         }
@@ -155,12 +144,12 @@ public class ProfileGenerator implements Iterable<Profile> {
     }
     private static final  Function<Gender, String> defaultNameFunction() {
         return gender -> {
-            switch (gender.getValue()) {
-                case 0:
+            switch (gender) {
+                case Male:
                     return maleNames.get();
-                case 1:
+                case Female:
                     return femaleNames.get();
-                case 2:
+                case Disambiguous:
                     return transgenderNames.get();
                 default:
                     throw new AssertionError();
@@ -169,7 +158,7 @@ public class ProfileGenerator implements Iterable<Profile> {
     }
 
     private static int randomAge() {
-        return random.nextInt(RangeConstants.MAX_AGE - RangeConstants.MIN_AGE) + RangeConstants.MIN_AGE;
+        return random.nextInt(Range.MAX_AGE - Range.MIN_AGE) + Range.MIN_AGE;
     }
 
     private static Gender randomGender() {
@@ -178,19 +167,12 @@ public class ProfileGenerator implements Iterable<Profile> {
 
     }
 
-    private static Activity createActivity(Date lastLogin, int frequency) {
-      Activity activity = new Activity();
-      activity.setLastLoginTimestamp(lastLogin.getTime());
-      activity.setLoginCount(frequency);
-
-      return activity;
-    }
 
     private static Activity randomActivity() {
         int frequency = random.nextInt(10);
         long toEpochMilli = NOW.minus(random.nextInt(1_000_000), ChronoUnit.MINUTES).toEpochMilli();
         Date lastLogin = new Date(toEpochMilli);
-        return createActivity(lastLogin, frequency);
+        return new Activity(lastLogin, frequency);
     }
 
     private static Seeking randomSeeking() {

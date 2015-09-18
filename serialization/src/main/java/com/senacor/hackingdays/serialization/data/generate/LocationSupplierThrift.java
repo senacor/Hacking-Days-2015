@@ -1,7 +1,6 @@
 package com.senacor.hackingdays.serialization.data.generate;
 
 import com.senacor.hackingdays.serialization.data.thrift.Location;
-import com.senacor.hackingdays.serialization.thirftdata.Location;
 
 import java.util.List;
 import java.util.Random;

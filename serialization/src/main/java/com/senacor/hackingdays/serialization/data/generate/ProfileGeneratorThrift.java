@@ -1,15 +1,11 @@
 package com.senacor.hackingdays.serialization.data.generate;
 
 
-import com.senacor.hackingdays.serialization.thirftdata.*;
+import com.senacor.hackingdays.serialization.data.thrift.Profile;
+import com.senacor.hackingdays.serialization.data.thrift.*;
 
-import static com.senacor.hackingdays.serialization.thirftdata.Gender.Disambiguous;
-import static com.senacor.hackingdays.serialization.thirftdata.Gender.Female;
-import static com.senacor.hackingdays.serialization.thirftdata.Gender.Male;
-
-import static com.senacor.hackingdays.serialization.thirftdata.RelationShipStatus.Divorced;
-import static com.senacor.hackingdays.serialization.thirftdata.RelationShipStatus.Single;
-import static com.senacor.hackingdays.serialization.thirftdata.RelationShipStatus.Maried;
+import com.senacor.hackingdays.serialization.data.thrift.Gender;
+import com.senacor.hackingdays.serialization.data.thrift.RelationShipStatus;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -27,10 +23,10 @@ import static java.lang.Integer.min;
 
 public class ProfileGeneratorThrift implements Iterable<Profile> {
 
-    private final static com.senacor.hackingdays.serialization.data.generate.NameSupplier femaleNames = com.senacor.hackingdays.serialization.data.generate.NameSupplier.forGender(Female);
-    private final static com.senacor.hackingdays.serialization.data.generate.NameSupplier maleNames = com.senacor.hackingdays.serialization.data.generate.NameSupplier.forGender(Male);
-    private final static com.senacor.hackingdays.serialization.data.generate.NameSupplier transgenderNames = com.senacor.hackingdays.serialization.data.generate.NameSupplier.forGender(Disambiguous);
-    private final static com.senacor.hackingdays.serialization.data.generate.LocationSupplier locationSupplier = com.senacor.hackingdays.serialization.data.generate.LocationSupplier.newInstance();
+    private final static NameSupplierThrift femaleNames = NameSupplierThrift.forGender(Gender.Female);
+    private final static NameSupplierThrift maleNames = NameSupplierThrift.forGender(Gender.Male);
+    private final static NameSupplierThrift transgenderNames = NameSupplierThrift.forGender(Gender.Disambiguous);
+    private final static LocationSupplierThrift locationSupplier = LocationSupplierThrift.newInstance();
     private final static Random random = new Random();
     private static final Instant NOW = Instant.now();
 
@@ -174,7 +170,7 @@ public class ProfileGeneratorThrift implements Iterable<Profile> {
 
     private static Gender randomGender() {
         int i = random.nextInt(100);
-        return i < 45 ? Gender.Male : i > 95 ? Gender.Disambiguous : Female;
+        return i < 45 ? Gender.Male : i > 95 ? Gender.Disambiguous : Gender.Female;
 
     }
 
@@ -201,7 +197,7 @@ public class ProfileGeneratorThrift implements Iterable<Profile> {
 
     private static RelationShipStatus randomRelationShipStatus() {
         int i = random.nextInt(100);
-        return i < 35 ? Divorced : i > 65 ? RelationShipStatus.Maried : RelationShipStatus.Single;
+        return i < 35 ? RelationShipStatus.Divorced : i > 65 ? RelationShipStatus.Maried : RelationShipStatus.Single;
     }
 
 

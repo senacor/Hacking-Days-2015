@@ -1,7 +1,7 @@
 package com.senacor.hackingdays.serialization.data.generate;
 
 
-import com.senacor.hackingdays.serialization.thirftdata.Gender;
+import com.senacor.hackingdays.serialization.data.thrift.Gender;
 
 import java.util.List;
 import java.util.Random;

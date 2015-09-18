@@ -1,7 +1,6 @@
 package com.senacor.hackingdays.serialization.data.generate;
 
-
-import com.senacor.hackingdays.serialization.thirftdata.Gender;
+import com.senacor.hackingdays.serialization.data.Gender;
 
 import java.util.List;
 import java.util.Random;
@@ -16,12 +15,12 @@ class NameSupplier implements Supplier<String> {
     }
 
     static NameSupplier forGender(Gender gender) {
-        switch (gender.getValue()) {
-            case 0:
+        switch (gender) {
+            case Male:
                 return new NameSupplier(parse("male-firstname.txt"));
-            case 1:
+            case Female:
                 return new NameSupplier(parse("female-firstname.txt"));
-            case 2:
+            case Disambiguous:
                 return new NameSupplier(parse("transgender-name.txt"));
             default:
                 throw new AssertionError();

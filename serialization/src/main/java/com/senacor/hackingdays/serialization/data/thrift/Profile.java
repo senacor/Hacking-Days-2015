@@ -965,7 +965,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
             break;
           case 5: // RELATION_SHIP
             if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
-              struct.relationShip = com.senacor.hackingdays.serialization.thirftdata.RelationShipStatus.findByValue(iprot.readI32());
+              struct.relationShip = com.senacor.hackingdays.serialization.data.thrift.RelationShipStatus.findByValue(iprot.readI32());
               struct.setRelationShipIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
@@ -1139,7 +1139,7 @@ public class Profile implements org.apache.thrift.TBase<Profile, Profile._Fields
         struct.setLocationIsSet(true);
       }
       if (incoming.get(4)) {
-        struct.relationShip = com.senacor.hackingdays.serialization.thirftdata.RelationShipStatus.findByValue(iprot.readI32());
+        struct.relationShip = com.senacor.hackingdays.serialization.data.thrift.RelationShipStatus.findByValue(iprot.readI32());
         struct.setRelationShipIsSet(true);
       }
       if (incoming.get(5)) {

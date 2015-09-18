@@ -6,7 +6,7 @@ import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.ReceiveBuilder;
-import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.data.generate.ProfileGeneratorThrift;
 import scala.PartialFunction;
 import scala.runtime.BoxedUnit;
 
@@ -28,7 +28,7 @@ public class ProducerActorThrift extends AbstractActor {
 
     private void sendMessagesToConsumer(int count) {
         ActorRef collector = context().actorOf(AckCollector.props(count, sender()), "collector");
-        ProfileGenerator.newInstance(count).stream().forEach(profile -> consumer.tell(profile, collector));
+        ProfileGeneratorThrift.newInstance(count).stream().forEach(profile -> consumer.tell(profile, collector));
     }
 
 
