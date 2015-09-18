@@ -4,17 +4,17 @@ import akka.actor.AbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.ReceiveBuilder;
-import com.senacor.hackingdays.serialization.thirftdata.Profile;
+import com.senacor.hackingdays.serialization.data.Profile;
 import scala.PartialFunction;
 import scala.runtime.BoxedUnit;
 
-public class ConsumerActor extends AbstractActor {
+public class ConsumerActorThrift extends AbstractActor {
 
     private final LoggingAdapter logger = Logging.getLogger(context().system().eventStream(), this);
 
     private int receivedCount;
 
-    public ConsumerActor() {
+    public ConsumerActorThrift() {
         receive(messageHandler());
     }
 

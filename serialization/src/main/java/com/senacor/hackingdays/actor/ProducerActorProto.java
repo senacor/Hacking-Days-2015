@@ -6,16 +6,16 @@ import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.ReceiveBuilder;
-import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.data.generate.ProfileProtoGenerator;
 import scala.PartialFunction;
 import scala.runtime.BoxedUnit;
 
-public class ProducerActor extends AbstractActor {
+public class ProducerActorProto extends AbstractActor {
 
 
     private final ActorRef consumer;
 
-    public ProducerActor(ActorRef consumer) {
+    public ProducerActorProto(ActorRef consumer) {
         this.consumer = consumer;
         receive(messageHandler());
     }
@@ -28,7 +28,7 @@ public class ProducerActor extends AbstractActor {
 
     private void sendMessagesToConsumer(int count) {
         ActorRef collector = context().actorOf(AckCollector.props(count, sender()), "collector");
-        ProfileGenerator.newInstance(count).stream().forEach(profile -> consumer.tell(profile, collector));
+        ProfileProtoGenerator.newInstance(count).stream().forEach(profile -> consumer.tell(profile, collector));
     }
 
 
@@ -54,9 +54,7 @@ public class ProducerActor extends AbstractActor {
 
         private void checkForCompletion() {
             acknowledged++;
-//            if (acknowledged % 100 == 0) {
-//                logger.info(String.format("acked %s profiles", acknowledged));
-//            }
+//            logger.info(String.format("acked %s profiles", acknowledged));
             if (acknowledged == count) {
                 launcher.tell("completed", launcher);
             }

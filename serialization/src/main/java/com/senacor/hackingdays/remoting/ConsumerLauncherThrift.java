@@ -7,7 +7,7 @@ import com.senacor.hackingdays.actor.ConsumerActor;
 
 import static com.senacor.hackingdays.config.ConfigHelper.createConfig;
 
-public class ConsumerLauncher {
+public class ConsumerLauncherThrift {
 
 
     public static void main(String[] args) {

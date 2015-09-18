@@ -10,12 +10,12 @@ import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
 import scala.PartialFunction;
 import scala.runtime.BoxedUnit;
 
-public class ProducerActor extends AbstractActor {
+public class ProducerActorThrift extends AbstractActor {
 
 
     private final ActorRef consumer;
 
-    public ProducerActor(ActorRef consumer) {
+    public ProducerActorThrift(ActorRef consumer) {
         this.consumer = consumer;
         receive(messageHandler());
     }

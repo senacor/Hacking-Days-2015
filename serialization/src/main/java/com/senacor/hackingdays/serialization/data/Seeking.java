@@ -1,0 +1,46 @@
+package com.senacor.hackingdays.serialization.data;
+
+import org.codehaus.jackson.annotate.JsonProperty;
+
+import java.io.Serializable;
+
+public class Seeking implements Serializable, UnsafeSerializable {
+
+    private final Gender gender;
+    private final Range ageRange;
+
+    public Seeking(
+            @JsonProperty("gender") Gender gender,
+            @JsonProperty("ageRange") Range ageRange) {
+        this.gender = gender;
+        this.ageRange = ageRange;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public Range getAgeRange() {
+        return ageRange;
+    }
+
+    @Override
+    public String toString() {
+        return "Seeking{" +
+                "gender=" + gender +
+                ", ageRange=" + ageRange +
+                '}';
+    }
+
+  @Override
+  public void serializeUnsafe(UnsafeMemory memory) {
+    gender.serializeUnsafe(memory);
+    ageRange.serializeUnsafe(memory);
+  }
+
+  public static Seeking deserializeUnsafe(final UnsafeMemory memory) {
+    final Gender gender = Gender.deserializeUnsafe(memory);
+    final Range ageRange = Range.deserializeUnsafe(memory);
+    return new Seeking(gender, ageRange);
+  }
+}
