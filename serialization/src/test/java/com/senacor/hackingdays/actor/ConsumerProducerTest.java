@@ -4,10 +4,14 @@ import static com.senacor.hackingdays.config.ConfigHelper.*;
 import static junitparams.JUnitParamsRunner.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
@@ -150,7 +154,14 @@ public class ConsumerProducerTest {
 
 		Set<ClassInfo> classInfos = ClassPath.from(Serializer.class.getClassLoader())
 				.getTopLevelClasses("com.senacor.hackingdays.serializer");
-		Set<Object[]> resultSet = new HashSet<Object[]>();
+		Set<Object[]> resultSet = new TreeSet<>(new Comparator<Object[]>() {
+
+			@Override
+			public int compare(Object[] o1, Object[] o2) {
+				return o1[0].toString().compareTo(o2[0].toString()) ;
+			}
+			
+		});
 
 		resultSet.add($(JavaSerializer.class.getSimpleName(), JavaSerializer.class.getCanonicalName()));
 
