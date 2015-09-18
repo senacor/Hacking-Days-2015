@@ -44,10 +44,14 @@ public class ConsumerProducerTest {
         Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT), timeout);
         Await.result(ask, timeout.duration());
         stopwatch.stop();
-        actorSystem.shutdown();
-        actorSystem.awaitTermination();
+        shutdown(actorSystem);
         System.err.println(
             String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+    }
+
+    private void shutdown(ActorSystem actorSystem) {
+        actorSystem.shutdown();
+        actorSystem.awaitTermination();
     }
 
     @Test
@@ -63,8 +67,7 @@ public class ConsumerProducerTest {
         Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT), timeout);
         Await.result(ask, timeout.duration());
         stopwatch.stop();
-        actorSystem.shutdown();
-        actorSystem.awaitTermination();
+        shutdown(actorSystem);
         System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
@@ -73,11 +76,10 @@ public class ConsumerProducerTest {
     public void calculateObjectSize(String serializerName, String fqcn) throws Exception {
         ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
 
-        Profile p = ProfileGenerator.newInstance(1).iterator().next();
+        Profile p = ProfileGenerator.newProfile();
         int length = SerializationExtension.get(actorSystem).serializerFor(Profile.class).toBinary(p).length;
-        Thread.sleep(1000);
-        actorSystem.shutdown();
-        actorSystem.awaitTermination();
+        Thread.sleep(200);
+        shutdown(actorSystem);
 
         System.err.println(String.format("Serializing a Profile with %s took %s bytes.", serializerName, length));
     }
@@ -92,8 +94,7 @@ public class ConsumerProducerTest {
         Profile input = ProfileGenerator.newProfile();
         Profile output = (Profile) serializer.fromBinary(serializer.toBinary(input), Profile.class);
 
-        actorSystem.shutdown();
-        actorSystem.awaitTermination();
+        shutdown(actorSystem);
 
         Assert.assertNotNull(output);
         Assert.assertNotNull(output.getActivity());
@@ -128,22 +129,6 @@ public class ConsumerProducerTest {
                 $("unsafe", "com.senacor.hackingdays.serializer.UnsafeSerializer")
         );
     }
-//    private Config overrideConfig(String serializerName, String fqcn) {
-//        String configSnippet = String.format("akka {\n" +
-//            "  actor {\n" +
-//            "    serializers {\n" +
-//            "      %s = \"%s\"\n" +
-//            "    }\n" +
-//            "\n" +
-//            "    serialization-bindings {\n" +
-//            "      \"com.senacor.hackingdays.serialization.data.Profile\" = %s\n" +
-//            "    }\n" +
-//            "  }\n" +
-//            "}", serializerName, fqcn, serializerName);
-//
-//        Config overrides = ConfigFactory.parseString(configSnippet);
-//        return overrides.withFallback(ConfigFactory.load());
-//    }
 
     @SuppressWarnings("unusedDeclaration")
     static Object[] serializerProtoBuf() {
