@@ -27,8 +27,7 @@ import static junitparams.JUnitParamsRunner.$;
 public class ConsumerProducerTest {
 
 
-    public static final int COUNT = 100_000;
-
+    public static final int COUNT = 100000;
 
     @Test
     @Parameters(method = "serializers")
@@ -70,6 +69,8 @@ public class ConsumerProducerTest {
         return $(
                 $("java", "akka.serialization.JavaSerializer"),
                 $("json", "com.senacor.hackingdays.serializer.JacksonSerializer"),
+                $("gson", "com.senacor.hackingdays.serializer.GsonSerializer"),
+                $("gson2", "com.senacor.hackingdays.serializer.GsonSerializer2"),
                 $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer")
         );
     }
