@@ -28,8 +28,7 @@ public class MulitpleConsumerLauncher {
                 new ProducerProfile("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer", "2559"),
                 new ProducerProfile("kryo", "com.senacor.hackingdays.serializer.KryoSerializer", "2560"),
                 new ProducerProfile("unsafe", "com.senacor.hackingdays.serializer.UnsafeSerializer", "2561"),
-                new ProducerProfile("refl-kryo", "com.senacor.hackingdays.serializer.ReflectionKryoSerializer", "2562"),
-                new ProducerProfile("jaxb", "com.senacor.hackingdays.serializer.JAXBSerializer", "2563")
+                new ProducerProfile("refl-kryo", "com.senacor.hackingdays.serializer.ReflectionKryoSerializer", "2562")
         ).forEach(triple -> {
 
             Config config = createConfig(triple.name, triple.fqcn, "application-remote.conf");

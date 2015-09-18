@@ -27,7 +27,7 @@ public class ProducerLauncherProto {
         ActorRef remoteConsumer = actorSystem.actorFor("akka.tcp://consumer-actorsystem-protobuf@172.16.236.207:2553/user/consumer");
 
         ActorRef producer = actorSystem.actorOf(Props.create(ProducerActorProto.class, () -> new ProducerActorProto(remoteConsumer)), "producer");
-        System.out.println("Startet producer " + producer);
+        System.out.println("Started producer " + producer);
 
 
         sendDataAndWaitForCompletion(producer);
