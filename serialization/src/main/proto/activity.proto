@@ -1,0 +1,47 @@
+option java_package = "com.senacor.hackingdays.serialization.data.proto";
+
+option java_outer_classname = "ProfileProtos";
+
+message Profile {
+    optional string name = 1;
+    optional Gender gender = 2;
+    optional int32 age = 3;
+    optional Location location = 4;
+    optional RelationShipStatus relationShip = 5;
+    optional bool smoker = 6;
+    optional Seeking seeking = 7;
+    optional Activity activity = 8;
+}
+
+message Location {
+    optional string state = 1;
+    optional string city = 2;
+    optional string zip = 3;
+}
+
+message Seeking {
+    optional Gender gender = 1;
+    optional Range ageRange = 2;
+}
+
+message Range {
+    optional int32 lower=1;
+    optional int32 upper=2;
+}
+
+message Activity {
+    optional int64 lastLogin = 1;
+    optional int32 loginCount = 2;
+}
+
+enum RelationShipStatus {
+    Divorced = 0;
+    Maried = 1;
+    Single = 2;
+}
+
+enum Gender {
+    Male = 0;
+    Female = 1;
+    Disambiguous = 2;
+}
