@@ -1,28 +1,28 @@
 package com.senacor.hackingdays.actor;
 
+import static com.senacor.hackingdays.config.ConfigHelper.*;
+import static junitparams.JUnitParamsRunner.*;
+
+import java.io.File;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import com.google.common.base.Stopwatch;
+import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
+
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import com.google.common.base.Stopwatch;
-import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
-import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
-
-import java.io.File;
-import java.util.concurrent.TimeUnit;
-
-import static com.senacor.hackingdays.config.ConfigHelper.createConfig;
-import static junitparams.JUnitParamsRunner.$;
 
 @RunWith(JUnitParamsRunner.class)
 public class ConsumerProducerTest {
@@ -55,6 +55,7 @@ public class ConsumerProducerTest {
                 $("json", "com.senacor.hackingdays.serializer.JacksonSerializer"),
                 $("gson", "com.senacor.hackingdays.serializer.GsonSerializer"),
                 $("gson2", "com.senacor.hackingdays.serializer.GsonSerializer2"),
+				$("xml", "com.senacor.hackingdays.serializer.XStreamXMLSerializer"),
                 $("json-io", "com.senacor.hackingdays.serializer.JsonIoSerializer"),
                 $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer")
         );
