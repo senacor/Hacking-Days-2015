@@ -167,8 +167,9 @@ public class ConsumerProducerTest {
 
     Serializer serializer = SerializationExtension.get(actorSystem).serializerFor(Profile.class);
 
-    Profile input = ProfileGenerator.newProfile();
-    Profile output = (Profile) serializer.fromBinary(serializer.toBinary(input), Profile.class);
+    com.senacor.hackingdays.serialization.data.thrift.Profile input = ProfileGeneratorThrift.newProfile();
+    com.senacor.hackingdays.serialization.data.thrift.Profile output =
+            (com.senacor.hackingdays.serialization.data.thrift.Profile) serializer.fromBinary(serializer.toBinary(input), com.senacor.hackingdays.serialization.data.thrift.Profile.class);
 
     shutdown(actorSystem);
 
@@ -177,7 +178,7 @@ public class ConsumerProducerTest {
     Assert.assertNotNull(output.getLocation());
     Assert.assertNotNull(output.getSeeking());
 
-    Assert.assertEquals(input.getActivity().getLastLogin(), output.getActivity().getLastLogin());
+    Assert.assertEquals(input.getActivity().getLastLoginTimestamp(), output.getActivity().getLastLoginTimestamp());
     Assert.assertEquals(input.getActivity().getLoginCount(), output.getActivity().getLoginCount());
     Assert.assertEquals(input.getAge(), output.getAge());
     Assert.assertEquals(input.getGender(), output.getGender());
