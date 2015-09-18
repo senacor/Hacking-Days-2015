@@ -6,15 +6,14 @@ import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.ReceiveBuilder;
-import akka.serialization.Serialization;
-import akka.serialization.SerializationExtension;
 import com.senacor.hackingdays.serialization.data.generate.DataGenerator;
 import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
 import scala.PartialFunction;
 import scala.runtime.BoxedUnit;
 
-public class ProducerActor extends AbstractActor {
+import java.lang.reflect.InvocationTargetException;
 
+public class ProducerActor extends AbstractActor {
 
     private final ActorRef consumer;
 
@@ -34,9 +33,9 @@ public class ProducerActor extends AbstractActor {
 
         if (generatorClazz != null) {
           try {
-            DataGenerator generator = generatorClazz.newInstance();
+            DataGenerator generator = (DataGenerator) generatorClazz.getMethod("newInstance", Integer.TYPE).invoke(null, count);
             generator.doEach(count, profile -> consumer.tell(profile, collector));
-          } catch (InstantiationException|IllegalAccessException e) {
+          } catch (IllegalAccessException|NoSuchMethodException|InvocationTargetException e) {
             throw new RuntimeException(e);
           }
         } else {

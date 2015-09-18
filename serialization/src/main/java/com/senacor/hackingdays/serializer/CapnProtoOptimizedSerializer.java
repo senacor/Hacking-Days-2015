@@ -47,7 +47,7 @@ public class CapnProtoOptimizedSerializer extends JSerializer {
 
             Profile profile = new Profile(capnProfile.getName().toString(), Gender.valueOf(toCamel(capnProfile.getGender().name())));
             Range seekingRange = new Range(capnProfile.getSeekingRangeLower(),capnProfile.getSeekingRangeUpper());
-            Seeking seek = new Seeking(Gender.valueOf(toCamel(capnProfile.getGender().name())),seekingRange);
+            Seeking seek = new Seeking(Gender.valueOf(toCamel(capnProfile.getSeekingGender().name())),seekingRange);
             profile.setSeeking(seek);
             profile.setRelationShip(RelationShipStatus.valueOf(toCamel(capnProfile.getRelationShip().name())));
             Location loc = new Location(capnProfile.getLocationState().toString(),capnProfile.getLocationCity().toString(),capnProfile.getLocationZip().toString());

@@ -108,7 +108,7 @@ public class ProfileGeneratorThrift implements Iterable<Profile>, DataGenerator 
 
     @Override
     public void doEach(int size, Consumer consumer) {
-      new Builder(size).build().iterator().forEachRemaining(o -> consumer.accept(o));
+      iterator().forEachRemaining(o -> consumer.accept(o));
     }
 
     public static class Builder {
