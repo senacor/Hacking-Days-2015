@@ -13,7 +13,7 @@ public class ConsumerLauncherProto {
 
 
     public static void main(String[] args) {
-        ActorSystem actorSystem = ActorSystem.create("consumer-actorsystem-protobuf", createConfig("proto", "com.senacor.hackingdays.serializer.ProtoBufSerilalizer", "application-remote.conf"));
+        ActorSystem actorSystem = ActorSystem.create("consumer-actorsystem", createConfig("proto", "com.senacor.hackingdays.serializer.ProtoBufSerilalizer", "application-remote.conf"));
         ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActorProto.class, () -> new ConsumerActorProto()), "consumer");
         System.out.println("Started consumer " + consumer);
     }
