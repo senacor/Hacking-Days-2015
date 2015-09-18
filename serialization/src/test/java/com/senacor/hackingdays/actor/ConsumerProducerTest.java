@@ -83,6 +83,23 @@ public class ConsumerProducerTest {
         System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
+  @Test
+  @Parameters(method = "serializerThrift")
+  public void sendMessagesThrift(String serializerName, String fqcn) throws Exception {
+    ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem-thrift", createConfig(serializerName, fqcn));
+    ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActorThrift.class, () -> new ConsumerActorThrift()), "consumer");
+    ActorRef producer = actorSystem.actorOf(Props.create(ProducerActorThrift.class, () -> new ProducerActorThrift(consumer)), "producer");
+
+    Timeout timeout = Timeout.apply(25, TimeUnit.SECONDS);
+
+    Stopwatch stopwatch = Stopwatch.createStarted();
+    Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT), timeout);
+    Await.result(ask, timeout.duration());
+    stopwatch.stop();
+    shutdown(actorSystem);
+    System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+  }
+
     @Test
     @Parameters(method = "serializers")
     public void calculateObjectSize(String serializerName, String fqcn) throws Exception {
@@ -129,7 +146,7 @@ public class ConsumerProducerTest {
 
 	static Object[] serializers() throws IOException {
 
-		final List<Class<?>> testExceptions = Arrays.asList(ProtoBufSerilalizer.class);
+		final List<Class<ProtoBufSerilalizer>> testExceptions = Arrays.asList(ProtoBufSerilalizer.class);
 
 		Set<ClassInfo> classInfos = ClassPath.from(Serializer.class.getClassLoader())
 				.getTopLevelClasses("com.senacor.hackingdays.serializer");
@@ -152,6 +169,18 @@ public class ConsumerProducerTest {
         return $(
                 $("protoBuf", "com.senacor.hackingdays.serializer.ProtoBufSerilalizer")
         );
+    }
+
+    @SuppressWarnings("unusedDeclaration")
+    static Object[] serializerThrift() {
+      return $(
+              $("thrifttuple", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTTuple"),
+              $("thriftbinary", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTBinary"),
+              $("thriftcompact", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTCompact"),
+              $("thriftjson", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTJSON"),
+              $("thriftsimplejson", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTSimpleJSON"),
+              $("thrifttuple", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTTuple")
+      );
     }
 
 
