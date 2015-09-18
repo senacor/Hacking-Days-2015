@@ -37,8 +37,7 @@ public class MulitpleConsumerLauncher {
                 new ProducerProfile("capn-proto-opt", "com.senacor.hackingdays.serializer.CapnProtoOptimizedSerializer", "2565"),
                 new ProducerProfile("proto", ProtoBufSerilalizer.class.getName(), "2566"),
                 new ProducerProfile("thrift-bin", ThriftSerializerTBinary.class.getName(), "2567"),
-                new ProducerProfile("thrift-tuple", ThriftSerializerTTuple.class.getName(), "2568"),
-                new ProducerProfile("json-io", JsonIoSerializer.class.getName(), "2569")
+                new ProducerProfile("thrift-tuple", ThriftSerializerTTuple.class.getName(), "2568")
         ).forEach(triple -> {
 
             Config config = createConfig(triple.name, triple.fqcn, "application-remote.conf");
