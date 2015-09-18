@@ -8,8 +8,6 @@ import akka.util.Timeout;
 import com.google.common.base.Stopwatch;
 import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
 import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Ignore;
@@ -55,8 +53,9 @@ public class ConsumerProducerTest {
                 $("json", "com.senacor.hackingdays.serializer.JacksonSerializer"),
                 $("gson", "com.senacor.hackingdays.serializer.GsonSerializer"),
                 $("gson2", "com.senacor.hackingdays.serializer.GsonSerializer2"),
-                $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer")
-        );
+                $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer"),
+                $("jaxb", "com.senacor.hackingdays.serializer.JAXBSerializer")
+                );
     }
 
     @Test
