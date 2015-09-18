@@ -25,8 +25,8 @@ public class KryoSerializer extends JSerializer {
         kryo.addDefaultSerializer(Gender.class, new GenderSerializer());
         kryo.addDefaultSerializer(Seeking.class, new SeekingSerializer());
         kryo.addDefaultSerializer(Activity.class, new ActivitySerializer());
-//        kryo.addDefaultSerializer(Profile.class, com.senacor.hackingdays.serializer.ProfileSerializer.class);
-        kryo.addDefaultSerializer(Profile.class, new com.senacor.hackingdays.serializer.ProfileSerializer(kryo));
+        kryo.addDefaultSerializer(Profile.class, new com.senacor.hackingdays.serializer.kryo.sryll.ProfileSerializer());
+//        kryo.addDefaultSerializer(Profile.class, new com.senacor.hackingdays.serializer.ProfileSerializer(kryo));
     }
 
     @Override
