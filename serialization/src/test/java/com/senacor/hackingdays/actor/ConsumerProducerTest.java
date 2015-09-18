@@ -6,26 +6,23 @@ import static junitparams.JUnitParamsRunner.$;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import com.google.common.base.Stopwatch;
-import com.google.common.base.Stopwatch;
-import com.senacor.hackingdays.serialization.data.Profile;
-import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
-import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
-import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
-import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
-
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.pattern.Patterns;
 import akka.serialization.SerializationExtension;
+import akka.serialization.Serializer;
 import akka.util.Timeout;
+import com.google.common.base.Stopwatch;
+import com.senacor.hackingdays.serialization.data.Profile;
+import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 
@@ -83,6 +80,33 @@ public class ConsumerProducerTest {
         actorSystem.awaitTermination();
 
         System.err.println(String.format("Serializing a Profile with %s took %s bytes.", serializerName, length));
+    }
+
+    @Test
+    @Parameters(method = "serializers")
+    public void assertFields(String serializerName, String fqcn) throws Exception {
+        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
+
+        Serializer serializer = SerializationExtension.get(actorSystem).serializerFor(Profile.class);
+
+        Profile input = ProfileGenerator.newInstance(1).iterator().next();
+        Profile output = (Profile) serializer.fromBinary(serializer.toBinary(input), Profile.class);
+
+        actorSystem.shutdown();
+        actorSystem.awaitTermination();
+
+        Assert.assertEquals(input.getActivity().getLastLogin(), output.getActivity().getLastLogin());
+        Assert.assertEquals(input.getActivity().getLoginCount(), output.getActivity().getLoginCount());
+        Assert.assertEquals(input.getAge(), output.getAge());
+        Assert.assertEquals(input.getGender(), output.getGender());
+        Assert.assertEquals(input.getLocation().getCity(), output.getLocation().getCity());
+        Assert.assertEquals(input.getLocation().getState(), output.getLocation().getState());
+        Assert.assertEquals(input.getLocation().getZip(), output.getLocation().getZip());
+        Assert.assertEquals(input.getName(), output.getName());
+        Assert.assertEquals(input.getRelationShip(), output.getRelationShip());
+        Assert.assertEquals(input.getSeeking().getAgeRange().getLower(), output.getSeeking().getAgeRange().getLower());
+        Assert.assertEquals(input.getSeeking().getAgeRange().getUpper(), output.getSeeking().getAgeRange().getUpper());
+        Assert.assertEquals(input.getSeeking().getGender(), output.getSeeking().getGender());
     }
 
     @SuppressWarnings("unusedDeclaration")
