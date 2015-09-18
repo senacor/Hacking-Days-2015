@@ -22,7 +22,7 @@ public class ThriftSerializerTCompact extends JSerializer {
 
   @Override
   public int identifier() {
-    return 4711;
+    return 3426;
   }
 
   @Override
