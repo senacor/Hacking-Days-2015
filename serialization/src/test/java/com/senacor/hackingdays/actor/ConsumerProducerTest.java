@@ -128,14 +128,16 @@ public class ConsumerProducerTest {
     }
 
 	static Object[] serializers() throws IOException {
-		
+
 		final List<Class<?>> testExceptions = Arrays.asList(ProtoBufSerilalizer.class);
 
+		Set<ClassInfo> classInfos = ClassPath.from(Serializer.class.getClassLoader())
+				.getTopLevelClasses("com.senacor.hackingdays.serializer");
 		Set<Object[]> resultSet = new HashSet<Object[]>();
+
 		resultSet.add($(JavaSerializer.class.getSimpleName(), JavaSerializer.class.getCanonicalName()));
 
-		for (ClassInfo info : ClassPath.from(Serializer.class.getClassLoader())
-				.getTopLevelClasses("com.senacor.hackingdays.serializer")) {
+		for (ClassInfo info : classInfos) {
 			Class<?> clazz = info.load();
 			if (isSerializer(clazz) && !testExceptions.contains(clazz))
 				resultSet.add($(clazz.getSimpleName(), clazz.getCanonicalName()));
@@ -144,7 +146,8 @@ public class ConsumerProducerTest {
 		return resultSet.toArray();
 		
 	}
-
+	
+    @SuppressWarnings("unusedDeclaration")
     static Object[] serializerProtoBuf() {
         return $(
                 $("protoBuf", "com.senacor.hackingdays.serializer.ProtoBufSerilalizer")
