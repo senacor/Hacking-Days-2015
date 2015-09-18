@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.Date;
 
 public class CapnProtoSerializer extends JSerializer {
 
@@ -44,7 +45,20 @@ public class CapnProtoSerializer extends JSerializer {
                     message.getRoot(CapnProtoProfile.ProfileStruct.factory);
 
             Profile profile = new Profile(capnProfile.getName().toString(), Gender.valueOf(toCamel(capnProfile.getGender().name())));
-            //           profile.setSeeking();
+            Range seekingRange = new Range(capnProfile.getSeeking().getAgeRange().getLower(),capnProfile.getSeeking().getAgeRange().getUpper());
+            Seeking seek = new Seeking(Gender.valueOf(toCamel(capnProfile.getSeeking().getGender().name())),seekingRange);
+            profile.setSeeking(seek);
+            profile.setRelationShip(RelationShipStatus.valueOf(toCamel(capnProfile.getRelationShip().name())));
+            Location loc = new Location(capnProfile.getLocation().getState().toString(),capnProfile.getLocation().getCity().toString(),capnProfile.getLocation().getZip().toString());
+
+            profile.setLocation(loc);
+
+              profile.setAge(capnProfile.getAge());
+            CapnProtoProfile.ProfileStruct.Date.Reader llCap = capnProfile.getActivity().getLastLogin();
+            Date lastlog = new Date(llCap.getDay(),llCap.getMonth(),llCap.getYear());
+            Activity act = new Activity(lastlog,capnProfile.getActivity().getLoginCount());
+            profile.setActivity(act);
+
 
             return profile;
         } catch (IOException e) {

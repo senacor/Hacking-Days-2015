@@ -1,0 +1,56 @@
+@0x9eb32e19f86ee174;
+using Java = import "java.capnp";
+$Java.package("com.senacor.hackingdays.serialization.data");
+$Java.outerClassname("Profile");
+
+struct ProfileStruct {
+  age @0 :UInt32;
+  name @1 :Text;
+  gender @2 :Gender;
+  location @3 :Location;
+  relationShip @4 :RelationShipStatus;
+  smoker @5 :Bool;
+  seeking @6 :Seeking;
+  activity @7 :Activity;
+
+  enum Gender {
+      male @0;
+      female @1;
+      disambiguous @2;
+    }
+
+  struct Location {
+  state @0 :Text;
+  city @1 :Text;
+  zip @2 :Text;
+  }
+
+  enum RelationShipStatus {
+      divorced @0;
+      maried @1;
+      single @2;
+    }
+
+  struct Seeking {
+  gender @0 :Gender;
+  ageRange @1 :Range;
+  }
+
+  struct Range {
+  lower @0 :UInt32;
+  upper @1 :UInt32;
+  }
+
+  struct Activity {
+  lastLogin @0 :Date;
+  loginCount @1 :UInt32;
+  }
+
+
+struct Date {
+  year @0 :UInt32;
+  month @1 :UInt32;
+  day @2 :UInt32;
+}
+
+}
