@@ -1,14 +1,15 @@
 package com.senacor.hackingdays.serializer;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
 import akka.serialization.JSerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.senacor.hackingdays.serialization.data.Gender;
 import com.senacor.hackingdays.serialization.data.Location;
 import com.senacor.hackingdays.serialization.data.Range;
+import com.senacor.hackingdays.serialization.data.Seeking;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 public class KryoSerializer extends JSerializer {
 
@@ -17,6 +18,8 @@ public class KryoSerializer extends JSerializer {
     public KryoSerializer() {
         kryo.addDefaultSerializer(Range.class, new RangeSerializer());
         kryo.addDefaultSerializer(Location.class, new LocationSerializer());
+        kryo.addDefaultSerializer(Gender.class, new GenderSerializer());
+        kryo.addDefaultSerializer(Seeking.class, new SeekingSerializer());
     }
 
     @Override
