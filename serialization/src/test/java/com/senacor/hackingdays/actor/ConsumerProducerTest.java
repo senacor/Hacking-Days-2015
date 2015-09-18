@@ -123,15 +123,5 @@ public class ConsumerProducerTest {
         );
     }
 
-    @Test
-    @Ignore
-    public void writeXmlFile() throws Exception {
-
-        try (XMLProfileWriter writer = new XMLProfileWriter(new File("src/main/resources/database.xml"))) {
-            ProfileGenerator generator = ProfileGenerator.newInstance(1_000_000);
-            generator.stream().forEach(writer::write);
-
-        }
-    }
 
 }
