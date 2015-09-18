@@ -80,7 +80,7 @@ public class ConsumerProducerTest {
     @SuppressWarnings("unusedDeclaration")
     static Object[] serializerProtoBuf() {
         return $(
-                $("protoBuff", "com.senacor.hackingdays.serializer.ProtoBufSerilalizer")
+                $("protoBuf", "com.senacor.hackingdays.serializer.ProtoBufSerilalizer")
         );
     }
 
