@@ -1,25 +1,27 @@
 package com.senacor.hackingdays.actor;
 
+import java.io.File;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
+import com.google.common.base.Stopwatch;
+import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
+
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import com.google.common.base.Stopwatch;
-import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
-import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
-import org.junit.Ignore;
-import org.junit.Test;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
-
-import java.io.File;
-import java.util.concurrent.TimeUnit;
 
 public class ConsumerProducerTest {
 
 
-    public static final int COUNT = 1000;
+    public static final int COUNT = 100 * 1000;
 
 
     @Test

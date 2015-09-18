@@ -2,7 +2,7 @@ package com.senacor.hackingdays.serializer;
 
 import akka.serialization.JSerializer;
 
-public class KyroSerilalizer extends JSerializer {
+public class KryoSerializer extends JSerializer {
 
     @Override
     public Object fromBinaryJava(byte[] bytes, Class<?> manifest) {
@@ -23,4 +23,5 @@ public class KyroSerilalizer extends JSerializer {
     public boolean includeManifest() {
         return false;
     }
+
 }
