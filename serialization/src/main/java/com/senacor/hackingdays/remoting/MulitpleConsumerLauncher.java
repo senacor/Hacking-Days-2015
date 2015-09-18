@@ -46,7 +46,7 @@ public class MulitpleConsumerLauncher {
             Config mergedConfig = overridePort(triple.port).withFallback(config);
             ActorSystem actorSystem = ActorSystem.create("consumer-actorsystem", mergedConfig);
 
-            ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActor.class, () -> new ConsumerActor()), "consumer");
+            ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActor.class, ConsumerActor::new), "consumer");
             System.out.println("Startet consumer " + consumer);
 
         });
