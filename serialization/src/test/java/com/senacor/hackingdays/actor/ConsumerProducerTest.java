@@ -70,7 +70,8 @@ public class ConsumerProducerTest {
                 $("java", "akka.serialization.JavaSerializer"),
                 $("json", "com.senacor.hackingdays.serializer.JacksonSerializer"),
                 $("gson", "com.senacor.hackingdays.serializer.GsonSerializer"),
-                $("gson2", "com.senacor.hackingdays.serializer.GsonSerializer2")
+                $("gson2", "com.senacor.hackingdays.serializer.GsonSerializer2"),
+                $("xml", "com.senacor.hackingdays.serializer.XStreamXMLSerializer")
         );
     }
 
