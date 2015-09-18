@@ -35,7 +35,7 @@ public class JsonSerializerTest {
 
 	@Test
 	public void testSerialization() {
-		JsonSerializer serializer = new JsonSerializer();
+		GsonSerializer serializer = new GsonSerializer();
 		Zeug zeug = new Zeug("a", "b", false);
 		byte[] serialized = serializer.toBinary(zeug);
 		assertThat(serialized, is(notNullValue()));

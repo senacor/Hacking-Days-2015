@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 
 import akka.serialization.JSerializer;
 
-public class JsonSerializer extends JSerializer {
+public class GsonSerializer extends JSerializer {
 
 	private final Gson gson = new Gson();
 	private static final Charset UTF8 = Charset.forName("UTF-8");

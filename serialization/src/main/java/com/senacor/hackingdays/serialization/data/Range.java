@@ -1,5 +1,7 @@
 package com.senacor.hackingdays.serialization.data;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -14,7 +16,9 @@ public class Range implements Serializable {
     private final int lower;
     private final int upper;
 
-    public Range(int lower, int upper) {
+    public Range(
+            @JsonProperty("lower") int lower,
+            @JsonProperty("upper") int upper) {
         checkArgument(upper <= MAX_AGE, "upper must be < " + MAX_AGE + " but is " + upper);
         checkArgument(lower >= MIN_AGE, "lower must be > " + MIN_AGE + " but is " + lower);
         checkArgument(lower <= upper);
