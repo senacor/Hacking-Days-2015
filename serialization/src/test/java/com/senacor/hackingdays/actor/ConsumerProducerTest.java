@@ -81,7 +81,7 @@ public class ConsumerProducerTest {
         Thread.sleep(200);
         shutdown(actorSystem);
 
-        System.err.println(String.format("Serializing a Profile with %s took %s bytes.", serializerName, length));
+        System.err.println(String.format("Serializing a Profile with %s weights %s bytes.", serializerName, length));
     }
 
     @Test
