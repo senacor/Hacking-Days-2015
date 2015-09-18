@@ -2,7 +2,7 @@ package com.senacor.hackingdays.serializer;
 
 import akka.serialization.JSerializer;
 import com.google.gson.Gson;
-import com.senacor.hackingdays.serialization.data.Profile;
+import com.google.gson.GsonBuilder;
 
 import java.nio.charset.Charset;
 
@@ -12,7 +12,7 @@ import java.nio.charset.Charset;
 public class GsonSerializer2 extends JSerializer {
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
-    private final Gson gson = new Gson();
+    private final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
 
     @Override
     public Object fromBinaryJava(byte[] bytes, Class<?> aClass) {
