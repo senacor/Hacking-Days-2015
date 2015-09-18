@@ -89,11 +89,16 @@ public class ConsumerProducerTest {
 
         Serializer serializer = SerializationExtension.get(actorSystem).serializerFor(Profile.class);
 
-        Profile input = ProfileGenerator.newInstance(1).iterator().next();
+        Profile input = ProfileGenerator.newProfile();
         Profile output = (Profile) serializer.fromBinary(serializer.toBinary(input), Profile.class);
 
         actorSystem.shutdown();
         actorSystem.awaitTermination();
+
+        Assert.assertNotNull(output);
+        Assert.assertNotNull(output.getActivity());
+        Assert.assertNotNull(output.getLocation());
+        Assert.assertNotNull(output.getSeeking());
 
         Assert.assertEquals(input.getActivity().getLastLogin(), output.getActivity().getLastLogin());
         Assert.assertEquals(input.getActivity().getLoginCount(), output.getActivity().getLoginCount());
