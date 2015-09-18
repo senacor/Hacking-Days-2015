@@ -1,5 +1,6 @@
 package com.senacor.hackingdays.serializer;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 import com.cedarsoftware.util.io.JsonReader;
@@ -9,18 +10,32 @@ import akka.serialization.JSerializer;
 
 public class KyroSerilalizer extends JSerializer {
 	
-	JsonReader reader = new JsonReader();
-	JsonWriter writer = new JsonWriter(System.out);
+//	JsonReader reader = new JsonReader();
+//	JsonWriter writer = new JsonWriter(System.out);
 	public static Charset UTF8 = Charset.forName("UTF-8");
 
     @Override
     public Object fromBinaryJava(byte[] bytes, Class<?> manifest) {
-    	return JsonReader.jsonToJava(new String(bytes, UTF8));
+    	Object result = null;
+    	try {
+			result = JsonReader.jsonToJava(new String(bytes, UTF8));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return result;
     }
 
     @Override
     public byte[] toBinary(Object o) {
-    	return JsonWriter.objectToJson(o).getBytes(UTF8);
+    	byte[] result = null;
+    	try {
+			result = JsonWriter.objectToJson(o).getBytes(UTF8);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return result;
     }
 
     @Override
