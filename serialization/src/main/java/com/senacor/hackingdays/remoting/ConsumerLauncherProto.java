@@ -12,9 +12,9 @@ public class ConsumerLauncherProto {
 
 
     public static void main(String[] args) {
-        ActorSystem actorSystem = ActorSystem.create("consumer-actorsystem", createConfig("java", "akka.serialization.JavaSerializer"));
+        ActorSystem actorSystem = ActorSystem.create("consumer-actorsystem-protobuf", createConfig("java", "akka.serialization.JavaSerializer"));
         ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActorProto.class, () -> new ConsumerActorProto()), "consumer");
         System.out.println("Startet consumer " + consumer);
-        //actorSystem.shutdown(); akka.tcp://consumer-actorsystem@172.16.236.207:2553/user/consumer
+        //actorSystem.shutdown(); akka.tcp://consumer-actorsystem-protobuf@172.16.236.207:2553/user/consumer
     }
 }
