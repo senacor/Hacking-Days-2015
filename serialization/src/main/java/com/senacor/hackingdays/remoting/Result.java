@@ -3,7 +3,7 @@ package com.senacor.hackingdays.remoting;
 /**
  * @author Alasdair Collinson, Senacor Technologies AG
  */
-class Result implements Comparable<Result> {
+public class Result implements Comparable<Result> {
     private long time;
     private String name;
 

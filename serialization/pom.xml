@@ -65,29 +65,33 @@
 <!-- 				</executions> -->
 <!-- 			</plugin> -->
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<downloadSources>true</downloadSources>
-					<downloadJavadocs>true</downloadJavadocs>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.3</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <!--downloadSources>true</downloadSources>
+          <downloadJavadocs>true</downloadJavadocs-->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
-	<dependencies>
-		<!-- Hilfs-JAR fuer capn proto -->
-		<dependency>
-			<groupId>fakegroup</groupId>
-			<artifactId>capnproto-jar</artifactId>
-			<version>0.0.1</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/src/main/resources/capnproto.jar</systemPath>
-		</dependency>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <!-- Hilfs-JAR fuer capn proto -->
+    <dependency>
+      <groupId>fakegroup</groupId>
+      <artifactId>capnproto-jar</artifactId>
+      <version>0.0.1</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/src/main/resources/capnproto.jar</systemPath>
+    </dependency>
 
 		<dependency>
 			<groupId>com.google.protobuf</groupId>

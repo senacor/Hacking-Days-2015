@@ -6,7 +6,7 @@ import com.senacor.hackingdays.serialization.data.proto.ProfileProtos;
 /**
  * @author Alasdair Collinson, Senacor Technologies AG
  */
-class ProducerProfile {
+public class ProducerProfile {
     final String serializerName;
     final String fqcn;
     final String port;
@@ -17,6 +17,22 @@ class ProducerProfile {
         this.fqcn = fqcn;
         this.port = port;
         this.profileClass = profileClass;
+    }
+
+    public String getSerializerName() {
+        return serializerName;
+    }
+
+    public String getFqcn() {
+        return fqcn;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public Class<?> getProfileClass() {
+        return profileClass;
     }
 
     public static ProducerProfile createProfile(String serializerName, String fqcn, String port) {
