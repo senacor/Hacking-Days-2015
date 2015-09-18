@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,13 +21,16 @@ import com.senacor.hackingdays.serialization.data.Profile;
  */
 public class ProfileSerializerTest {
 
+	private static final String NAME = "Hans Mueller";
 	private Profile profile;
 	private Kryo kryo;
 	private ProfileSerializer profileSerializer;
 
 	@Before
 	public void setup() {
-		profile = new Profile("Hans Müller", Gender.Male);
+		System.out.println(Arrays.toString(NAME.getBytes()));
+
+		profile = new Profile(NAME, Gender.Male);
 		profile.setAge(38);
 
 		kryo = new Kryo();
@@ -45,6 +49,8 @@ public class ProfileSerializerTest {
 
         output.flush();
         output.close();
+
+        System.out.println(Arrays.toString(outputStream.toByteArray()));
 
         Input input = new Input(new ByteArrayInputStream(outputStream.toByteArray()));
 
