@@ -56,21 +56,6 @@ public class ConsumerProducerTest {
     }
 
     @Test
-    @Parameters(method = "serializers")
-    public void calculateObjectSize(String serializerName, String fqcn) throws Exception {
-        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
-
-        Profile p = ProfileGenerator.newInstance(1).iterator().next();
-        int length = SerializationExtension.get(actorSystem).serialize(p).get().length;
-        Thread.sleep(1000);
-        actorSystem.shutdown();
-        actorSystem.awaitTermination();
-
-
-        System.err.println(String.format("Serializing a Profile with %s took %s bytes.", serializerName, length));
-    }
-
-    @Test
     @Parameters(method = "serializerProtoBuf")
     public void sendMessagesProtoBuf(String serializerName, String fqcn) throws Exception {
         ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem-protobuf", createConfig(serializerName, fqcn));
@@ -86,6 +71,20 @@ public class ConsumerProducerTest {
         actorSystem.shutdown();
         actorSystem.awaitTermination();
         System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+    }
+
+    @Test
+    @Parameters(method = "serializers")
+    public void calculateObjectSize(String serializerName, String fqcn) throws Exception {
+        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
+
+        Profile p = ProfileGenerator.newInstance(1).iterator().next();
+        int length = SerializationExtension.get(actorSystem).serializerFor(Profile.class).toBinary(p).length;
+        Thread.sleep(1000);
+        actorSystem.shutdown();
+        actorSystem.awaitTermination();
+
+        System.err.println(String.format("Serializing a Profile with %s took %s bytes.", serializerName, length));
     }
 
     @SuppressWarnings("unusedDeclaration")
