@@ -23,6 +23,5 @@ public class ConsumerLauncher {
         ActorSystem actorSystem = ActorSystem.create("consumer-actorsystem", createConfig("java", "akka.serialization.JavaSerializer"));
         ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActor.class, () -> new ConsumerActor()), "consumer");
         System.out.println("Startet consumer " + consumer);
-        //actorSystem.shutdown(); akka.tcp://consumer-actorsystem@172.16.236.207:2553/user/consumer
     }
 }

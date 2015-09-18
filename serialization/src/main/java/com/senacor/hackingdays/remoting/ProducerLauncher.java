@@ -3,6 +3,7 @@ package com.senacor.hackingdays.remoting;
 import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
 import akka.actor.ActorSystem;
+import akka.actor.Identify;
 import akka.actor.Props;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
@@ -12,6 +13,7 @@ import com.senacor.hackingdays.actor.GenerateMessages;
 import com.senacor.hackingdays.actor.ProducerActor;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,13 +27,18 @@ public class ProducerLauncher {
         ActorSystem actorSystem = ActorSystem.create("producer-actorsystem", createConfig("java", "akka.serialization.JavaSerializer"));
 
         //TODO edit IP here
-        ActorRef remoteConsumer = actorSystem.actorFor("akka.tcp://consumer-actorsystem@172.16.236.207:2553/user/consumer");
+        ActorRef remoteConsumer = findRemoteConsumer(actorSystem);
 
         ActorRef producer = actorSystem.actorOf(Props.create(ProducerActor.class, () -> new ProducerActor(remoteConsumer)), "producer");
         System.out.println("Startet producer " + producer);
 
-
         sendDataAndWaitForCompletion(producer);
+    }
+
+    private static ActorRef findRemoteConsumer(ActorSystem actorSystem) throws Exception {
+        ActorSelection actorSelection = actorSystem.actorSelection("akka.tcp://consumer-actorsystem@172.16.236.207:2553/user/consumer");
+        Future<ActorRef> consumerFuture = actorSelection.resolveOne(Timeout.apply(2, TimeUnit.SECONDS));
+        return Await.result(consumerFuture, Duration.create(2, TimeUnit.SECONDS));
     }
 
     private static void sendDataAndWaitForCompletion(ActorRef producer) throws Exception {
