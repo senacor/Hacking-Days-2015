@@ -71,7 +71,8 @@ public class ConsumerProducerTest {
                 $("json", "com.senacor.hackingdays.serializer.JacksonSerializer"),
                 $("gson", "com.senacor.hackingdays.serializer.GsonSerializer"),
                 $("gson2", "com.senacor.hackingdays.serializer.GsonSerializer2"),
-                $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer")
+                $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer"),
+                $("unsafe", "com.senacor.hackingdays.serializer.UnsafeSerializer")
         );
     }
 
