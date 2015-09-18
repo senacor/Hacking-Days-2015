@@ -115,20 +115,33 @@ public class ConsumerProducerTest {
     @Test
     @Parameters(method = "serializers")
     public void calculateObjectSize(String serializerName, String fqcn) throws Exception {
-        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
+      ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
 
-        Profile p = ProfileGenerator.newProfile();
-        int length = SerializationExtension.get(actorSystem).serializerFor(Profile.class).toBinary(p).length;
-        Thread.sleep(200);
-        shutdown(actorSystem);
+      Profile p = ProfileGenerator.newProfile();
+      int length = SerializationExtension.get(actorSystem).serializerFor(Profile.class).toBinary(p).length;
+      Thread.sleep(200);
+      shutdown(actorSystem);
 
-    System.err.println(String.format("Serializing a Profile with %25s weights %4s bytes.", serializerName, length));
+      System.err.println(String.format("Serializing a Profile with %25s weights %4s bytes.", serializerName, length));
+    }
+
+    @Test
+    @Parameters(method = "serializerThrift")
+    public void calculateObjectSizeThrift(String serializerName, String fqcn) throws Exception {
+      ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
+
+      com.senacor.hackingdays.serialization.data.thrift.Profile p = ProfileGeneratorThrift.newProfile();
+      int length = SerializationExtension.get(actorSystem).serializerFor(com.senacor.hackingdays.serialization.data.thrift.Profile.class).toBinary(p).length;
+      Thread.sleep(200);
+      shutdown(actorSystem);
+
+      System.err.println(String.format("Serializing a Profile with %25s weights %4s bytes.", serializerName, length));
     }
 
     @Test
     @Parameters(method = "serializers")
     public void assertFields(String serializerName, String fqcn) throws Exception {
-        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem-thrift", createConfig(serializerName, fqcn));
+        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
 
         Serializer serializer = SerializationExtension.get(actorSystem).serializerFor(com.senacor.hackingdays.serialization.data.thrift.Profile.class);
 
