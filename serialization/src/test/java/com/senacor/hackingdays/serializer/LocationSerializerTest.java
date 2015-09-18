@@ -7,6 +7,8 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.senacor.hackingdays.serialization.data.Location;
+import com.senacor.hackingdays.serializer.kryo.LocationSerializer;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Assert;

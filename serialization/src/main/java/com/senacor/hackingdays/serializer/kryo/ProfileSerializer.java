@@ -1,4 +1,4 @@
-package com.senacor.hackingdays.serializer;
+package com.senacor.hackingdays.serializer.kryo;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;

@@ -10,6 +10,8 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.google.common.collect.Lists;
 import com.senacor.hackingdays.serialization.data.Gender;
+import com.senacor.hackingdays.serializer.kryo.GenderSerializer;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Assert;

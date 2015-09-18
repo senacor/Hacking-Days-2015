@@ -12,6 +12,11 @@ import com.senacor.hackingdays.serialization.data.Location;
 import com.senacor.hackingdays.serialization.data.Profile;
 import com.senacor.hackingdays.serialization.data.Range;
 import com.senacor.hackingdays.serialization.data.Seeking;
+import com.senacor.hackingdays.serializer.kryo.ActivitySerializer;
+import com.senacor.hackingdays.serializer.kryo.GenderSerializer;
+import com.senacor.hackingdays.serializer.kryo.LocationSerializer;
+import com.senacor.hackingdays.serializer.kryo.RangeSerializer;
+import com.senacor.hackingdays.serializer.kryo.SeekingSerializer;
 
 import akka.serialization.JSerializer;
 

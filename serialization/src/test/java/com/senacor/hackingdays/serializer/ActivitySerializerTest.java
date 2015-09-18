@@ -11,6 +11,8 @@ import com.esotericsoftware.kryo.io.Output;
 import com.google.common.collect.Lists;
 import com.senacor.hackingdays.serialization.data.Activity;
 import com.senacor.hackingdays.serialization.data.Location;
+import com.senacor.hackingdays.serializer.kryo.ActivitySerializer;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Assert;

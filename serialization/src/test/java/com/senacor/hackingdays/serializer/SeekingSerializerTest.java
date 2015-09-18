@@ -12,6 +12,9 @@ import com.google.common.collect.Lists;
 import com.senacor.hackingdays.serialization.data.Gender;
 import com.senacor.hackingdays.serialization.data.Range;
 import com.senacor.hackingdays.serialization.data.Seeking;
+import com.senacor.hackingdays.serializer.kryo.RangeSerializer;
+import com.senacor.hackingdays.serializer.kryo.SeekingSerializer;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Assert;
