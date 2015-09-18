@@ -233,7 +233,7 @@ public class ConsumerProducerTest {
               $("thriftbinary", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTBinary"),
               $("thriftcompact", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTCompact"),
               $("thriftjson", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTJSON"),
-              $("thriftsimplejson", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTSimpleJSON"),
+              /*$("thriftsimplejson", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTSimpleJSON"), has problems */
               $("thrifttuple", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTTuple")
       );
     }
