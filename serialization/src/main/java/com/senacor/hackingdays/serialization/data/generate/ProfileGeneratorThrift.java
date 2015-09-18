@@ -9,9 +9,8 @@ import com.senacor.hackingdays.serialization.data.thrift.RelationShipStatus;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -21,7 +20,7 @@ import java.util.stream.StreamSupport;
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 
-public class ProfileGeneratorThrift implements Iterable<Profile> {
+public class ProfileGeneratorThrift implements Iterable<Profile>, DataGenerator {
 
     private final static NameSupplierThrift femaleNames = NameSupplierThrift.forGender(Gender.Female);
     private final static NameSupplierThrift maleNames = NameSupplierThrift.forGender(Gender.Male);
@@ -104,6 +103,12 @@ public class ProfileGeneratorThrift implements Iterable<Profile> {
             default:
                 throw new AssertionError();
         }
+    }
+
+
+    @Override
+    public void doEach(int size, Consumer consumer) {
+      iterator().forEachRemaining(o -> consumer.accept(o));
     }
 
     public static class Builder {

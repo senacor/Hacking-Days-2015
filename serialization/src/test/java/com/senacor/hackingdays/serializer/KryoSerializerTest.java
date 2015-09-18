@@ -1,13 +1,5 @@
 package com.senacor.hackingdays.serializer;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.util.Date;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.senacor.hackingdays.serialization.data.Activity;
 import com.senacor.hackingdays.serialization.data.Gender;
 import com.senacor.hackingdays.serialization.data.Location;
@@ -15,6 +7,12 @@ import com.senacor.hackingdays.serialization.data.Profile;
 import com.senacor.hackingdays.serialization.data.Range;
 import com.senacor.hackingdays.serialization.data.RelationShipStatus;
 import com.senacor.hackingdays.serialization.data.Seeking;
+import java.util.Arrays;
+import java.util.Date;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Alasdair Collinson, Senacor Technologies AG
@@ -50,7 +48,7 @@ public class KryoSerializerTest {
     public void inputAndOutputAreSame() {
         final byte[] binaryProfile = kryoSerializer.toBinary(profile);
 
-//        System.out.println("Profile binary: " + Arrays.toString(binaryProfile));
+        System.out.println(binaryProfile.length + "Profile binary: " + Arrays.toString(binaryProfile));
 
         Profile outputElement = (Profile) kryoSerializer.fromBinary(binaryProfile, Profile.class);
 
