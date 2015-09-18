@@ -10,8 +10,10 @@ import com.esotericsoftware.kryo.io.Output;
 import com.senacor.hackingdays.serialization.data.Activity;
 import com.senacor.hackingdays.serialization.data.Gender;
 import com.senacor.hackingdays.serialization.data.Location;
+import com.senacor.hackingdays.serialization.data.Profile;
 import com.senacor.hackingdays.serialization.data.Range;
 import com.senacor.hackingdays.serialization.data.Seeking;
+import com.senacor.hackingdays.serializer.kryo.sryll.ProfileSerializer;
 
 public class KryoSerializer extends JSerializer {
 
@@ -23,6 +25,7 @@ public class KryoSerializer extends JSerializer {
         kryo.addDefaultSerializer(Gender.class, new GenderSerializer());
         kryo.addDefaultSerializer(Seeking.class, new SeekingSerializer());
         kryo.addDefaultSerializer(Activity.class, new ActivitySerializer());
+        kryo.addDefaultSerializer(Profile.class, ProfileSerializer.class);
     }
 
     @Override
