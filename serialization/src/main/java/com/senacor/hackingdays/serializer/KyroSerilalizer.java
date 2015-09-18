@@ -1,26 +1,22 @@
 package com.senacor.hackingdays.serializer;
 
 import akka.serialization.JSerializer;
-import org.nustaq.serialization.FSTConfiguration;
 
-public class FastSerializer extends JSerializer {
-
-    static FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
+public class KyroSerilalizer extends JSerializer {
 
     @Override
     public Object fromBinaryJava(byte[] bytes, Class<?> manifest) {
-        return conf.asObject(bytes);
+        return null;
     }
 
     @Override
     public byte[] toBinary(Object o) {
-        byte byteArray[] = conf.asByteArray(o);
-        return byteArray;
+        return new byte[0];
     }
 
     @Override
     public int identifier() {
-        return 1373372;
+        return 0;
     }
 
     @Override
