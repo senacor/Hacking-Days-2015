@@ -9,7 +9,7 @@ public class ProfileGeneratorTest {
     public void thatProfilesAreGenerated() {
 
 
-        ProfileGenerator generator = new ProfileGenerator(100);
+        ProfileGenerator generator = ProfileGenerator.newInstance(100);
         generator.stream().forEach(System.out::println);
 
     }

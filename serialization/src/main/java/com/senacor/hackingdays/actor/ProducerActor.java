@@ -28,7 +28,7 @@ public class ProducerActor extends AbstractActor {
 
     private void sendMessagesToConsumer(int count) {
         ActorRef collector = context().actorOf(AckCollector.props(count, sender()), "collector");
-        new ProfileGenerator(count).stream().forEach(profile -> consumer.tell(profile, collector));
+        ProfileGenerator.newInstance(count).stream().forEach(profile -> consumer.tell(profile, collector));
     }
 
 

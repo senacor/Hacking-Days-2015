@@ -50,6 +50,7 @@ public class DisruptorTest {
             TimeUnit.MILLISECONDS.sleep(100);
         }
         TimeUnit.MILLISECONDS.sleep(1000);
+        disruptor.shutdown();
         System.err.println("Processed " + SAMPLE_SIZE + " profiles in " + stopwatch.elapsed(TimeUnit.MILLISECONDS) + " milliseconds.");
     }
 

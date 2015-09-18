@@ -20,7 +20,7 @@ public class XMLProfileWriterTest {
 
         File file = tmpFolder.newFile();
         try (ProfileWriter writer = new XMLProfileWriter(file)) {
-            new ProfileGenerator(2).stream().forEach(writer::write);
+            ProfileGenerator.newInstance(2).forEach(writer::write);
         } catch (Exception e) {
             e.printStackTrace();
             fail();

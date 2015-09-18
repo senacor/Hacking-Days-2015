@@ -12,6 +12,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -32,13 +34,23 @@ public class ProfileGenerator implements Iterable<Profile> {
     private static final Instant NOW = Instant.now();
 
     private final int sampleSize;
+    private final Supplier<Integer> ageFunction;
+    private final Supplier<Gender> genderFunction;
+    private final Function<Gender, String> nameFunction;
 
-    public ProfileGenerator(int sampleSize) {
-        this.sampleSize = sampleSize;
+    public static ProfileGenerator newInstance(int sampleSize) {
+        return new Builder(sampleSize).build();
     }
 
-    public static Profile newInstance() {
-        return newProfile();
+    public static Profile newProfile() {
+        return newInstance(1).generateProfile();
+    }
+
+    private ProfileGenerator(int size, Supplier<Integer> ageFunction, Supplier<Gender> genderFunction, Function<Gender, String> nameFunction) {
+        this.sampleSize = size;
+        this.ageFunction = ageFunction;
+        this.genderFunction = genderFunction;
+        this.nameFunction = nameFunction;
     }
 
     public Stream<Profile> stream() {
@@ -54,16 +66,17 @@ public class ProfileGenerator implements Iterable<Profile> {
             }
 
             public Profile next() {
-                Profile profile = newProfile();
+                Profile profile = generateProfile();
                 count++;
                 return profile;
             }
         };
     }
 
-    private static Profile newProfile() {
-        Profile profile = initialProfile(randomGender());
-        profile.setAge(randomAge());
+    private Profile generateProfile() {
+        Gender gender = genderFunction.get();
+        Profile profile = new Profile(nameFunction.apply(gender), gender);
+        profile.setAge(ageFunction.get());
         profile.setLocation(locationSupplier.get());
         profile.setRelationShip(randomRelationShipStatus());
         profile.setSmoker(random.nextBoolean());
@@ -71,6 +84,76 @@ public class ProfileGenerator implements Iterable<Profile> {
         profile.setActivity(randomActivity());
         return profile;
     }
+
+
+    private static Profile initialProfile(Gender gender) {
+        switch (gender) {
+            case Male:
+                return new Profile(maleNames.get(), gender);
+            case Female:
+                return new Profile(femaleNames.get(), gender);
+            case Disambiguous:
+                return new Profile(transgenderNames.get(), gender);
+            default:
+                throw new AssertionError();
+        }
+    }
+
+    public static class Builder {
+
+        private Supplier<Integer> ageFunction = ProfileGenerator::randomAge;
+        private Supplier<Gender> genderFunction = ProfileGenerator::randomGender;
+        private Function<Gender, String> nameFunction = defaultNameFunction();
+        private final int size;
+        public Builder(int sampleSize) {
+            this.size = sampleSize;
+        }
+
+        public Builder withAge(Supplier<Integer> ageFunction) {
+            this.ageFunction = ageFunction;
+            return this;
+        }
+
+
+        public Builder withGender(Supplier<Gender> genderFunction) {
+            this.genderFunction = genderFunction;
+            return this;
+        }
+        public Builder withName(Function<Gender, String> nameFunction) {
+            this.nameFunction = nameFunction;
+            return this;
+        }
+
+        public ProfileGenerator build() {
+            return new ProfileGenerator(size, ageFunction, genderFunction, nameFunction);
+        }
+
+    }
+    private static final  Function<Gender, String> defaultNameFunction() {
+        return gender -> {
+            switch (gender) {
+                case Male:
+                    return maleNames.get();
+                case Female:
+                    return femaleNames.get();
+                case Disambiguous:
+                    return transgenderNames.get();
+                default:
+                    throw new AssertionError();
+            }
+        };
+    }
+
+    private static int randomAge() {
+        return random.nextInt(Range.MAX_AGE - Range.MIN_AGE) + Range.MIN_AGE;
+    }
+
+    private static Gender randomGender() {
+        int i = random.nextInt(100);
+        return i < 45 ? Gender.Male : i > 95 ? Gender.Disambiguous : Female;
+
+    }
+
 
     private static Activity randomActivity() {
         int frequency = random.nextInt(10);
@@ -88,33 +171,6 @@ public class ProfileGenerator implements Iterable<Profile> {
     private static RelationShipStatus randomRelationShipStatus() {
         int i = random.nextInt(100);
         return i < 35 ? Divorced : i > 65 ? RelationShipStatus.Maried : RelationShipStatus.Single;
-    }
-
-    private static int randomAge() {
-        return random.nextInt(Range.MAX_AGE - Range.MIN_AGE) + Range.MIN_AGE;
-    }
-
-    private static Profile initialProfile(Gender gender) {
-        switch (gender) {
-            case Male:
-                return new Profile(maleNames.get(), gender);
-            case Female:
-                return new Profile(femaleNames.get(), gender);
-            case Disambiguous:
-                return new Profile(transgenderNames.get(), gender);
-            default:
-                throw new AssertionError();
-        }
-    }
-
-    private static String nextMale() {
-        return null;
-    }
-
-    private static Gender randomGender() {
-        int i = random.nextInt(100);
-        return i < 45 ? Gender.Male : i > 95 ? Gender.Disambiguous : Female;
-
     }
 
 

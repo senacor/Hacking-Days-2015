@@ -20,17 +20,15 @@ public class ProfileTest {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream ous = new ObjectOutputStream(bos);
 
-        new ProfileGenerator(1).stream().forEach(p -> {
-            try {
-                ous.writeObject(p);
-                ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray()));
-                Profile p2 = (Profile) ois.readObject();
-            } catch (IOException e) {
-                fail();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        });
+        Profile p = ProfileGenerator.newProfile();
+        try {
+            ous.writeObject(p);
+            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray()));
+            Profile p2 = (Profile) ois.readObject();
+        } catch (IOException e) {
+            fail();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
-
 }
