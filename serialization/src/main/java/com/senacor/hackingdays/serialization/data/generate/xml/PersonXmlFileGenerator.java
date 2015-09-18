@@ -6,7 +6,7 @@ import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
 import java.io.File;
 import java.io.IOException;
 
-public class PersonDatabaseGenerator {
+public class PersonXmlFileGenerator {
 
 
     public static void main(String[] args) throws IOException {
