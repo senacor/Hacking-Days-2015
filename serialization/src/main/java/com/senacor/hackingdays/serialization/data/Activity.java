@@ -1,11 +1,14 @@
 package com.senacor.hackingdays.serialization.data;
 
+import com.senacor.hackingdays.serialization.data.unsafe.BufferTooSmallException;
+import com.senacor.hackingdays.serialization.data.unsafe.UnsafeMemory;
+import com.senacor.hackingdays.serialization.data.unsafe.UnsafeSerializable;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.Serializable;
 import java.util.Date;
 
-public class Activity implements Serializable {
+public class Activity implements Serializable, UnsafeSerializable {
 
     private static final long serialVersionUID = 1;
 
@@ -38,4 +41,17 @@ public class Activity implements Serializable {
                 ", loginCount=" + loginCount +
                 '}';
     }
+
+  @Override
+  public void serializeUnsafe(UnsafeMemory memory) throws BufferTooSmallException {
+    memory.putLong(lastLogin.getTime());
+    memory.putInt(loginCount);
+  }
+
+  public static Activity deserializeUnsafe(UnsafeMemory memory) {
+    final long lastLoginUnixTime = memory.getLong();
+    final Date lastLogin = new Date(lastLoginUnixTime);
+    final int loginCount = memory.getInt();
+    return new Activity(lastLogin, loginCount);
+  }
 }
