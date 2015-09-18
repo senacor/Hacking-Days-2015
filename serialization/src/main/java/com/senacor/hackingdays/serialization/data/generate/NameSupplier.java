@@ -15,13 +15,13 @@ class NameSupplier implements Supplier<String> {
         this.names = names;
     }
 
-    static NameSupplier forGender(int gender) {
-        switch (gender) {
-            case Gender.Male:
+    static NameSupplier forGender(Gender gender) {
+        switch (gender.getValue()) {
+            case 0:
                 return new NameSupplier(parse("male-firstname.txt"));
-            case Gender.Female:
+            case 1:
                 return new NameSupplier(parse("female-firstname.txt"));
-            case Gender.Disambiguous:
+            case 2:
                 return new NameSupplier(parse("transgender-name.txt"));
             default:
                 throw new AssertionError();

@@ -6,6 +6,7 @@ import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TTupleProtocol;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,8 +17,8 @@ import org.apache.thrift.protocol.TBinaryProtocol;
  */
 public class ThriftSerializerTTuple extends JSerializer {
 
-  private TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
-  TDeserializer deserializer = new TDeserializer(new TBinaryProtocol.Factory());
+  private TSerializer serializer = new TSerializer(new TTupleProtocol.Factory());
+  TDeserializer deserializer = new TDeserializer(new TTupleProtocol.Factory());
 
   @Override
   public int identifier() {

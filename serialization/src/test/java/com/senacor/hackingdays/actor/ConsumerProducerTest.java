@@ -27,7 +27,7 @@ import static junitparams.JUnitParamsRunner.$;
 public class ConsumerProducerTest {
 
 
-    public static final int COUNT = 100000;
+    public static final int COUNT = 1000000;
 
     @Test
     @Parameters(method = "serializers")
@@ -36,7 +36,7 @@ public class ConsumerProducerTest {
         ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActor.class, () -> new ConsumerActor()), "consumer");
         ActorRef producer = actorSystem.actorOf(Props.create(ProducerActor.class, () -> new ProducerActor(consumer)), "producer");
 
-        Timeout timeout = Timeout.apply(25, TimeUnit.SECONDS);
+        Timeout timeout = Timeout.apply(120, TimeUnit.SECONDS);
 
         Stopwatch stopwatch = Stopwatch.createStarted();
         Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT), timeout);
@@ -67,7 +67,12 @@ public class ConsumerProducerTest {
     @SuppressWarnings("unusedDeclaration")
     static Object[] serializers() {
         return $(
-                $("thrift", "com.senacor.hackingdays.serializer.ThriftSerializer"),
+                $("thrifttuple", "com.senacor.hackingdays.serializer.ThriftSerializerTTuple"),
+                $("thriftbinary", "com.senacor.hackingdays.serializer.ThriftSerializerTBinary"),
+                $("thriftcompact", "com.senacor.hackingdays.serializer.ThriftSerializerTCompact"),
+                $("thriftjson", "com.senacor.hackingdays.serializer.ThriftSerializerTJSON"),
+                $("thriftsimplejson", "com.senacor.hackingdays.serializer.ThriftSerializerTSimpleJSON"),
+                $("thrifttuple", "com.senacor.hackingdays.serializer.ThriftSerializerTTuple"),
                 $("java", "akka.serialization.JavaSerializer"),
                 /* $("json", "com.senacor.hackingdays.serializer.JacksonSerializer"),  */
                 $("gson", "com.senacor.hackingdays.serializer.GsonSerializer"),
