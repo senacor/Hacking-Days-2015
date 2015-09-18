@@ -1,4 +1,4 @@
-package com.senacor.hackingdays.serializer;
+package com.senacor.hackingdays.serializer.kryo;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
