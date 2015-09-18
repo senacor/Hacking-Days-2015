@@ -125,7 +125,7 @@ public class ConsumerProducerTest {
                 $("json-io", "com.senacor.hackingdays.serializer.JsonIoSerializer"),
                 $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer"),
                 $("kryo", "com.senacor.hackingdays.serializer.KryoSerializer"),
-                $("kryo_reflect", "com.senacor.hackingdays.serializer.KryoSerializer2"),
+                $("kryo_reflect", "com.senacor.hackingdays.serializer.ReflectionKryoSerializer"),
                 $("unsafe", "com.senacor.hackingdays.serializer.UnsafeSerializer")
         );
     }

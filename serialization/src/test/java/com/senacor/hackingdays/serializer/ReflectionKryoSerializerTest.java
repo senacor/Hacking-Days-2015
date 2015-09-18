@@ -8,6 +8,7 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.esotericsoftware.minlog.Log;
 import com.senacor.hackingdays.serialization.data.Activity;
 import com.senacor.hackingdays.serialization.data.Gender;
 import com.senacor.hackingdays.serialization.data.Location;
@@ -19,18 +20,18 @@ import com.senacor.hackingdays.serialization.data.Seeking;
 /**
  * @author Alasdair Collinson, Senacor Technologies AG
  */
-public class KryoSerializer2Test {
+public class ReflectionKryoSerializerTest {
 
 	private static final String NAME = "Hans Mueller";
 
 	private Profile profile;
 
-	private KryoSerializer kryoSerializer;
+	private ReflectionKryoSerializer reflectionKryoSerializer;
 
 
 	@Before
 	public void setup() {
-//		Log.set(Log.LEVEL_TRACE);
+		Log.set(Log.LEVEL_TRACE);
 
 //		System.out.println("NAME (chars): " + Arrays.toString(NAME.toCharArray()));
 //		System.out.println("NAME (bytes): " + Arrays.toString(NAME.getBytes(StandardCharsets.UTF_8)));
@@ -43,16 +44,16 @@ public class KryoSerializer2Test {
 		profile.setRelationShip(RelationShipStatus.Maried);
 		profile.setSeeking(new Seeking(Gender.Female, new Range(21, 30)));
 
-		kryoSerializer = new KryoSerializer();
+		reflectionKryoSerializer = new ReflectionKryoSerializer();
 	}
 
     @Test
     public void inputAndOutputAreSame() {
-        final byte[] binaryProfile = kryoSerializer.toBinary(profile);
+        final byte[] binaryProfile = reflectionKryoSerializer.toBinary(profile);
 
 //        System.out.println("Profile binary: " + Arrays.toString(binaryProfile));
 
-        Profile outputElement = (Profile) kryoSerializer.fromBinary(binaryProfile, Profile.class);
+        Profile outputElement = (Profile) reflectionKryoSerializer.fromBinary(binaryProfile, Profile.class);
 
         assertThat(outputElement.getName(), is(profile.getName()));
         assertThat(outputElement.getGender(), is(profile.getGender()));

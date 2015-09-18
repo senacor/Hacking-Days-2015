@@ -15,18 +15,18 @@ import com.senacor.hackingdays.serialization.data.Seeking;
 
 import akka.serialization.JSerializer;
 
-public class KryoSerializer2 extends JSerializer {
+public class ReflectionKryoSerializer extends JSerializer {
 
     private Kryo kryo = new Kryo();
 
-    public KryoSerializer2() {
+    public ReflectionKryoSerializer() {
         kryo.addDefaultSerializer(Range.class, new RangeSerializer());
         kryo.addDefaultSerializer(Location.class, new LocationSerializer());
         kryo.addDefaultSerializer(Gender.class, new GenderSerializer());
         kryo.addDefaultSerializer(Seeking.class, new SeekingSerializer());
         kryo.addDefaultSerializer(Activity.class, new ActivitySerializer());
 //        kryo.addDefaultSerializer(Profile.class, new com.senacor.hackingdays.serializer.kryo.sryll.ProfileSerializer());
-        kryo.addDefaultSerializer(Profile.class, new com.senacor.hackingdays.serializer.ProfileSerializer(kryo));
+        kryo.addDefaultSerializer(Profile.class, new com.senacor.hackingdays.serializer.ReflectionProfileSerializer(kryo));
     }
 
     @Override
