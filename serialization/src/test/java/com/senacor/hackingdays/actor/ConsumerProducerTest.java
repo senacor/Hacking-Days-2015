@@ -32,7 +32,7 @@ import scala.concurrent.Future;
 @RunWith(JUnitParamsRunner.class)
 public class ConsumerProducerTest {
 
-    public static final int COUNT = 1_000_000;
+    public static final int COUNT = 100_000;
 
     @Test
     @Parameters(method = "serializers")
