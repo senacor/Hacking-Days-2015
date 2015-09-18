@@ -11,7 +11,7 @@ public class GsonSerializer2 extends JSerializer {
 
     @Override
     public Object fromBinaryJava(byte[] bytes, Class<?> aClass) {
-        return new Gson().fromJson(new String(bytes), Object.class);
+        return new Gson().fromJson(new String(bytes), aClass);
     }
 
     @Override
