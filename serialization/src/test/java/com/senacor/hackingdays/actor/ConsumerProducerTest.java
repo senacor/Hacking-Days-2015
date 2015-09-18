@@ -8,6 +8,7 @@ import akka.util.Timeout;
 import com.google.common.base.Stopwatch;
 import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
 import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
+import org.junit.Ignore;
 import org.junit.Test;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
@@ -18,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class ConsumerProducerTest {
 
 
-    public static final int COUNT = 1_000_000;
+    public static final int COUNT = 1000;
 
 
     @Test
@@ -39,6 +40,7 @@ public class ConsumerProducerTest {
     }
 
     @Test
+    @Ignore
     public void writeXmlFile() throws Exception {
 
         try(XMLProfileWriter writer = new XMLProfileWriter(new File("src/main/resources/database.xml"))) {

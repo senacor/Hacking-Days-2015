@@ -37,6 +37,10 @@ public class ProfileGenerator implements Iterable<Profile> {
         this.sampleSize = sampleSize;
     }
 
+    public static Profile newInstance() {
+        return newProfile();
+    }
+
     public Stream<Profile> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
