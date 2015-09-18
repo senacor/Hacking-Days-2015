@@ -1,0 +1,2 @@
+FlightRecorder aktivieren (Analyse mittels Tool "jmc")
+-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:StartFlightRecording=duration=60s,filename=myrecording.jfr

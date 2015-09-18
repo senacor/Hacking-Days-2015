@@ -1,7 +1,7 @@
 package com.senacor.hackingdays.actor;
 
-import static com.senacor.hackingdays.config.ConfigHelper.*;
-import static junitparams.JUnitParamsRunner.*;
+import static com.senacor.hackingdays.config.ConfigHelper.createConfig;
+import static junitparams.JUnitParamsRunner.$;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -11,13 +11,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.base.Stopwatch;
+import com.senacor.hackingdays.serialization.data.Profile;
 import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
+import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
 import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.pattern.Patterns;
+import akka.serialization.SerializationExtension;
 import akka.util.Timeout;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -27,8 +32,7 @@ import scala.concurrent.Future;
 @RunWith(JUnitParamsRunner.class)
 public class ConsumerProducerTest {
 
-
-    public static final int COUNT = 100000;
+    public static final int COUNT = 1_000_000;
 
     @Test
     @Parameters(method = "serializers")
@@ -45,7 +49,8 @@ public class ConsumerProducerTest {
         stopwatch.stop();
         actorSystem.shutdown();
         actorSystem.awaitTermination();
-        System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+        System.err.println(
+            String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
     @Test
@@ -66,6 +71,20 @@ public class ConsumerProducerTest {
         System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, serializerName, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
+    @Test
+    @Parameters(method = "serializers")
+    public void calculateObjectSize(String serializerName, String fqcn) throws Exception {
+        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
+
+        Profile p = ProfileGenerator.newInstance(1).iterator().next();
+        int length = SerializationExtension.get(actorSystem).serializerFor(Profile.class).toBinary(p).length;
+        Thread.sleep(1000);
+        actorSystem.shutdown();
+        actorSystem.awaitTermination();
+
+        System.err.println(String.format("Serializing a Profile with %s took %s bytes.", serializerName, length));
+    }
+
     @SuppressWarnings("unusedDeclaration")
     static Object[] serializers() {
         return $(
@@ -74,10 +93,28 @@ public class ConsumerProducerTest {
                 $("gson", "com.senacor.hackingdays.serializer.GsonSerializer"),
                 $("gson2", "com.senacor.hackingdays.serializer.GsonSerializer2"),
                 $("xml", "com.senacor.hackingdays.serializer.XStreamXMLSerializer"),
+                $("json-io", "com.senacor.hackingdays.serializer.JsonIoSerializer"),
                 $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer"),
+                $("kryo", "com.senacor.hackingdays.serializer.KryoSerializer"),
                 $("unsafe", "com.senacor.hackingdays.serializer.UnsafeSerializer")
         );
     }
+//    private Config overrideConfig(String serializerName, String fqcn) {
+//        String configSnippet = String.format("akka {\n" +
+//            "  actor {\n" +
+//            "    serializers {\n" +
+//            "      %s = \"%s\"\n" +
+//            "    }\n" +
+//            "\n" +
+//            "    serialization-bindings {\n" +
+//            "      \"com.senacor.hackingdays.serialization.data.Profile\" = %s\n" +
+//            "    }\n" +
+//            "  }\n" +
+//            "}", serializerName, fqcn, serializerName);
+//
+//        Config overrides = ConfigFactory.parseString(configSnippet);
+//        return overrides.withFallback(ConfigFactory.load());
+//    }
 
     @SuppressWarnings("unusedDeclaration")
     static Object[] serializerProtoBuf() {
