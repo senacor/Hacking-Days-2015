@@ -19,7 +19,7 @@ public class ActivitySerializer extends Serializer<Activity> {
     }
 
     @Override
-    public Activity read(Kryo kryo, Input input, Class type) {
+    public Activity read(Kryo kryo, Input input, Class<Activity> type) {
         return new Activity(kryo.readObjectOrNull(input, Date.class), input.readInt());
     }
 }

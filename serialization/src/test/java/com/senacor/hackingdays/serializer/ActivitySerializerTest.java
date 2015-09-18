@@ -41,7 +41,7 @@ public class ActivitySerializerTest {
         output.flush();
 
         Input input = new Input(new ByteArrayInputStream(outputStream.toByteArray()));
-        Activity outputElement = serializer.read(kryo, input, Location.class);
+        Activity outputElement = serializer.read(kryo, input, Activity.class);
 
         Assert.assertEquals(inputElement.getLastLogin(), outputElement.getLastLogin());
         Assert.assertEquals(inputElement.getLoginCount(), outputElement.getLoginCount());
