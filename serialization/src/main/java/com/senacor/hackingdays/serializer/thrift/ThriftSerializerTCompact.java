@@ -1,4 +1,4 @@
-package com.senacor.hackingdays.serializer;
+package com.senacor.hackingdays.serializer.thrift;
 
 import akka.serialization.JSerializer;
 import org.apache.thrift.TBase;
@@ -6,7 +6,7 @@ import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TJSONProtocol;
+import org.apache.thrift.protocol.TCompactProtocol;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,10 +15,10 @@ import org.apache.thrift.protocol.TJSONProtocol;
  * Time: 14:09
  * To change this template use File | Settings | File Templates.
  */
-public class ThriftSerializerTJSON extends JSerializer {
+public class ThriftSerializerTCompact extends JSerializer {
 
-  private TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
-  TDeserializer deserializer = new TDeserializer(new TJSONProtocol.Factory());
+  private TSerializer serializer = new TSerializer(new TCompactProtocol.Factory());
+  TDeserializer deserializer = new TDeserializer(new TCompactProtocol.Factory());
 
   @Override
   public int identifier() {

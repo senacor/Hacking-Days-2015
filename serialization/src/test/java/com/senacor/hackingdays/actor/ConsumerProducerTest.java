@@ -37,7 +37,7 @@ import scala.concurrent.Future;
 @RunWith(JUnitParamsRunner.class)
 public class ConsumerProducerTest {
 
-    public static final int COUNT = 1;
+    public static final int COUNT = 100_000;
     
 	private static boolean isSerializer(Class<?> cls) {
 		return Serializer.class.isAssignableFrom(cls);
@@ -171,16 +171,15 @@ public class ConsumerProducerTest {
         );
     }
 
-
     @SuppressWarnings("unusedDeclaration")
     static Object[] serializerThrift() {
       return $(
-              $("thrifttuple", "com.senacor.hackingdays.serializer.ThriftSerializerTTuple"),
-              $("thriftbinary", "com.senacor.hackingdays.serializer.ThriftSerializerTBinary"),
-              $("thriftcompact", "com.senacor.hackingdays.serializer.ThriftSerializerTCompact"),
-              $("thriftjson", "com.senacor.hackingdays.serializer.ThriftSerializerTJSON"),
-              $("thriftsimplejson", "com.senacor.hackingdays.serializer.ThriftSerializerTSimpleJSON"),
-              $("thrifttuple", "com.senacor.hackingdays.serializer.ThriftSerializerTTuple")
+              $("thrifttuple", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTTuple"),
+              $("thriftbinary", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTBinary"),
+              $("thriftcompact", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTCompact"),
+              $("thriftjson", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTJSON"),
+              $("thriftsimplejson", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTSimpleJSON"),
+              $("thrifttuple", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTTuple")
       );
     }
 

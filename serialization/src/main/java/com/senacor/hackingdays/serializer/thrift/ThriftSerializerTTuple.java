@@ -1,4 +1,4 @@
-package com.senacor.hackingdays.serializer;
+package com.senacor.hackingdays.serializer.thrift;
 
 import akka.serialization.JSerializer;
 import org.apache.thrift.TBase;
