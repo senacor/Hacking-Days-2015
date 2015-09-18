@@ -3,8 +3,15 @@ package com.senacor.hackingdays.actor;
 import static com.senacor.hackingdays.config.ConfigHelper.createConfig;
 import static junitparams.JUnitParamsRunner.$;
 
-import java.io.File;
 import java.util.concurrent.TimeUnit;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import com.google.common.base.Stopwatch;
+import com.senacor.hackingdays.serialization.data.Profile;
+import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -13,16 +20,8 @@ import akka.pattern.Patterns;
 import akka.serialization.SerializationExtension;
 import akka.serialization.Serializer;
 import akka.util.Timeout;
-import com.google.common.base.Stopwatch;
-import com.senacor.hackingdays.serialization.data.Profile;
-import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
-import com.senacor.hackingdays.serialization.data.writer.XMLProfileWriter;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 
@@ -126,6 +125,7 @@ public class ConsumerProducerTest {
                 $("json-io", "com.senacor.hackingdays.serializer.JsonIoSerializer"),
                 $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer"),
                 $("kryo", "com.senacor.hackingdays.serializer.KryoSerializer"),
+                $("kryo_reflect", "com.senacor.hackingdays.serializer.KryoSerializer2"),
                 $("unsafe", "com.senacor.hackingdays.serializer.UnsafeSerializer")
         );
     }
