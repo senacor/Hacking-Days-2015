@@ -12,7 +12,8 @@ package com.senacor.hackingdays.serializer;
 
 import akka.serialization.JSerializer;
 import com.senacor.hackingdays.serialization.data.Profile;
-import com.senacor.hackingdays.serialization.data.UnsafeMemory;
+import com.senacor.hackingdays.serialization.data.unsafe.BufferTooSmallException;
+import com.senacor.hackingdays.serialization.data.unsafe.UnsafeMemory;
 
 /**
  * @author ccharles
@@ -20,8 +21,10 @@ import com.senacor.hackingdays.serialization.data.UnsafeMemory;
  */
 public class UnsafeSerializer extends JSerializer {
 
-  // TODO: we hope that the serialization fits into this array
-  final static byte[] buffer = new byte[10*1024];
+  private static final int INITIAL_BUFFER_SIZE = 10;
+  private static final int BUFFER_INCREASE_DELTA = 10;
+
+  static byte[] buffer = new byte[INITIAL_BUFFER_SIZE];
   final static UnsafeMemory memory = new UnsafeMemory(buffer);
 
   @Override
@@ -38,8 +41,16 @@ public class UnsafeSerializer extends JSerializer {
 
   @Override
   public byte[] toBinary(Object o) {
-    memory.reset();
-    ((Profile) o).serializeUnsafe(memory);
+    while (true) {
+      try {
+        memory.setBuffer(buffer);
+        memory.reset();
+        ((Profile) o).serializeUnsafe(memory);
+        break;
+      } catch (BufferTooSmallException e) {
+        buffer = new byte[buffer.length + BUFFER_INCREASE_DELTA];
+      }
+    }
     return buffer;
   }
 

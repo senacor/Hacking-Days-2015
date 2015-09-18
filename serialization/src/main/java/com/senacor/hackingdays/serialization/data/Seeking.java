@@ -1,5 +1,8 @@
 package com.senacor.hackingdays.serialization.data;
 
+import com.senacor.hackingdays.serialization.data.unsafe.BufferTooSmallException;
+import com.senacor.hackingdays.serialization.data.unsafe.UnsafeMemory;
+import com.senacor.hackingdays.serialization.data.unsafe.UnsafeSerializable;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.Serializable;
@@ -33,7 +36,7 @@ public class Seeking implements Serializable, UnsafeSerializable {
     }
 
   @Override
-  public void serializeUnsafe(UnsafeMemory memory) {
+  public void serializeUnsafe(UnsafeMemory memory) throws BufferTooSmallException {
     gender.serializeUnsafe(memory);
     ageRange.serializeUnsafe(memory);
   }
