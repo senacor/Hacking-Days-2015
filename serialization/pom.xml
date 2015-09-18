@@ -58,6 +58,14 @@
     </build>
 
     <dependencies>
+      <!-- Hilfs-JAR fuer capn proto -->
+        <dependency>
+            <groupId>fakegroup</groupId>
+            <artifactId>capnproto-jar</artifactId>
+            <version>0.0.1</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/resources/capnproto.jar</systemPath>
+        </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
