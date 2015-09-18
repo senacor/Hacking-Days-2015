@@ -13,6 +13,7 @@ import akka.util.Timeout;
 import com.google.common.base.Stopwatch;
 import com.senacor.hackingdays.actor.GenerateMessages;
 import com.senacor.hackingdays.actor.ProducerActor;
+import com.senacor.hackingdays.serialization.data.generate.ProfileGeneratorThrift;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -45,7 +46,7 @@ public class ProducerLauncherThrift {
     private static void sendDataAndWaitForCompletion(ActorRef producer) throws Exception {
         Timeout timeout = Timeout.apply(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
         Stopwatch stopwatch = Stopwatch.createStarted();
-        Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT), timeout);
+        Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT, ProfileGeneratorThrift.class), timeout);
         Await.result(ask, timeout.duration());
         stopwatch.stop();
         System.err.println(String.format("Sending %s dating profiles with %s took %s millis.", COUNT, "java", stopwatch.elapsed(TimeUnit.MILLISECONDS)));

@@ -13,6 +13,9 @@ import java.util.Date;
 public class ActivitySerializer extends Serializer<Activity> {
 
     public final static ActivitySerializer INSTANCE = new ActivitySerializer();
+    {
+        setAcceptsNull(true);
+    }
 
     @Override
     public void write(Kryo kryo, Output output, Activity object) {

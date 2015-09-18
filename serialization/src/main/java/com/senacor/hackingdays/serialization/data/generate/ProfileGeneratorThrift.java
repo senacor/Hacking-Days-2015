@@ -1,25 +1,24 @@
 package com.senacor.hackingdays.serialization.data.generate;
 
-
-import com.senacor.hackingdays.serialization.data.thrift.Profile;
-import com.senacor.hackingdays.serialization.data.thrift.*;
-
-import com.senacor.hackingdays.serialization.data.thrift.Gender;
-import com.senacor.hackingdays.serialization.data.thrift.RelationShipStatus;
+import static java.lang.Integer.max;
+import static java.lang.Integer.min;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-
-import static java.lang.Integer.max;
-import static java.lang.Integer.min;
+import com.senacor.hackingdays.serialization.data.thrift.Activity;
+import com.senacor.hackingdays.serialization.data.thrift.Gender;
+import com.senacor.hackingdays.serialization.data.thrift.Profile;
+import com.senacor.hackingdays.serialization.data.thrift.Range;
+import com.senacor.hackingdays.serialization.data.thrift.RangeConstants;
+import com.senacor.hackingdays.serialization.data.thrift.RelationShipStatus;
+import com.senacor.hackingdays.serialization.data.thrift.Seeking;
 
 public class ProfileGeneratorThrift implements Iterable<Profile> {
 
@@ -43,11 +42,12 @@ public class ProfileGeneratorThrift implements Iterable<Profile> {
         return newInstance(1).generateProfile();
     }
 
-    private ProfileGeneratorThrift(int size, Supplier<Integer> ageFunction, Supplier<Gender> genderFunction, Function<Gender, String> nameFunction, Supplier<Activity> activityFunction, Supplier<RelationShipStatus> bla) {
+    private ProfileGeneratorThrift(int size, Supplier<Integer> ageFunction, Supplier<Gender> genderFunction, Function<Gender, String> nameFunction, Supplier<Activity> activityFunction, Supplier<RelationShipStatus> bla, long seed) {
         this.sampleSize = size;
         this.ageFunction = ageFunction;
         this.genderFunction = genderFunction;
         this.nameFunction = nameFunction;
+        random.setSeed(seed);
     }
 
     public Stream<Profile> stream() {
@@ -92,7 +92,6 @@ public class ProfileGeneratorThrift implements Iterable<Profile> {
       return profile;
     }
 
-
     private static Profile initialProfile(Gender gender) {
         switch (gender.getValue()) {
             case 0:
@@ -106,6 +105,7 @@ public class ProfileGeneratorThrift implements Iterable<Profile> {
         }
     }
 
+
     public static class Builder {
 
         private Supplier<Integer> ageFunction = ProfileGeneratorThrift::randomAge;
@@ -113,6 +113,7 @@ public class ProfileGeneratorThrift implements Iterable<Profile> {
         private Function<Gender, String> nameFunction = defaultNameFunction();
         private Supplier<RelationShipStatus> relationShipStatusFunction = ProfileGeneratorThrift::randomRelationShipStatus;
         private Supplier<Activity> activityFunction = ProfileGeneratorThrift::randomActivity;
+        private long seed = 42L;
         private final int size;
 
         public Builder(int sampleSize) {
@@ -123,7 +124,6 @@ public class ProfileGeneratorThrift implements Iterable<Profile> {
             this.ageFunction = ageFunction;
             return this;
         }
-
 
         public Builder withGender(Supplier<Gender> genderFunction) {
             this.genderFunction = genderFunction;
@@ -144,12 +144,17 @@ public class ProfileGeneratorThrift implements Iterable<Profile> {
             return this;
         }
 
+        public Builder setSeed(long seed) {
+            this.seed = seed;
+            return this;
+        }
+
         public ProfileGeneratorThrift build() {
-            return new ProfileGeneratorThrift(size, ageFunction, genderFunction, nameFunction, activityFunction, relationShipStatusFunction);
+            return new ProfileGeneratorThrift(size, ageFunction, genderFunction, nameFunction, activityFunction, relationShipStatusFunction, seed);
         }
 
     }
-    private static final  Function<Gender, String> defaultNameFunction() {
+    private static Function<Gender, String> defaultNameFunction() {
         return gender -> {
             switch (gender.getValue()) {
                 case 0:
@@ -199,6 +204,4 @@ public class ProfileGeneratorThrift implements Iterable<Profile> {
         int i = random.nextInt(100);
         return i < 35 ? RelationShipStatus.Divorced : i > 65 ? RelationShipStatus.Maried : RelationShipStatus.Single;
     }
-
-
 }
