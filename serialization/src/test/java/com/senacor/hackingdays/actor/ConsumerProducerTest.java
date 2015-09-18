@@ -29,7 +29,10 @@ import scala.concurrent.Await;
 import scala.concurrent.Future;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import static com.senacor.hackingdays.config.ConfigHelper.createConfig;
@@ -69,24 +72,6 @@ public class ConsumerProducerTest {
     }
 
     @Test
-    @Parameters(method = "serializerThrift")
-    public void sendMessagesThrift(String serializerName, String fqcn) throws Exception {
-        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem-actorsystem", createConfig(serializerName, fqcn));
-        ActorRef consumer = actorSystem.actorOf(Props.create(ConsumerActor.class, () -> new ConsumerActor()), "consumer");
-        ActorRef producer = actorSystem.actorOf(Props.create(ProducerActor.class, () -> new ProducerActor(consumer)), "producer");
-
-        Timeout timeout = Timeout.apply(25, TimeUnit.SECONDS);
-
-        Stopwatch stopwatch = Stopwatch.createStarted();
-        Future<Object> ask = Patterns.ask(producer, new GenerateMessages(COUNT, ProfileGeneratorThrift.class), timeout);
-        Await.result(ask, timeout.duration());
-        stopwatch.stop();
-        shutdown(actorSystem);
-        System.err.println(String.format("Sending %s dating profiles with %25s took %4s millis.", COUNT, serializerName,
-                stopwatch.elapsed(TimeUnit.MILLISECONDS)));
-    }
-
-    @Test
     @Parameters(method = "serializers")
     public void calculateObjectSize(String serializerName, String fqcn, Class<?> profileClass) throws Exception {
         ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
@@ -94,24 +79,13 @@ public class ConsumerProducerTest {
         final Object p;
         if (ProfileProtos.Profile.class.equals(profileClass)) {
             p = ProfileProtoGenerator.newProfile();
+        } else if (com.senacor.hackingdays.serialization.data.thrift.Profile.class.equals(profileClass)) {
+            p = ProfileGeneratorThrift.newProfile();
         } else {
             p = ProfileGenerator.newProfile();
         }
 
         int length = SerializationExtension.get(actorSystem).serializerFor(profileClass).toBinary(p).length;
-        Thread.sleep(200);
-        shutdown(actorSystem);
-
-        System.err.println(String.format("Serializing a Profile with %25s weights %4s bytes.", serializerName, length));
-    }
-
-    @Test
-    @Parameters(method = "serializerThrift")
-    public void calculateObjectSizeThrift(String serializerName, String fqcn) throws Exception {
-        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
-
-        com.senacor.hackingdays.serialization.data.thrift.Profile p = ProfileGeneratorThrift.newProfile();
-        int length = SerializationExtension.get(actorSystem).serializerFor(com.senacor.hackingdays.serialization.data.thrift.Profile.class).toBinary(p).length;
         Thread.sleep(200);
         shutdown(actorSystem);
 
@@ -126,7 +100,7 @@ public class ConsumerProducerTest {
         Serializer serializer = SerializationExtension.get(actorSystem).serializerFor(com.senacor.hackingdays.serialization.data.thrift.Profile.class);
         System.out.println("serializer=" + serializer.getClass().getName());
 
-        if (ProtoBufSerilalizer.class.equals(serializer.getClass())) {
+        if (ProfileProtos.Profile.class.equals(profileClass)) {
             ProfileProtos.Profile input = ProfileProtoGenerator.newProfile();
             ProfileProtos.Profile output = (ProfileProtos.Profile) serializer.fromBinary(serializer.toBinary(input), ProfileProtos.Profile.class);
 
@@ -153,6 +127,30 @@ public class ConsumerProducerTest {
             Assert.assertEquals(input.getSeeking().getAgeRange().getLower(), seeking.getAgeRange().getLower());
             Assert.assertEquals(input.getSeeking().getAgeRange().getUpper(), seeking.getAgeRange().getUpper());
             Assert.assertEquals(input.getSeeking().getGender(), seeking.getGender());
+        } else if (com.senacor.hackingdays.serialization.data.thrift.Profile.class.equals(profileClass)) {
+            com.senacor.hackingdays.serialization.data.thrift.Profile input = ProfileGeneratorThrift.newProfile();
+            com.senacor.hackingdays.serialization.data.thrift.Profile output =
+                    (com.senacor.hackingdays.serialization.data.thrift.Profile) serializer.fromBinary(serializer.toBinary(input), com.senacor.hackingdays.serialization.data.thrift.Profile.class);
+
+            shutdown(actorSystem);
+
+            Assert.assertNotNull(output);
+            Assert.assertNotNull(output.getActivity());
+            Assert.assertNotNull(output.getLocation());
+            Assert.assertNotNull(output.getSeeking());
+
+            Assert.assertEquals(input.getActivity().getLastLoginTimestamp(), output.getActivity().getLastLoginTimestamp());
+            Assert.assertEquals(input.getActivity().getLoginCount(), output.getActivity().getLoginCount());
+            Assert.assertEquals(input.getAge(), output.getAge());
+            Assert.assertEquals(input.getGender(), output.getGender());
+            Assert.assertEquals(input.getLocation().getCity(), output.getLocation().getCity());
+            Assert.assertEquals(input.getLocation().getState(), output.getLocation().getState());
+            Assert.assertEquals(input.getLocation().getZip(), output.getLocation().getZip());
+            Assert.assertEquals(input.getName(), output.getName());
+            Assert.assertEquals(input.getRelationShip(), output.getRelationShip());
+            Assert.assertEquals(input.getSeeking().getAgeRange().getLower(), output.getSeeking().getAgeRange().getLower());
+            Assert.assertEquals(input.getSeeking().getAgeRange().getUpper(), output.getSeeking().getAgeRange().getUpper());
+            Assert.assertEquals(input.getSeeking().getGender(), output.getSeeking().getGender());
         } else {
             Profile input = ProfileGenerator.newProfile();
             Profile output = (Profile) serializer.fromBinary(serializer.toBinary(input), Profile.class);
@@ -183,51 +181,17 @@ public class ConsumerProducerTest {
         }
     }
 
-    @Test
-    @Parameters(method = "serializerThrift")
-    public void assertFieldsThrift(String serializerName, String fqcn) throws Exception {
-        ActorSystem actorSystem = ActorSystem.create("producer-consumer-actorsystem", createConfig(serializerName, fqcn));
-
-        Serializer serializer = SerializationExtension.get(actorSystem).serializerFor(Profile.class);
-
-        com.senacor.hackingdays.serialization.data.thrift.Profile input = ProfileGeneratorThrift.newProfile();
-        com.senacor.hackingdays.serialization.data.thrift.Profile output =
-                (com.senacor.hackingdays.serialization.data.thrift.Profile) serializer.fromBinary(serializer.toBinary(input), com.senacor.hackingdays.serialization.data.thrift.Profile.class);
-
-        shutdown(actorSystem);
-
-        Assert.assertNotNull(output);
-        Assert.assertNotNull(output.getActivity());
-        Assert.assertNotNull(output.getLocation());
-        Assert.assertNotNull(output.getSeeking());
-
-        Assert.assertEquals(input.getActivity().getLastLoginTimestamp(), output.getActivity().getLastLoginTimestamp());
-        Assert.assertEquals(input.getActivity().getLoginCount(), output.getActivity().getLoginCount());
-        Assert.assertEquals(input.getAge(), output.getAge());
-        Assert.assertEquals(input.getGender(), output.getGender());
-        Assert.assertEquals(input.getLocation().getCity(), output.getLocation().getCity());
-        Assert.assertEquals(input.getLocation().getState(), output.getLocation().getState());
-        Assert.assertEquals(input.getLocation().getZip(), output.getLocation().getZip());
-        Assert.assertEquals(input.getName(), output.getName());
-        Assert.assertEquals(input.getRelationShip(), output.getRelationShip());
-        Assert.assertEquals(input.getSeeking().getAgeRange().getLower(), output.getSeeking().getAgeRange().getLower());
-        Assert.assertEquals(input.getSeeking().getAgeRange().getUpper(), output.getSeeking().getAgeRange().getUpper());
-        Assert.assertEquals(input.getSeeking().getGender(), output.getSeeking().getGender());
-    }
-
     static Object[] serializers() throws IOException {
 
         final List<Class<ProtoBufSerilalizer>> testExceptions = new ArrayList<>();
 
         Set<ClassInfo> classInfos = ClassPath.from(Serializer.class.getClassLoader())
                 .getTopLevelClasses("com.senacor.hackingdays.serializer");
-        Set<Object[]> resultSet = new TreeSet<>(new Comparator<Object[]>() {
+        Set<ClassInfo> classInfosThrift = ClassPath.from(Serializer.class.getClassLoader())
+                .getTopLevelClasses("com.senacor.hackingdays.serializer.thrift");
 
-            @Override
-            public int compare(Object[] o1, Object[] o2) {
-                return o1[0].toString().compareTo(o2[0].toString());
-            }
-
+        Set<Object[]> resultSet = new TreeSet<>((o1, o2) -> {
+            return o1[0].toString().compareTo(o2[0].toString());
         });
 
         resultSet.add($(JavaSerializer.class.getSimpleName(), JavaSerializer.class.getCanonicalName(), Profile.class));
@@ -242,22 +206,13 @@ public class ConsumerProducerTest {
                 resultSet.add($(clazz.getSimpleName(), clazz.getCanonicalName(), generatedClass));
             }
         }
+        for (ClassInfo info : classInfosThrift) {
+            Class<?> clazz = info.load();
+            if (isSerializer(clazz) && !testExceptions.contains(clazz)) {
+                resultSet.add($(clazz.getSimpleName(), clazz.getCanonicalName(), com.senacor.hackingdays.serialization.data.thrift.Profile.class));
+            }
+        }
 
         return resultSet.toArray();
-
     }
-
-    @SuppressWarnings("unusedDeclaration")
-    static Object[] serializerThrift() {
-        return $(
-                $("thrifttuple", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTTuple"),
-                $("thriftbinary", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTBinary"),
-                $("thriftcompact", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTCompact"),
-                $("thriftjson", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTJSON"),
-              /*$("thriftsimplejson", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTSimpleJSON"), has problems */
-                $("thrifttuple", "com.senacor.hackingdays.serializer.thrift.ThriftSerializerTTuple")
-        );
-    }
-
-
 }
