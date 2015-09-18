@@ -26,7 +26,7 @@ public class ThriftSerializerTBinary extends JSerializer {
 
   @Override
   public boolean includeManifest() {
-    return false;
+    return true;
   }
 
   @Override
