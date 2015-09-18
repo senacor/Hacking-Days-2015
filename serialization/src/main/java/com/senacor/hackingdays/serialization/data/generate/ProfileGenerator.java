@@ -46,7 +46,7 @@ public class ProfileGenerator implements Iterable<Profile> {
         return newInstance(1).generateProfile();
     }
 
-    private ProfileGenerator(int size, Supplier<Integer> ageFunction, Supplier<Gender> genderFunction, Function<Gender, String> nameFunction) {
+    private ProfileGenerator(int size, Supplier<Integer> ageFunction, Supplier<Gender> genderFunction, Function<Gender, String> nameFunction, Supplier<Activity> activityFunction, Supplier<RelationShipStatus> relationShipStatusFunction) {
         this.sampleSize = size;
         this.ageFunction = ageFunction;
         this.genderFunction = genderFunction;
@@ -104,7 +104,10 @@ public class ProfileGenerator implements Iterable<Profile> {
         private Supplier<Integer> ageFunction = ProfileGenerator::randomAge;
         private Supplier<Gender> genderFunction = ProfileGenerator::randomGender;
         private Function<Gender, String> nameFunction = defaultNameFunction();
+        private Supplier<RelationShipStatus> relationShipStatusFunction = ProfileGenerator::randomRelationShipStatus;
+        private Supplier<Activity> activityFunction = ProfileGenerator::randomActivity;
         private final int size;
+
         public Builder(int sampleSize) {
             this.size = sampleSize;
         }
@@ -124,8 +127,18 @@ public class ProfileGenerator implements Iterable<Profile> {
             return this;
         }
 
+        public Builder withRelationShipStatus(Supplier<RelationShipStatus> relationShipStatusFunction) {
+            this.relationShipStatusFunction = relationShipStatusFunction;
+            return this;
+        }
+
+        public Builder withActivity(Supplier<Activity> activityFunction) {
+            this.activityFunction = activityFunction;
+            return this;
+        }
+
         public ProfileGenerator build() {
-            return new ProfileGenerator(size, ageFunction, genderFunction, nameFunction);
+            return new ProfileGenerator(size, ageFunction, genderFunction, nameFunction, activityFunction, relationShipStatusFunction);
         }
 
     }
