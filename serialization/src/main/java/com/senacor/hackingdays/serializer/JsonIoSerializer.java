@@ -7,7 +7,7 @@ import com.cedarsoftware.util.io.JsonWriter;
 
 import akka.serialization.JSerializer;
 
-public class JsonIoSerilalizer extends JSerializer {
+public class JsonIoSerializer extends JSerializer {
 	
 	public static Charset UTF8 = Charset.forName("UTF-8");
 
