@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class ConsumerProducerTest {
 
 
-    public static final int COUNT = 100000;
+    public static final int COUNT = 1;
 
 
     @Test
