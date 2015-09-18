@@ -95,7 +95,8 @@ public class ConsumerProducerTest {
                 $("xml", "com.senacor.hackingdays.serializer.XStreamXMLSerializer"),
                 $("json-io", "com.senacor.hackingdays.serializer.JsonIoSerializer"),
                 $("fast-ser", "com.senacor.hackingdays.serializer.FastSerializer"),
-                $("kryo", "com.senacor.hackingdays.serializer.KryoSerializer")
+                $("kryo", "com.senacor.hackingdays.serializer.KryoSerializer"),
+                $("unsafe", "com.senacor.hackingdays.serializer.UnsafeSerializer")
         );
     }
 //    private Config overrideConfig(String serializerName, String fqcn) {
