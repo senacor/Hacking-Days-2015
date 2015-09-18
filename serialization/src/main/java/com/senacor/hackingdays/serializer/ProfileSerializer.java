@@ -10,14 +10,14 @@ public class ProfileSerializer extends FieldSerializer<Profile> {
 
 	public ProfileSerializer(Kryo kryo) {
 		super(kryo, Profile.class);
-		removeField("name");
-		removeField("gender");
 	}
 
 	@Override
 	protected Profile create(Kryo kryo, Input input, Class<Profile> type) {
 		final String name = kryo.readObject(input, String.class);
 		final Gender gender = kryo.readObject(input, Gender.class);
+		removeField("name");
+		removeField("gender");
 		return new Profile(name, gender);
 	}
 
