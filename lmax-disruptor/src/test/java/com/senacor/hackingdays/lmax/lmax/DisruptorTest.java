@@ -84,7 +84,8 @@ public class DisruptorTest {
                 loggedInToday,
                 creepyOldMenConsumer,
                 fraudConsumer,
-                averageAgeEventHandler
+                averageAgeEventHandler,
+                homosexualCountingConsumer
         );
         return countDownLatch;
     }

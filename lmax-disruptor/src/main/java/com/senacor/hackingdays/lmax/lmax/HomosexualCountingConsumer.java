@@ -15,7 +15,7 @@ public class HomosexualCountingConsumer extends CompletableConsumer {
 
     @Override
     protected void onComplete() {
-        System.out.println(count + " homosexual users");
+        System.out.println((double)count/(double)maxSequence + "% homosexual users");
     }
 
     @Override
