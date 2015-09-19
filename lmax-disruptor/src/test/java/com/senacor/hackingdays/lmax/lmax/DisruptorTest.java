@@ -7,7 +7,10 @@ import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
 import com.senacor.hackingdays.lmax.generate.model.Profile;
 import com.senacor.hackingdays.lmax.queue.QueueConsumer;
 import com.senacor.hackingdays.lmax.queue.QueuePublisher;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
@@ -16,15 +19,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
+import static junitparams.JUnitParamsRunner.$;
+
+@RunWith(JUnitParamsRunner.class)
 public class DisruptorTest {
 
 
-    public static final int SAMPLE_SIZE = 1_000_000;
+    public static final int SAMPLE_SIZE = 100_000;
 
     @Test
-    public void testDisruptor() throws InterruptedException {
+    @Parameters(method = "poolSize")
+    public void testDisruptor(int poolSize) throws InterruptedException {
         // Executor that will be used to construct new threads for consumers
-        Executor executor = Executors.newFixedThreadPool(12);
+        Executor executor = Executors.newFixedThreadPool(poolSize);
 
         // Specify the size of the ring buffer, must be power of 2.
         int bufferSize = 1024;
@@ -55,9 +62,10 @@ public class DisruptorTest {
     }
 
     @Test
-    public void testLinkedQueue() throws InterruptedException {
+    @Parameters(method = "poolSize")
+    public void testLinkedQueue(int poolSize) throws InterruptedException {
 
-        Executor executor = Executors.newFixedThreadPool(12);
+        Executor executor = Executors.newFixedThreadPool(poolSize);
 
         ConcurrentLinkedQueue<Profile> queue = new ConcurrentLinkedQueue<>();
         QueuePublisher publisher = new QueuePublisher(queue);
@@ -69,13 +77,28 @@ public class DisruptorTest {
         ProfileGenerator.newInstance(SAMPLE_SIZE).forEach(profile -> executor.execute(() -> publisher.publish(profile)));
 
 
-        IntStream.range(1, 10).forEach(i -> executor.execute(() -> consumer.poll()));
+        IntStream.range(1, 3).forEach(i -> executor.execute(() -> consumer.poll()));
 
 
         latch.await();
         TimeUnit.MILLISECONDS.sleep(1000);
         System.err.println("Processed " + SAMPLE_SIZE + " profiles in " + stopwatch.elapsed(TimeUnit.MILLISECONDS) + " milliseconds.");
 
+    }
+
+
+    @SuppressWarnings("unusedDeclaration")
+    static Object[] poolSize() {
+        return $(
+                $(1),
+                $(4),
+                $(8),
+                $(12),
+                $(16),
+                $(20),
+                $(40),
+                $(80)
+        );
     }
 
 }
