@@ -33,5 +33,8 @@ public class GettingStarted {
         System.out.println("First profile: " + queueCustomers.poll());
         System.out.println("Second profile: " + queueCustomers.peek());
         System.out.println("Queue size: " + queueCustomers.size());
+
+        Map<String, Profile> datingProfiles = hazelcastInstance.getMap("datingProfiles");
+        ProfileGenerator.newInstance(5).stream().forEach(profile -> datingProfiles.put(profile.getId().toString(), profile));
     }
 }
