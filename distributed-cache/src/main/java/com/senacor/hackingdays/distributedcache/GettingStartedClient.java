@@ -4,6 +4,7 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.config.SerializerConfig;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IList;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.IQueue;
 import com.hazelcast.security.UsernamePasswordCredentials;
@@ -14,14 +15,12 @@ import com.senacor.hackingdays.distributedcache.serializer.KryoProfileStreamSeri
 
 public class GettingStartedClient {
     public static void main(String[] args) {
-        ClientConfig clientConfig = new ClientConfig();
-        clientConfig.getSerializationConfig().getSerializerConfigs().add(
-                new SerializerConfig().
-                        setTypeClass(Profile.class).
-                        setImplementation(new KryoProfileStreamSerializer()));
-        clientConfig.setCredentials(new UsernamePasswordCredentials("sinalco", "sinalco"));
-        HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
+
+        HazelcastInstance client = HazelcastClient.newHazelcastClient();
         IQueue<Profile> queue = client.getQueue("profiles");
+
+        IList<Object> fooListe = client.getList("foo");
+                                   System.out.println("Fooliste item 0:"+fooListe.get(0));
         for (Profile profile : queue) {
             System.out.printf("Q1 (%s): %s, %d, %s aus %s, %s sucht: ", profile.getId().toString(), profile.getName(), profile.getAge(), toString(profile.getGender()), profile.getLocation().getCity(), profile.getLocation().getState());
             Seeking seeking = profile.getSeeking();
