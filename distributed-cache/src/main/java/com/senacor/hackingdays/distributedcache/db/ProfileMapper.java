@@ -115,7 +115,7 @@ public class ProfileMapper {
 		return "update " //
 				+ this.tableName //
 				+ " set " //
-				+ "uuid=?, name=?, gender=?, age=?, location_state=?, location_city=?, location_zip=?, relationship=?, smoker=?, seeking_gender=?, seeking_age_min=?, seeking_age_max=?, activity_logincount=?, activity_lastlogin=?) "
+				+ "uuid=?, name=?, gender=?, age=?, location_state=?, location_city=?, location_zip=?, relationship=?, smoker=?, seeking_gender=?, seeking_age_min=?, seeking_age_max=?, activity_logincount=?, activity_lastlogin=? "
 				+ "where uuid=?";
 	}
 
@@ -199,7 +199,6 @@ public class ProfileMapper {
 
 	public boolean updateProfile(Profile profile) {
 		try (PreparedStatement statement = connection.prepareStatement(createUpdateStatement())) {
-			System.out.println(statement.getParameterMetaData().getParameterCount());
 			mapProfileToStatement(statement, profile);
 			return statement.executeUpdate() == 1;
 
