@@ -1,26 +1,30 @@
 package com.senacor.hackingdays.lmax.lmax;
 
-import com.google.common.base.Stopwatch;
-import com.lmax.disruptor.EventHandler;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
-import com.senacor.hackingdays.lmax.lmax.fraud.FraudConsumer;
-import com.senacor.hackingdays.lmax.generate.model.Profile;
-
-import com.senacor.hackingdays.lmax.lmax.fraudrule.RuleBasedFraudDetector;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static junitparams.JUnitParamsRunner.$;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static junitparams.JUnitParamsRunner.$;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import com.google.common.base.Stopwatch;
+import com.lmax.disruptor.EventTranslatorOneArg;
+import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.dsl.Disruptor;
+import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
+import com.senacor.hackingdays.lmax.generate.model.Profile;
+<<<<<<< HEAD
+
+import com.senacor.hackingdays.lmax.lmax.fraudrule.RuleBasedFraudDetector;
+=======
+import com.senacor.hackingdays.lmax.lmax.fraud.FraudConsumer;
+>>>>>>> b1d28cb4ba99be73348f03cd9e9679c443de0524
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 
 @RunWith(JUnitParamsRunner.class)
 public class DisruptorTest {
@@ -51,15 +55,24 @@ public class DisruptorTest {
         // Get the ring buffer from the Disruptor to be used for publishing.
         RingBuffer<DisruptorEnvelope> ringBuffer = disruptor.getRingBuffer();
 
-        ProfileGenerator generator = ProfileGenerator.newInstance(SAMPLE_SIZE);
+        ProfileGenerator generator = setupGenerator();
 
         Stopwatch stopwatch = Stopwatch.createStarted();
-        generator.forEach(profile -> ringBuffer.publishEvent((envelope, sequence) -> envelope.setProfile(profile)));
+        generator.forEach(prof -> ringBuffer.publishEvent(
+            (envelope, sequence, profile) -> envelope .setProfile(profile), prof)
+        );
+        
+        // wait for termination
         countDownLatch.await();
         stopwatch.stop();
         disruptor.shutdown();
         executor.shutdown();
         resultCollector.addResult(poolSize, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+    }
+
+    private ProfileGenerator setupGenerator() {
+        return new ProfileGenerator.Builder(SAMPLE_SIZE)
+                .build();
     }
 
     private CountDownLatch registerConsumers(Disruptor<DisruptorEnvelope> disruptor) {
@@ -86,7 +99,6 @@ public class DisruptorTest {
     @SuppressWarnings("unusedDeclaration")
     static Object[] poolSize() {
         return $(
-                $(10),
                 $(12)
         );
     }

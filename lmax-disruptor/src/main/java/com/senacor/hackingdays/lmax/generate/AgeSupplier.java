@@ -7,13 +7,17 @@ import com.senacor.hackingdays.lmax.generate.model.Range;
 import java.util.Random;
 import java.util.function.Function;
 
-interface AgeSupplier extends Function<Gender, Integer> {
+public interface AgeSupplier extends Function<Gender, Integer> {
 
 
     static AgeSupplier randomAge() {
 
+        return randomAge(Range.MIN_AGE, Range.MAX_AGE);
+    }
+    static AgeSupplier randomAge(int min, int max) {
+
         final Random random = new Random();
 
-        return g -> random.nextInt(Range.MAX_AGE - Range.MIN_AGE) + Range.MIN_AGE;
+        return g -> random.nextInt(max - min) + min;
     }
 }
