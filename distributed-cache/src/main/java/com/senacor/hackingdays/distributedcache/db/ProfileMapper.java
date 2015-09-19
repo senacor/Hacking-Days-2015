@@ -97,8 +97,21 @@ public class ProfileMapper {
 		}
 	}
 
+	public List<UUID> getAllIds() {
+		try (PreparedStatement statement = connection.prepareStatement("select uuid from profile")) {
+			ResultSet resultset = statement.executeQuery();
+			List<UUID> result = new ArrayList<>();
+			while (resultset.next()) {
+				result.add(UUID.fromString(resultset.getString("uuid")));
+			}
+			return result;
+		} catch (SQLException ex) {
+			throw new RuntimeException("SQLException when fetching all profiles.", ex);
+		}
+	}
+
 	public Profile getProfileById(UUID id) {
-		try (PreparedStatement statement = connection.prepareStatement("select * from profile where id = ?")) {
+		try (PreparedStatement statement = connection.prepareStatement("select * from profile where uuid = ?")) {
 			statement.setString(1, id.toString());
 			ResultSet resultset = statement.executeQuery();
 			if (resultset.next()) {
@@ -130,16 +143,16 @@ public class ProfileMapper {
 			throw new RuntimeException("SQLException when updating profile.", ex);
 		}
 	}
-	
-	public boolean deleteProfile(Profile profile) {
+
+	public boolean deleteProfile(UUID id) {
 		try (PreparedStatement statement = connection.prepareStatement("delete from profile where uuid = ?")) {
-			statement.setString(1, profile.getId().toString());
+			statement.setString(1, id.toString());
 			return statement.executeUpdate() == 1;
-		
-	} catch (SQLException ex) {
-		throw new RuntimeException("SQLException when updating profile.", ex);
-	}
-				
+
+		} catch (SQLException ex) {
+			throw new RuntimeException("SQLException when updating profile.", ex);
+		}
+
 	}
 
 }
