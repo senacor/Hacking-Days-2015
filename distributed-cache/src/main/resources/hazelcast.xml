@@ -14,9 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<hazelcast xsi:schemaLocation="http://www.hazelcast.com/schema/config hazelcast-config-3.5.xsd"
-           xmlns="http://www.hazelcast.com/schema/config"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<hazelcast xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.hazelcast.com/schema/config
+                               http://www.hazelcast.com/schema/config/hazelcast-config-3.5.xsd"
+           xmlns="http://www.hazelcast.com/schema/config">
   <group>
     <name>sinalco</name>
     <password>sinalco</password>
@@ -126,7 +127,7 @@
     <!--
         Number of async backups. 0 means no backup.
     -->
-    <async-backup-count>0</async-backup-count>
+    <async-backup-count>1</async-backup-count>
     <!--
   Maximum number of seconds for each entry to stay in the map. Entries that are
   older than <time-to-live-seconds> and not updated for <time-to-live-seconds>
@@ -186,6 +187,19 @@
     -->
     <merge-policy>com.hazelcast.map.merge.PutIfAbsentMapMergePolicy</merge-policy>
 
+  </map>
+
+  <map name="profileMap">
+    <in-memory-format>BINARY</in-memory-format>
+    <backup-count>0</backup-count>
+    <async-backup-count>1</async-backup-count>
+    <eviction-policy>LFU</eviction-policy>
+    <eviction-percentage>25</eviction-percentage>
+    <min-eviction-check-millis>100</min-eviction-check-millis>
+    <merge-policy>com.hazelcast.map.merge.LatestUpdateMapMergePolicy</merge-policy>
+    <map-store enabled="true">
+      <class-name>com.senacor.hackingdays.distributedcache.ProfileMapStore</class-name>
+    </map-store>
   </map>
 
   <multimap name="default">
