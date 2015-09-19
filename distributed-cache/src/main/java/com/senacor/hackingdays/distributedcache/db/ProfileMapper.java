@@ -129,7 +129,17 @@ public class ProfileMapper {
 		} catch (SQLException ex) {
 			throw new RuntimeException("SQLException when updating profile.", ex);
 		}
-
+	}
+	
+	public boolean deleteProfile(Profile profile) {
+		try (PreparedStatement statement = connection.prepareStatement("delete from profile where uuid = ?")) {
+			statement.setString(1, profile.getId().toString());
+			return statement.executeUpdate() == 1;
+		
+	} catch (SQLException ex) {
+		throw new RuntimeException("SQLException when updating profile.", ex);
+	}
+				
 	}
 
 }
