@@ -2,15 +2,22 @@ package com.senacor.hackingdays.lmax.lmax;
 
 import com.google.common.base.Stopwatch;
 import com.lmax.disruptor.BlockingWaitStrategy;
+import com.lmax.disruptor.BusySpinWaitStrategy;
+import com.lmax.disruptor.LiteBlockingWaitStrategy;
+import com.lmax.disruptor.PhasedBackoffWaitStrategy;
 import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.SleepingWaitStrategy;
+import com.lmax.disruptor.TimeoutBlockingWaitStrategy;
+import com.lmax.disruptor.WaitStrategy;
+import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
 import com.senacor.hackingdays.lmax.lmax.fraudrule.RuleBasedFraudDetector;
-import com.senacor.hackingdays.lmax.lmax.fraud.FraudConsumer;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,34 +33,30 @@ import static junitparams.JUnitParamsRunner.$;
 public class DisruptorTest {
 
 
-    public static final int SAMPLE_SIZE = 500_000;
+    public static final int SAMPLE_SIZE = 1_000_000;
 
     @ClassRule
     public static final ResultCollector resultCollector = new ResultCollector();
+    private ExecutorService executor;
     public static final int POOL_SIZE = 12;
+    public static final int RING_BUFFER_SIZE = 1024 * 2 * 2;
+
+    @Before
+    public void init() {
+        executor = Executors.newFixedThreadPool(POOL_SIZE);
+    }
+
+    @After
+    public void shutdown() {
+        executor.shutdown();
+    }
+
 
     @Test
-    public void testDisruptor() throws InterruptedException {
-        // Executor that will be used to construct new threads for consumers
-        ExecutorService executor = Executors.newFixedThreadPool(POOL_SIZE);
+    @Parameters(method = "disruptorParams")
+    public void testDisruptor(ProducerType producerType, WaitStrategy waitStrategy) throws InterruptedException {
 
-        // Specify the size of the ring buffer, must be power of 2.
-        int bufferSize = 4096 * 2;
-        // Construct the Disruptor
-        // single-producer disruptor, yielding wait
-        //        Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor, ProducerType.SINGLE, new YieldingWaitStrategy());
-
-        // single-producer disruptor, blocking wait
-        //        Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(
-        //            DisruptorEnvelope::new, 
-        //            bufferSize, 
-        //            executor,
-        //            ProducerType.SINGLE,
-        //            new BlockingWaitStrategy());
-        
-        // multi-producer, blocking wait
-        Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor);
-
+        Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, RING_BUFFER_SIZE, executor, producerType, waitStrategy);
         CountDownLatch countDownLatch = registerConsumers(disruptor);
 
         // Start the Disruptor, starts all threads running
@@ -66,16 +69,31 @@ public class DisruptorTest {
 
         Stopwatch stopwatch = Stopwatch.createStarted();
         generator.forEach(prof -> ringBuffer.publishEvent(
-            (envelope, sequence, profile) -> envelope.setProfile(profile),
-            prof)
+                        (envelope, sequence, profile) -> envelope.setProfile(profile),
+                        prof)
         );
 
         // wait for termination
         countDownLatch.await();
         stopwatch.stop();
         disruptor.shutdown();
-        executor.shutdown();
-        resultCollector.addResult(POOL_SIZE, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+        resultCollector.addResult(producerType, waitStrategy, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+    }
+
+    @SuppressWarnings("unusedDeclaration")
+    private Object[] disruptorParams() {
+        return $(
+                $(ProducerType.MULTI, new BlockingWaitStrategy()),        // warm up
+                $(ProducerType.MULTI, new BlockingWaitStrategy()),        // warm up
+                $(ProducerType.MULTI, new BlockingWaitStrategy()),
+                $(ProducerType.SINGLE, new YieldingWaitStrategy()),
+                $(ProducerType.SINGLE, new BlockingWaitStrategy()),
+                $(ProducerType.SINGLE, new BusySpinWaitStrategy()),
+                $(ProducerType.SINGLE, new PhasedBackoffWaitStrategy(100, 100, TimeUnit.MILLISECONDS, new YieldingWaitStrategy())),
+                $(ProducerType.SINGLE, new LiteBlockingWaitStrategy()),
+                $(ProducerType.SINGLE, new TimeoutBlockingWaitStrategy(100, TimeUnit.MILLISECONDS)),
+                $(ProducerType.SINGLE, new SleepingWaitStrategy())
+        );
     }
 
     private ProfileGenerator setupGenerator() {
