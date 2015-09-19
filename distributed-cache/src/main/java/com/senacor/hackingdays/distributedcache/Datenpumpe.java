@@ -29,14 +29,7 @@ public class Datenpumpe {
         String defaultMap = "profileSenke";
         Integer defaultCount = 10_000;
 
-
-        ClientConfig clientConfig = new ClientConfig();
-        clientConfig.getSerializationConfig().getSerializerConfigs().add(
-                new SerializerConfig().
-                        setTypeClass(Profile.class).
-                        setImplementation(new KryoProfileStreamSerializer()));
-        clientConfig.setCredentials(new UsernamePasswordCredentials("sinalco", "sinalco"));
-        HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
+        HazelcastInstance client = HazelcastClient.newHazelcastClient();
 
         try {
             Thread.sleep(500);
@@ -60,8 +53,9 @@ public class Datenpumpe {
 
             sw.start();
             ProfileGenerator.newInstance(defaultCount).stream().parallel().forEach(profile -> {
-                if (COUNT % 500 == 0) {
+                if (COUNT % 100 == 0) {
                     System.out.println("Habe bis jetzt " + COUNT + " Saetze nach " + sw.elapsed(TimeUnit.MILLISECONDS) + "ms geschrieben.");
+                    System.out.println("Die naechste ID ist "+profile.getId().toString()+" ("+profile.getName()+")");
                     System.out.flush();
                 }
                 COUNT++;
