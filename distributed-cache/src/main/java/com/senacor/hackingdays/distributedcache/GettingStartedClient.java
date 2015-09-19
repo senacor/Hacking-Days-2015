@@ -5,6 +5,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IList;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.IQueue;
+import com.senacor.hackingdays.distributedcache.generate.ProfileGenerator;
 import com.senacor.hackingdays.distributedcache.generate.model.Gender;
 import com.senacor.hackingdays.distributedcache.generate.model.Profile;
 import com.senacor.hackingdays.distributedcache.generate.model.Seeking;
@@ -16,7 +17,7 @@ public class GettingStartedClient {
         IQueue<Profile> queue = client.getQueue("profiles");
 
         IList<Object> fooListe = client.getList("foo");
-                                   System.out.println("Fooliste item 0:"+fooListe.get(0));
+        System.out.println("Fooliste item 0:" + (fooListe.isEmpty() ? "EMPTY!!!" : fooListe.get(0).toString()));
         for (Profile profile : queue) {
             System.out.printf("Q1 (%s): %s, %d, %s aus %s, %s sucht: ", profile.getId().toString(), profile.getName(), profile.getAge(), toString(profile.getGender()), profile.getLocation().getCity(), profile.getLocation().getState());
             Seeking seeking = profile.getSeeking();
@@ -29,6 +30,9 @@ public class GettingStartedClient {
             Seeking seeking = profile.getSeeking();
             System.out.printf("%s zwischen %d und %d%n", toString(seeking.getGender()), seeking.getAgeRange().getLower(), seeking.getAgeRange().getUpper());
         }
+        Profile profileOoooold = ProfileGenerator.newProfile();
+        profileOoooold.setAge(99);
+        map.put(profileOoooold.getId().toString(), profileOoooold);
 
         IMap<String, Profile> map2 = client.getMap("datingProfiles");
         for (Profile profile : map2.values()) {
