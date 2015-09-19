@@ -14,5 +14,6 @@
     <module>lmax-disruptor</module>
     <module>serialization</module>
     <module>serialization-benchmark</module>
+    <module>distributed-cache</module>
   </modules>
 </project>
