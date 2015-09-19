@@ -12,7 +12,9 @@ package com.senacor.hackingdays.serialization.data.unsafe;
 
 import sun.misc.Unsafe;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 /**
  * Based on http://mechanical-sympathy.blogspot.de/2012/07/native-cc-like-performance-for-java.html
@@ -23,12 +25,15 @@ import java.lang.reflect.Field;
  */
 public class UnsafeMemory {
   private static final Unsafe unsafe;
+  private static final Field stringValueField;
 
   static {
     try {
       Field field = Unsafe.class.getDeclaredField("theUnsafe");
       field.setAccessible(true);
       unsafe = (Unsafe) field.get(null);
+      stringValueField = String.class.getDeclaredField("value");
+      stringValueField.setAccessible(true);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -46,9 +51,13 @@ public class UnsafeMemory {
 
   private static final int SIZE_OF_LONG = 8;
 
-  private int pos = 0;
+  private long pos = 0;
 
-  private byte[] buffer;
+  private long bufferSize;
+
+  private long bufferOffset;
+
+  private Object buffer;
 
   public UnsafeMemory(final byte[] buffer) {
     if (null == buffer) {
@@ -56,6 +65,21 @@ public class UnsafeMemory {
     }
 
     this.buffer = buffer;
+    this.bufferSize = buffer.length;
+    this.bufferOffset = byteArrayOffset;
+  }
+
+  public UnsafeMemory(final long size) {
+    this.buffer = fromAddress(unsafe.allocateMemory(size));
+    this.bufferSize = size;
+    this.bufferOffset = 0;
+  }
+
+  private static Object fromAddress(long address) {
+    Object[] array = new Object[] {null};
+    long baseOffset = unsafe.arrayBaseOffset(Object[].class);
+    unsafe.putLong(array, baseOffset, address);
+    return array[0];
   }
 
   public void reset() {
@@ -64,52 +88,54 @@ public class UnsafeMemory {
 
   public void setBuffer(final byte[] buffer) {
     this.buffer = buffer;
+    this.bufferSize = buffer.length;
+    this.bufferOffset = byteArrayOffset;
   }
 
-  public int getPos() {
+  public long getPos() {
     return pos;
   }
 
   public void putBoolean(final boolean value) throws BufferTooSmallException {
-    if (pos + SIZE_OF_BOOLEAN > buffer.length) {
+    if (pos + SIZE_OF_BOOLEAN > bufferSize) {
       throw new BufferTooSmallException();
     }
-    unsafe.putBoolean(buffer, byteArrayOffset + pos, value);
+    unsafe.putBoolean(buffer, bufferOffset + pos, value);
     pos += SIZE_OF_BOOLEAN;
   }
 
   public boolean getBoolean() {
-    boolean value = unsafe.getBoolean(buffer, byteArrayOffset + pos);
+    boolean value = unsafe.getBoolean(buffer, bufferOffset + pos);
     pos += SIZE_OF_BOOLEAN;
 
     return value;
   }
 
   public void putInt(final int value) throws BufferTooSmallException {
-    if (pos + SIZE_OF_INT > buffer.length) {
+    if (pos + SIZE_OF_INT > bufferSize) {
       throw new BufferTooSmallException();
     }
-    unsafe.putInt(buffer, byteArrayOffset + pos, value);
+    unsafe.putInt(buffer, bufferOffset + pos, value);
     pos += SIZE_OF_INT;
   }
 
   public int getInt() {
-    int value = unsafe.getInt(buffer, byteArrayOffset + pos);
+    int value = unsafe.getInt(buffer, bufferOffset + pos);
     pos += SIZE_OF_INT;
 
     return value;
   }
 
   public void putLong(final long value) throws BufferTooSmallException {
-    if (pos + SIZE_OF_LONG > buffer.length) {
+    if (pos + SIZE_OF_LONG > bufferSize) {
       throw new BufferTooSmallException();
     }
-    unsafe.putLong(buffer, byteArrayOffset + pos, value);
+    unsafe.putLong(buffer, bufferOffset + pos, value);
     pos += SIZE_OF_LONG;
   }
 
   public long getLong() {
-    long value = unsafe.getLong(buffer, byteArrayOffset + pos);
+    long value = unsafe.getLong(buffer, bufferOffset + pos);
     pos += SIZE_OF_LONG;
 
     return value;
@@ -119,12 +145,12 @@ public class UnsafeMemory {
     putInt(values.length);
 
     long bytesToCopy = values.length << 3;
-    if (pos + bytesToCopy > buffer.length) {
+    if (pos + bytesToCopy > bufferSize) {
       throw new BufferTooSmallException();
     }
 
     unsafe.copyMemory(values, longArrayOffset,
-                      buffer, byteArrayOffset + pos,
+                      buffer, bufferOffset + pos,
                       bytesToCopy);
     pos += bytesToCopy;
   }
@@ -134,7 +160,7 @@ public class UnsafeMemory {
     long[] values = new long[arraySize];
 
     long bytesToCopy = values.length << 3;
-    unsafe.copyMemory(buffer, byteArrayOffset + pos,
+    unsafe.copyMemory(buffer, bufferOffset + pos,
                       values, longArrayOffset,
                       bytesToCopy);
     pos += bytesToCopy;
@@ -146,11 +172,11 @@ public class UnsafeMemory {
     putInt(values.length);
 
     long bytesToCopy = values.length;
-    if (pos + bytesToCopy > buffer.length) {
+    if (pos + bytesToCopy > bufferSize) {
       throw new BufferTooSmallException();
     }
     unsafe.copyMemory(values, byteArrayOffset,
-                      buffer, byteArrayOffset + pos,
+                      buffer, bufferOffset + pos,
                       bytesToCopy);
     pos += bytesToCopy;
   }
@@ -160,7 +186,7 @@ public class UnsafeMemory {
     byte[] values = new byte[arraySize];
 
     long bytesToCopy = values.length;
-    unsafe.copyMemory(buffer, byteArrayOffset + pos,
+    unsafe.copyMemory(buffer, bufferOffset + pos,
                       values, byteArrayOffset,
                       bytesToCopy);
     pos += bytesToCopy;
@@ -168,15 +194,39 @@ public class UnsafeMemory {
     return values;
   }
 
+  public void putByteArray(final long address, final byte[] values) {
+    long bytesToCopy = values.length;
+    unsafe.copyMemory(values, byteArrayOffset,
+                      buffer, bufferOffset + address,
+                      bytesToCopy);
+  }
+
+  public byte[] getByteArray(final long address, final int size) {
+    byte[] values = new byte[size];
+
+    unsafe.copyMemory(buffer, bufferOffset + address,
+                      values, byteArrayOffset,
+                      size);
+    return values;
+  }
+
+  public void putLong(final long address, final long longValue) {
+    unsafe.putLong(buffer, bufferOffset + address, longValue);
+  }
+
+  public long getLong(final long address) {
+    return unsafe.getLong(buffer, bufferOffset + address);
+  }
+
   public void putDoubleArray(final double[] values) throws BufferTooSmallException {
     putInt(values.length);
 
     long bytesToCopy = values.length << 3;
-    if (pos + bytesToCopy > buffer.length) {
+    if (pos + bytesToCopy > bufferSize) {
       throw new BufferTooSmallException();
     }
     unsafe.copyMemory(values, doubleArrayOffset,
-                      buffer, byteArrayOffset + pos,
+                      buffer, bufferOffset + pos,
                       bytesToCopy);
     pos += bytesToCopy;
   }
@@ -186,11 +236,47 @@ public class UnsafeMemory {
     double[] values = new double[arraySize];
 
     long bytesToCopy = values.length << 3;
-    unsafe.copyMemory(buffer, byteArrayOffset + pos,
+    unsafe.copyMemory(buffer, bufferOffset + pos,
                       values, doubleArrayOffset,
                       bytesToCopy);
     pos += bytesToCopy;
 
     return values;
+  }
+
+  public static long sizeOf(final Object object) {
+    Class clazz = object.getClass();
+    if (clazz.isArray()) {
+      int base = unsafe.arrayBaseOffset(clazz);
+      int scale = unsafe.arrayIndexScale(clazz);
+      long size = base + (scale * Array.getLength(object));
+      if ((size % 8) != 0) {
+        size += 8 - (size % 8);
+      }
+      return size;
+    }
+    long maximumOffset = 0;
+    do {
+      for (Field f : clazz.getDeclaredFields()) {
+        if (!Modifier.isStatic(f.getModifiers())) {
+          maximumOffset = Math.max(maximumOffset, unsafe.objectFieldOffset(f));
+        }
+      }
+    } while ((clazz = clazz.getSuperclass()) != null);
+    long objectSize = maximumOffset + 8;
+    // add the size of the char[] that backs the string
+    if (object instanceof String) {
+      objectSize += sizeOfStringValue((String)object);
+    }
+    return objectSize;
+  }
+
+  private static long sizeOfStringValue(final String string) {
+    try {
+      final char[] stringValue = (char[]) stringValueField.get(string);
+      return UnsafeMemory.sizeOf(stringValue);
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

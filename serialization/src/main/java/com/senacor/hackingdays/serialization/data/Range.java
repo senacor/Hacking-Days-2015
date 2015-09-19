@@ -1,17 +1,17 @@
 package com.senacor.hackingdays.serialization.data;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import com.senacor.hackingdays.serialization.data.unsafe.BufferTooSmallException;
+import com.senacor.hackingdays.serialization.data.unsafe.SizeAware;
+import com.senacor.hackingdays.serialization.data.unsafe.UnsafeMemory;
+import com.senacor.hackingdays.serialization.data.unsafe.UnsafeSerializable;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import static com.google.common.base.Preconditions.checkArgument;
 
-import com.senacor.hackingdays.serialization.data.unsafe.BufferTooSmallException;
-import com.senacor.hackingdays.serialization.data.unsafe.UnsafeMemory;
-import com.senacor.hackingdays.serialization.data.unsafe.UnsafeSerializable;
-
-public class Range implements Serializable, UnsafeSerializable {
+public class Range implements Serializable, UnsafeSerializable, SizeAware {
     private static final long serialVersionUID = 1;
 
     public static final int MAX_AGE = 75;
@@ -76,5 +76,16 @@ public class Range implements Serializable, UnsafeSerializable {
         final int lower = memory.getInt();
         final int upper = memory.getInt();
         return new Range(lower, upper);
+    }
+
+    @Override
+    public long getDeepSize() {
+        // native fields only, deepsize == shallowsize
+        return getShallowSize();
+    }
+
+    @Override
+    public long getShallowSize() {
+        return UnsafeMemory.sizeOf(this);
     }
 }

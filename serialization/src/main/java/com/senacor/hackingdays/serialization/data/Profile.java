@@ -1,13 +1,16 @@
 package com.senacor.hackingdays.serialization.data;
 
 import com.senacor.hackingdays.serialization.data.unsafe.BufferTooSmallException;
+import com.senacor.hackingdays.serialization.data.unsafe.SizeAware;
 import com.senacor.hackingdays.serialization.data.unsafe.UnsafeMemory;
 import com.senacor.hackingdays.serialization.data.unsafe.UnsafeSerializable;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.Serializable;
 
-public class Profile implements Serializable, UnsafeSerializable {
+import static com.senacor.hackingdays.serialization.data.unsafe.UnsafeMemory.sizeOf;
+
+public class Profile implements Serializable, UnsafeSerializable, SizeAware {
 
   private static final long serialVersionUID = 1;
 
@@ -136,5 +139,26 @@ public class Profile implements Serializable, UnsafeSerializable {
     profile.setSeeking(seeking);
     profile.setActivity(activity);
     return profile;
+  }
+
+  @Override
+  public long getDeepSize() {
+    // Includes references to objects and native member variables of profile
+    final long profileShallowSize = getShallowSize();
+    final long profileNameSize = sizeOf(name);
+    // gender is just a reference to an enum (singleton instance). It takes some space but once only, not for each profile.
+    // the reference to gender is already accounted for by profileShallowSize
+    // age is native int, already accounted for
+    final long profileLocationSize = location.getDeepSize();
+    // relationship is enum, already accounted for
+    // smoker is native boolean, already accounted for
+    final long profileSeekingSize = seeking.getDeepSize();
+    final long profileActivitySize = activity.getDeepSize();
+    return profileShallowSize + profileNameSize + profileLocationSize + profileSeekingSize + profileActivitySize;
+  }
+
+  @Override
+  public long getShallowSize() {
+    return UnsafeMemory.sizeOf(this);
   }
 }

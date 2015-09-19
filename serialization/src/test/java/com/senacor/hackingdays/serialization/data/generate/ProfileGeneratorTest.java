@@ -4,164 +4,118 @@ import com.senacor.hackingdays.serialization.data.CompactedProfile;
 import com.senacor.hackingdays.serialization.data.Gender;
 import com.senacor.hackingdays.serialization.data.Location;
 import com.senacor.hackingdays.serialization.data.RelationShipStatus;
-import com.senacor.hackingdays.serialization.data.Profile;
-import com.senacor.hackingdays.serialization.data.unsafe.BufferTooSmallException;
-import com.senacor.hackingdays.serialization.data.unsafe.UnsafeMemory;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.HashSet;
+
+import static org.junit.Assert.assertEquals;
 
 public class ProfileGeneratorTest {
 
-    private static final Unsafe unsafe;
+  private static final Unsafe unsafe;
 
-    static {
-        try {
-            Field field = Unsafe.class.getDeclaredField("theUnsafe");
-            field.setAccessible(true);
-            unsafe = (Unsafe) field.get(null);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+  static {
+    try {
+      Field field = Unsafe.class.getDeclaredField("theUnsafe");
+      field.setAccessible(true);
+      unsafe = (Unsafe) field.get(null);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
+  }
 
 
-    @Test
-    public void thatProfilesAreGenerated() {
-        ProfileGenerator generator = ProfileGenerator.newInstance(100);
-        generator.stream().forEach(System.out::println);
-    }
+  @Test
+  public void thatProfilesAreGenerated() {
+    ProfileGenerator generator = ProfileGenerator.newInstance(100);
+    generator.stream().forEach(System.out::println);
+  }
 
-    @Test
-    public void testCompactedProfile() {
-        String name = "Bibi Blocksberg";
-        String state = "BY";
-        String zip = "90410";
-        String city = "Nuernberg";
+  @Test
+  public void testCompactedProfile() {
+    String name = "Bibi Blocksberg";
+    String state = "BY";
+    String zip = "90410";
+    String city = "Nuernberg";
 
-        CompactedProfile cp = new CompactedProfile(name, new Location(state, city, zip));
-        assertEquals(name, cp.getName());
-        assertEquals(state, cp.getCompactedLocation().getState());
-        assertEquals(zip, cp.getCompactedLocation().getZip());
-        assertEquals(city, cp.getCompactedLocation().getCity());
+    CompactedProfile cp = new CompactedProfile(name, new Location(state, city, zip));
+    assertEquals(name, cp.getName());
+    assertEquals(state, cp.getCompactedLocation().getState());
+    assertEquals(zip, cp.getCompactedLocation().getZip());
+    assertEquals(city, cp.getCompactedLocation().getCity());
 
-        Gender gender = Gender.Disambiguous;
-        cp.setGender(gender);
-        assertEquals(gender, cp.getGender());
+    Gender gender = Gender.Disambiguous;
+    cp.setGender(gender);
+    assertEquals(gender, cp.getGender());
 
-        gender = Gender.Female;
-        cp.setGender(gender);
-        assertEquals(gender, cp.getGender());
+    gender = Gender.Female;
+    cp.setGender(gender);
+    assertEquals(gender, cp.getGender());
 
-        gender = Gender.Male;
-        cp.setGender(gender);
-        assertEquals(gender, cp.getGender());
+    gender = Gender.Male;
+    cp.setGender(gender);
+    assertEquals(gender, cp.getGender());
 
-        RelationShipStatus rss = RelationShipStatus.Single;
-        cp.setRelationShipStatus(rss);
-        assertEquals(rss, cp.getRelationShipStatus());
+    RelationShipStatus rss = RelationShipStatus.Single;
+    cp.setRelationShipStatus(rss);
+    assertEquals(rss, cp.getRelationShipStatus());
 
-        rss = RelationShipStatus.Maried;
-        cp.setRelationShipStatus(rss);
-        assertEquals(rss, cp.getRelationShipStatus());
+    rss = RelationShipStatus.Maried;
+    cp.setRelationShipStatus(rss);
+    assertEquals(rss, cp.getRelationShipStatus());
 
-        rss = RelationShipStatus.Divorced;
-        cp.setRelationShipStatus(rss);
-        assertEquals(rss, cp.getRelationShipStatus());
+    rss = RelationShipStatus.Divorced;
+    cp.setRelationShipStatus(rss);
+    assertEquals(rss, cp.getRelationShipStatus());
 
-        boolean smoker = false;
-        cp.setSmoker(smoker);
-        assertEquals(smoker, cp.isSmoker());
+    boolean smoker = false;
+    cp.setSmoker(smoker);
+    assertEquals(smoker, cp.isSmoker());
 
-        smoker = true;
-        cp.setSmoker(smoker);
-        assertEquals(smoker, cp.isSmoker());
+    smoker = true;
+    cp.setSmoker(smoker);
+    assertEquals(smoker, cp.isSmoker());
 
-        int age = 34;
-        cp.setAge(age);
-        assertEquals(age, cp.getAge());
+    int age = 34;
+    cp.setAge(age);
+    assertEquals(age, cp.getAge());
 
-        // Seeking
+    // Seeking
 
-        gender = Gender.Disambiguous;
-        cp.getCompactedSeeking().setGender(gender);
-        assertEquals(gender, cp.getCompactedSeeking().getGender());
+    gender = Gender.Disambiguous;
+    cp.getCompactedSeeking().setGender(gender);
+    assertEquals(gender, cp.getCompactedSeeking().getGender());
 
-        gender = Gender.Female;
-        cp.getCompactedSeeking().setGender(gender);
-        assertEquals(gender, cp.getCompactedSeeking().getGender());
+    gender = Gender.Female;
+    cp.getCompactedSeeking().setGender(gender);
+    assertEquals(gender, cp.getCompactedSeeking().getGender());
 
-        gender = Gender.Male;
-        cp.getCompactedSeeking().setGender(gender);
-        assertEquals(gender, cp.getCompactedSeeking().getGender());
+    gender = Gender.Male;
+    cp.getCompactedSeeking().setGender(gender);
+    assertEquals(gender, cp.getCompactedSeeking().getGender());
 
-        age = 27;
-        cp.getCompactedSeeking().getCompactedRange().setLower(age);
-        assertEquals(age, cp.getCompactedSeeking().getCompactedRange().getLower());
-        age = 64;
-        cp.getCompactedSeeking().getCompactedRange().setUpper(age);
-        assertEquals(age, cp.getCompactedSeeking().getCompactedRange().getUpper());
+    age = 27;
+    cp.getCompactedSeeking().getCompactedRange().setLower(age);
+    assertEquals(age, cp.getCompactedSeeking().getCompactedRange().getLower());
+    age = 64;
+    cp.getCompactedSeeking().getCompactedRange().setUpper(age);
+    assertEquals(age, cp.getCompactedSeeking().getCompactedRange().getUpper());
 
-        // Activity
+    // Activity
 
-        int loginCount = 2;
-        cp.getCompactedActivity().setLoginCount(loginCount);
-        assertEquals(loginCount, cp.getCompactedActivity().getLoginCount());
+    int loginCount = 2;
+    cp.getCompactedActivity().setLoginCount(loginCount);
+    assertEquals(loginCount, cp.getCompactedActivity().getLoginCount());
 
-        loginCount = 7;
-        cp.getCompactedActivity().setLoginCount(loginCount);
-        assertEquals(loginCount, cp.getCompactedActivity().getLoginCount());
+    loginCount = 7;
+    cp.getCompactedActivity().setLoginCount(loginCount);
+    assertEquals(loginCount, cp.getCompactedActivity().getLoginCount());
 
-        loginCount = 9;
-        cp.getCompactedActivity().setLoginCount(loginCount);
-        assertEquals(loginCount, cp.getCompactedActivity().getLoginCount());
+    loginCount = 9;
+    cp.getCompactedActivity().setLoginCount(loginCount);
+    assertEquals(loginCount, cp.getCompactedActivity().getLoginCount());
 
-    }
-
-    @Test
-    public void profileSizes() throws BufferTooSmallException {
-        final Profile profile = ProfileGenerator.newProfile();
-        long totalSize = 0;
-        totalSize += sizeOf(profile);
-        totalSize += sizeOf(profile.getLocation());
-        totalSize += sizeOf(profile.getActivity());
-        totalSize += sizeOf(profile.getSeeking());
-        totalSize += sizeOf(profile.getSeeking().getAgeRange());
-        System.out.println("size of profile: " + totalSize);
-
-        final byte[] buffer = new byte[1000];
-        final UnsafeMemory memory = new UnsafeMemory(buffer);
-        profile.serializeUnsafe(memory);
-        System.out.println("size of profile serialization: " + memory.getPos());
-    }
-
-    public static long sizeOf(Object o) {
-        Unsafe u = unsafe;
-        HashSet<Field> fields = new HashSet<Field>();
-        Class c = o.getClass();
-        while (c != Object.class) {
-            for (Field f : c.getDeclaredFields()) {
-                if ((f.getModifiers() & Modifier.STATIC) == 0) {
-                    fields.add(f);
-                }
-            }
-            c = c.getSuperclass();
-        }
-
-        // get offset
-        long maxSize = 0;
-        for (Field f : fields) {
-            long offset = u.objectFieldOffset(f);
-            if (offset > maxSize) {
-                maxSize = offset;
-            }
-        }
-
-        return ((maxSize/8) + 1) * 8;   // padding
-    }
+  }
 
 }
