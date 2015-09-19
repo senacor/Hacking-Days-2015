@@ -91,7 +91,7 @@ public class DisruptorTest {
 
     private CountDownLatch registerConsumers(Disruptor<DisruptorEnvelope> disruptor) {
         // Connect the handler
-        CountDownLatch countDownLatch = new CountDownLatch(6);
+        CountDownLatch countDownLatch = new CountDownLatch(7);
 
         Runnable onComplete = () -> countDownLatch.countDown();
         CompletableConsumer unisexNameConsumer = new UnisexNameConsumer(SAMPLE_SIZE, onComplete);
@@ -100,6 +100,7 @@ public class DisruptorTest {
         CompletableConsumer averageAgeEventHandler = new AverageAgeConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer fraudConsumer = new RuleBasedFraudDetector(SAMPLE_SIZE, onComplete);
         CompletableConsumer homosexualCountingConsumer = new HomosexualCountingConsumer(SAMPLE_SIZE, onComplete);
+        CompletableConsumer matchMakingConsumer = new MatchMakingConsumer(SAMPLE_SIZE, onComplete);
 
         disruptor.handleEventsWith(
                 unisexNameConsumer,
@@ -107,7 +108,8 @@ public class DisruptorTest {
                 creepyOldMenConsumer,
                 fraudConsumer,
                 averageAgeEventHandler,
-                homosexualCountingConsumer
+                homosexualCountingConsumer,
+                matchMakingConsumer
         );
         return countDownLatch;
     }
