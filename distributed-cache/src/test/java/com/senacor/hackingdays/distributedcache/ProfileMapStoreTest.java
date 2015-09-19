@@ -47,6 +47,23 @@ public class ProfileMapStoreTest {
     }
 
     @Test
+    public void updateProfile() throws IOException {
+        Profile inputProfile = createProfile("Hans Wurst", Gender.Male);
+
+        Assert.assertEquals(30, inputProfile.getAge());
+
+        Profile loadedProfile;
+        try (ProfileMapStore mapStore = new ProfileMapStore()) {
+            mapStore.store(inputProfile.getId(), inputProfile);
+            inputProfile.setAge(31);
+            mapStore.store(inputProfile.getId(), inputProfile);
+            loadedProfile = mapStore.load(inputProfile.getId());
+        }
+        Assert.assertEquals(31, inputProfile.getAge());
+        Assert.assertEquals(31, loadedProfile.getAge());
+    }
+
+    @Test
     public void storeAndRetrieveProfiles() throws IOException {
         Profile profile1 = createProfile("Hans Wurst", Gender.Male);
         Profile profile2 = createProfile("Brat Wurst", Gender.Disambiguous);

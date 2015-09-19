@@ -8,12 +8,15 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.io.Serializable;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
  * @author Andreas Keefer
  */
 public class MaxAgeCallable implements Callable<MaxAgeCallable.MaxAgeRes>, Serializable, HazelcastInstanceAware {
+
+    private static final long serialVersionUID = 1;
 
     private transient HazelcastInstance hazelcastInstance;
 
@@ -22,14 +25,15 @@ public class MaxAgeCallable implements Callable<MaxAgeCallable.MaxAgeRes>, Seria
         Profile res = null;
         long start = System.currentTimeMillis();
         IMap<String, Profile> profiles = hazelcastInstance.getMap("profiles");
-        for (String key : profiles.localKeySet()) {
+        Set<String> localKeySet = profiles.localKeySet();
+        for (String key : localKeySet) {
             Profile profile = profiles.get(key);
             if (null == res || res.getAge() < profile.getAge()) {
                 res = profile;
             }
         }
 
-        String info = "MaxAgeCallable: " + profiles.size() + " durchsucht. Found: "
+        String info = "MaxAgeCallable: " + localKeySet.size() + " durchsucht. Found: "
                 + res + " runtime=" + (System.currentTimeMillis() - start);
         System.out.println(info);
 

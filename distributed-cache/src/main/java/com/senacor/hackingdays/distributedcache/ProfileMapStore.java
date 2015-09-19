@@ -33,7 +33,11 @@ public class ProfileMapStore implements MapStore<UUID, Profile>, Closeable {
 
     @Override
     public synchronized void store(UUID key, Profile value) {
-        mapper.insertProfile(value);
+        if (mapper.getProfileById(key) == null) {
+            mapper.insertProfile(value);
+        } else {
+            mapper.updateProfile(value);
+        }
     }
 
     @Override
@@ -65,7 +69,7 @@ public class ProfileMapStore implements MapStore<UUID, Profile>, Closeable {
         Map<UUID, Profile> result = Maps.newHashMap();
         keys.stream().forEach(key -> {
             Profile profile = load(key);
-            if(profile != null) {
+            if (profile != null) {
                 result.put(profile.getId(), profile);
             }
         });
