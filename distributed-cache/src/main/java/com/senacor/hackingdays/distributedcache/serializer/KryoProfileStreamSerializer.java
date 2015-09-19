@@ -17,12 +17,17 @@ import java.io.OutputStream;
  */
 public class KryoProfileStreamSerializer implements StreamSerializer<Profile> {
 
-    private Kryo kryo = new KryoJSerializer().getKryo();
+    private static final ThreadLocal<Kryo> kryo = new ThreadLocal<Kryo>() {
+        @Override
+        protected Kryo initialValue() {
+            return new KryoJSerializer().getKryo();
+        }
+    };
 
     @Override
     public void write(ObjectDataOutput out, Profile object) throws IOException {
         Output output = new Output((OutputStream) out);
-        kryo.writeObject(output, object);
+        kryo.get().writeObject(output, object);
         output.flush();
     }
 
@@ -30,7 +35,7 @@ public class KryoProfileStreamSerializer implements StreamSerializer<Profile> {
     public Profile read(ObjectDataInput objectDataInput) throws IOException {
         InputStream in = (InputStream) objectDataInput;
         Input input = new Input(in);
-        return kryo.readObject(input, Profile.class);
+        return kryo.get().readObject(input, Profile.class);
     }
 
     @Override
