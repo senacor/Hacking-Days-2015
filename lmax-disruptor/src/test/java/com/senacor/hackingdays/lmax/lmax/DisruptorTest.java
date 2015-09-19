@@ -3,10 +3,10 @@ package com.senacor.hackingdays.lmax.lmax;
 import com.google.common.base.Stopwatch;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
+import com.senacor.hackingdays.lmax.generate.model.Profile;
 import com.senacor.hackingdays.lmax.queue.QueueConsumer;
 import com.senacor.hackingdays.lmax.queue.QueuePublisher;
-import com.senacor.hackingdays.serialization.data.Profile;
-import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
 import org.junit.Test;
 
 import java.util.concurrent.ConcurrentLinkedQueue;

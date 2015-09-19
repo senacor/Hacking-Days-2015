@@ -12,9 +12,12 @@ import com.google.common.base.Stopwatch;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 import com.senacor.hackingdays.serialization.data.Activity;
+import com.senacor.hackingdays.serialization.data.CompactedProfile;
 import com.senacor.hackingdays.serialization.data.Location;
 import com.senacor.hackingdays.serialization.data.Profile;
 import com.senacor.hackingdays.serialization.data.Seeking;
+import com.senacor.hackingdays.serialization.data.generate.CompactedProfileGenerator;
+import com.senacor.hackingdays.serialization.data.generate.NameSupplier;
 import com.senacor.hackingdays.serialization.data.generate.ProfileGenerator;
 import com.senacor.hackingdays.serialization.data.generate.ProfileGeneratorThrift;
 import com.senacor.hackingdays.serialization.data.generate.ProfileProtoGenerator;
@@ -30,12 +33,15 @@ import scala.concurrent.Future;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import static com.senacor.hackingdays.config.ConfigHelper.createConfig;
+import static com.senacor.hackingdays.serialization.data.Gender.Female;
 import static junitparams.JUnitParamsRunner.$;
 
 @RunWith(JUnitParamsRunner.class)
@@ -214,5 +220,95 @@ public class ConsumerProducerTest {
         }
 
         return resultSet.toArray();
+    }
+
+    @Test
+    public void checkMemory() throws Exception {
+        System.gc();
+
+        List profiles = Arrays.asList(ProfileGenerator.newInstance(COUNT).stream().toArray());
+        System.out.println(COUNT + " records generated");
+
+        System.out.println("(verification - count: " + profiles.stream().count() + ")");
+
+        System.gc();
+
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        Optional oldest = profiles.stream().max((p1, p2) -> {
+            return ((Profile) p1).getAge() - ((Profile) p2).getAge();
+        });
+        stopwatch.stop();
+        System.out.println("elapsed: " + stopwatch.elapsed(TimeUnit.MILLISECONDS));
+
+        stopwatch = Stopwatch.createStarted();
+        Optional youngest = profiles.stream().min((p1, p2) -> {
+            return ((Profile) p1).getAge() - ((Profile) p2).getAge();
+        });
+        stopwatch.stop();
+        System.out.println("elapsed: " + stopwatch.elapsed(TimeUnit.MILLISECONDS));
+
+        System.gc();
+        System.out.println("heap: " + Runtime.getRuntime().freeMemory());
+
+        NameSupplier femaleNames = NameSupplier.forGender(Female);
+        int max = 1000;
+        stopwatch = Stopwatch.createStarted();
+        while (max-- > 0) {
+            String name = femaleNames.get();
+            long num = profiles.parallelStream().filter(p -> {
+                return ((Profile)p).getName().contains(name);
+            }).count();
+            // System.out.println(name+" -> "+num);
+        }
+        stopwatch.stop();
+        System.out.println("elapsed (for all): " + stopwatch.elapsed(TimeUnit.MILLISECONDS));
+
+        System.gc();
+    }
+
+    @Test
+    public void checkCompactedMemory() throws Exception {
+        System.gc();
+
+        List profiles = Arrays.asList(CompactedProfileGenerator.newInstance(COUNT).stream().toArray());
+        System.out.println(COUNT+" records generated");
+
+        System.out.println("(verification - count: "+profiles.stream().count()+")");
+
+        System.gc();
+
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        Optional oldest = profiles.stream().max((p1, p2) -> {
+            return ((Profile) p1).getAge() - ((Profile) p2).getAge();
+        });
+        stopwatch.stop();
+        System.out.println("elapsed: " + stopwatch.elapsed(TimeUnit.MILLISECONDS));
+
+        stopwatch = Stopwatch.createStarted();
+        Optional youngest = profiles.stream().min((p1, p2) -> {
+            return ((Profile) p1).getAge() - ((Profile) p2).getAge();
+        });
+        stopwatch.stop();
+        System.out.println("elapsed: " + stopwatch.elapsed(TimeUnit.MILLISECONDS));
+
+        System.gc();
+        System.out.println("heap: " + Runtime.getRuntime().freeMemory());
+
+        NameSupplier femaleNames = NameSupplier.forGender(Female);
+        int max = 1000;
+        stopwatch = Stopwatch.createStarted();
+        while (max-- > 0) {
+            String name = femaleNames.get();
+            long num = profiles.parallelStream().filter(p -> {
+                return ((Profile)p).getName().contains(name);
+            }).count();
+            // System.out.println(name+" -> "+num);
+        }
+        stopwatch.stop();
+        System.out.println("elapsed (for all): " + stopwatch.elapsed(TimeUnit.MILLISECONDS));
+
+        System.gc();
+
+        System.out.println("avg size: " + profiles.stream().mapToInt(p -> {return ((CompactedProfile)p).getSize();}).average().getAsDouble());
     }
 }
