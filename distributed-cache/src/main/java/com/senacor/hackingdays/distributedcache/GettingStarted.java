@@ -14,12 +14,7 @@ import java.util.Queue;
 
 public class GettingStarted {
     public static void main(String[] args) {
-        Config config = new XmlConfigBuilder().build();
-        config.getSerializationConfig().getSerializerConfigs().add(
-                new SerializerConfig().
-                        setTypeClass(Profile.class).
-                        setImplementation(new KryoProfileStreamSerializer()));
-        HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(config);
+        HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance();
         Map<String, Profile> profiles = hazelcastInstance.getMap("profiles");
         ProfileGenerator.newInstance(5).stream()
                 .forEach(profile -> profiles.put(profile.getId().toString(), profile));
