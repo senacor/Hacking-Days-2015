@@ -15,7 +15,7 @@ public class DisruptorConsumer implements EventHandler<DisruptorEnvelope> {
     @Override
     public void onEvent(DisruptorEnvelope event, long sequence, boolean endOfBatch) throws Exception {
         if (endOfBatch) {
-            System.out.println("End of batch");
+//            System.out.println("End of batch");
         }
         expectedMessages--;
         if (expectedMessages == 0)
