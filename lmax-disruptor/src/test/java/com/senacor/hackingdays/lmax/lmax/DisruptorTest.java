@@ -1,28 +1,19 @@
 package com.senacor.hackingdays.lmax.lmax;
 
 import com.google.common.base.Stopwatch;
-import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.WaitStrategy;
-import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.dsl.ProducerType;
 import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
-import com.senacor.hackingdays.lmax.generate.model.Profile;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import static junitparams.JUnitParamsRunner.$;
 
@@ -47,15 +38,8 @@ public class DisruptorTest {
 //        Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor, ProducerType.SINGLE, new YieldingWaitStrategy());
         Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor);
 
-        // Connect the handler
-        CountDownLatch countDownLatch = new CountDownLatch(2);
+        CountDownLatch countDownLatch = registerConsumers(disruptor);
 
-        Runnable onComplete = () -> countDownLatch.countDown();
-        CompletableConsumer unisexNameConsumer = new UnisexNameConsumer(SAMPLE_SIZE, onComplete);
-        CompletableConsumer loggedInToday = new LoggedInTodayConsumer(SAMPLE_SIZE, onComplete);
-        disruptor.handleEventsWith(
-                unisexNameConsumer,
-                loggedInToday);
 
         // Start the Disruptor, starts all threads running
         disruptor.start();
@@ -72,6 +56,23 @@ public class DisruptorTest {
         disruptor.shutdown();
         executor.shutdown();
         resultCollector.addResult(poolSize, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+    }
+
+    private CountDownLatch registerConsumers(Disruptor<DisruptorEnvelope> disruptor) {
+        // Connect the handler
+        CountDownLatch countDownLatch = new CountDownLatch(3);
+
+        Runnable onComplete = () -> countDownLatch.countDown();
+        CompletableConsumer unisexNameConsumer = new UnisexNameConsumer(SAMPLE_SIZE, onComplete);
+        CompletableConsumer loggedInToday = new LoggedInTodayConsumer(SAMPLE_SIZE, onComplete);
+        CompletableConsumer creepyOldMenConsumer = new CreepyOldMenConsumer(SAMPLE_SIZE, onComplete);
+
+        disruptor.handleEventsWith(
+                unisexNameConsumer,
+                loggedInToday,
+                creepyOldMenConsumer
+        );
+        return countDownLatch;
     }
 
     @SuppressWarnings("unusedDeclaration")
