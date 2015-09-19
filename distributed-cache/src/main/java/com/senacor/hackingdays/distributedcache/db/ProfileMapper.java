@@ -1,5 +1,8 @@
 package com.senacor.hackingdays.distributedcache.db;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import org.apache.commons.io.IOUtils;
 
 import com.senacor.hackingdays.distributedcache.generate.model.Activity;
 import com.senacor.hackingdays.distributedcache.generate.model.Gender;
@@ -20,9 +25,43 @@ import com.senacor.hackingdays.distributedcache.generate.model.Seeking;
 public class ProfileMapper {
 
 	private final Connection connection;
+	private final String tableName;
 
 	public ProfileMapper(Connection connection) {
+		this(connection, "person");
+	}
+
+	public ProfileMapper(Connection connection, String tableName) {
 		this.connection = connection;
+		this.tableName = tableName;
+		initializeSchema(connection, tableName);
+	}
+	private static String getResourceAsString(final String resourceName) {
+		InputStream inputStream = null;
+		try {
+			inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(resourceName);
+			StringWriter stringWriter = new StringWriter();
+			IOUtils.copy(inputStream, stringWriter);
+			return stringWriter.toString();
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		} finally {
+			IOUtils.closeQuietly(inputStream);
+		}
+	}
+	
+	private static void initializeSchema(Connection connection, String tableName) {
+		final String resource = "db/initializeprofiletable.sql";
+		try {
+			final String sql = getResourceAsString(resource);
+			for (String statement : sql.split(";")) {
+				statement = statement.replaceAll("\\$PROFILETABLE\\$", tableName);
+				PreparedStatement stmt = connection.prepareStatement(statement);
+				stmt.execute();
+			}
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	private Profile mapProfileFromResultSet(ResultSet resultSet) throws SQLException {
@@ -53,12 +92,36 @@ public class ProfileMapper {
 
 	}
 
-	private final String INSERT_PROFILE = "insert into profile "
-			+ "(uuid, name, gender, age, location_state, location_city, location_zip, relationship, smoker, seeking_gender, seeking_age_min, seeking_age_max, activity_logincount, activity_lastlogin) "
-			+ "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	private final String UPDATE_PROFILE = "update profile set "
-			+ "uuid=?, name=?, gender=?, age=?, location_state=?, location_city=?, location_zip=?, relationship=?, smoker=?, seeking_gender=?, seeking_age_min=?, seeking_age_max=?, activity_logincount=?, activity_lastlogin=?) "
-			+ "where uuid=?";
+	private String createSelectAllStatement() {
+		return "select * from " + tableName;
+	}
+
+	private String createSelectAllUUIDsStatement() {
+		return "select uuid from " + tableName;
+	}
+	
+	private String createSelectByIdStatement() {
+		return "select * from " + tableName + " where uuid = ?";
+	}
+
+	private String createInsertStatement() {
+		return "insert into " //
+				+ this.tableName //
+				+ "(uuid, name, gender, age, location_state, location_city, location_zip, relationship, smoker, seeking_gender, seeking_age_min, seeking_age_max, activity_logincount, activity_lastlogin) "
+				+ "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	}
+
+	private String createUpdateStatement() {
+		return "update " //
+				+ this.tableName //
+				+ " set " //
+				+ "uuid=?, name=?, gender=?, age=?, location_state=?, location_city=?, location_zip=?, relationship=?, smoker=?, seeking_gender=?, seeking_age_min=?, seeking_age_max=?, activity_logincount=?, activity_lastlogin=?) "
+				+ "where uuid=?";
+	}
+
+	private String createDeleteStatement() {
+		return "delete from " + tableName + " where uuid = ?";
+	}
 
 	private void mapProfileToStatement(PreparedStatement statement, Profile profile) throws SQLException {
 		int i = 1;
@@ -76,7 +139,6 @@ public class ProfileMapper {
 		statement.setInt(i++, profile.getSeeking().getAgeRange().getUpper());
 		statement.setInt(i++, profile.getActivity().getLoginCount());
 		statement.setLong(i++, profile.getActivity().getLastLogin().getTime());
-		// statement.setLong(i++, 25l);
 		if (statement.getParameterMetaData().getParameterCount() >= i) {
 			// for update
 			statement.setString(i++, profile.getId().toString());
@@ -85,7 +147,7 @@ public class ProfileMapper {
 	}
 
 	public List<Profile> getAllProfiles() {
-		try (PreparedStatement statement = connection.prepareStatement("select * from profile")) {
+		try (PreparedStatement statement = connection.prepareStatement(createSelectAllStatement())) {
 			ResultSet resultset = statement.executeQuery();
 			List<Profile> result = new ArrayList<>();
 			while (resultset.next()) {
@@ -98,7 +160,7 @@ public class ProfileMapper {
 	}
 
 	public List<UUID> getAllIds() {
-		try (PreparedStatement statement = connection.prepareStatement("select uuid from profile")) {
+		try (PreparedStatement statement = connection.prepareStatement(createSelectAllUUIDsStatement())) {
 			ResultSet resultset = statement.executeQuery();
 			List<UUID> result = new ArrayList<>();
 			while (resultset.next()) {
@@ -111,7 +173,8 @@ public class ProfileMapper {
 	}
 
 	public Profile getProfileById(UUID id) {
-		try (PreparedStatement statement = connection.prepareStatement("select * from profile where uuid = ?")) {
+		try (PreparedStatement statement = connection
+				.prepareStatement(createSelectByIdStatement())) {
 			statement.setString(1, id.toString());
 			ResultSet resultset = statement.executeQuery();
 			if (resultset.next()) {
@@ -119,12 +182,12 @@ public class ProfileMapper {
 			}
 			return null;
 		} catch (SQLException ex) {
-			throw new RuntimeException("SQLException when fetching all profiles.", ex);
+			throw new RuntimeException("SQLException when fetching Profile by Id.", ex);
 		}
 	}
 
 	public boolean insertProfile(Profile profile) {
-		try (PreparedStatement statement = connection.prepareStatement(INSERT_PROFILE)) {
+		try (PreparedStatement statement = connection.prepareStatement(createInsertStatement())) {
 			mapProfileToStatement(statement, profile);
 			return statement.execute();
 
@@ -135,7 +198,8 @@ public class ProfileMapper {
 	}
 
 	public boolean updateProfile(Profile profile) {
-		try (PreparedStatement statement = connection.prepareStatement(UPDATE_PROFILE)) {
+		try (PreparedStatement statement = connection.prepareStatement(createUpdateStatement())) {
+			System.out.println(statement.getParameterMetaData().getParameterCount());
 			mapProfileToStatement(statement, profile);
 			return statement.executeUpdate() == 1;
 
@@ -145,7 +209,7 @@ public class ProfileMapper {
 	}
 
 	public boolean deleteProfile(UUID id) {
-		try (PreparedStatement statement = connection.prepareStatement("delete from profile where uuid = ?")) {
+		try (PreparedStatement statement = connection.prepareStatement(createDeleteStatement())) {
 			statement.setString(1, id.toString());
 			return statement.executeUpdate() == 1;
 
