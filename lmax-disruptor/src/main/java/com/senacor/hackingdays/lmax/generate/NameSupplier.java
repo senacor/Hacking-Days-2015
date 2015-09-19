@@ -1,12 +1,13 @@
-package com.senacor.hackingdays.serialization.data.generate;
+package com.senacor.hackingdays.lmax.generate;
 
-import com.senacor.hackingdays.serialization.data.Gender;
+
+import com.senacor.hackingdays.lmax.generate.model.Gender;
 
 import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
-public class NameSupplier implements Supplier<String> {
+class NameSupplier implements Supplier<String> {
     private final List<String> names;
     private final Random rnd = new Random();
 
@@ -14,7 +15,7 @@ public class NameSupplier implements Supplier<String> {
         this.names = names;
     }
 
-    public static NameSupplier forGender(Gender gender) {
+    static NameSupplier forGender(Gender gender) {
         switch (gender) {
             case Male:
                 return new NameSupplier(parse("male-firstname.txt"));
@@ -28,7 +29,7 @@ public class NameSupplier implements Supplier<String> {
     }
 
     private static List<String> parse(String fileName) {
-            return LineReader.readLines(fileName);
+        return LineReader.readLines(fileName);
     }
 
     public String get() {
