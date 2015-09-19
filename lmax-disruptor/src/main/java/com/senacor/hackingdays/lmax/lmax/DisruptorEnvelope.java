@@ -1,6 +1,7 @@
 package com.senacor.hackingdays.lmax.lmax;
 
-import com.senacor.hackingdays.serialization.data.Profile;
+
+import com.senacor.hackingdays.lmax.generate.model.Profile;
 
 public class DisruptorEnvelope {
 
