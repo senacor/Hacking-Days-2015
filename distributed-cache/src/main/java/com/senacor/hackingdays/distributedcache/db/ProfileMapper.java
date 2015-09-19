@@ -40,7 +40,7 @@ public class ProfileMapper {
 		final String zip = resultSet.getString("location_zip");
 		final Gender seekingGender = Gender.values()[resultSet.getInt("seeking_gender")];
 		final int lowerAge = resultSet.getInt("seeking_age_min");
-		final int upperAge = resultSet.getInt("seeking_age_min");
+		final int upperAge = resultSet.getInt("seeking_age_max");
 
 		Profile result = new Profile(name, gender, uuid);
 		result.setAge(age);
