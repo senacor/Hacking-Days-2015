@@ -26,7 +26,7 @@ public class ResultCollector extends ExternalResource {
     }
 
     private void printResults() {
-        results.forEach(res -> System.out.printf("%s Milliseconds for run with pool size of %s\n", res.getElapsedMillis(), res.getPoolsize()));
+        results.forEach(res -> System.err.printf("%s Milliseconds for run with pool size of %s\n", res.getElapsedMillis(), res.getPoolsize()));
     }
 
 

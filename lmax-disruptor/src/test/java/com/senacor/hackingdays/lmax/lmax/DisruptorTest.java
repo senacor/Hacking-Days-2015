@@ -1,30 +1,22 @@
 package com.senacor.hackingdays.lmax.lmax;
 
-import static junitparams.JUnitParamsRunner.$;
+import com.google.common.base.Stopwatch;
+import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.dsl.Disruptor;
+import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
+import com.senacor.hackingdays.lmax.lmax.fraudrule.RuleBasedFraudDetector;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import com.google.common.base.Stopwatch;
-import com.lmax.disruptor.EventTranslatorOneArg;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
-import com.senacor.hackingdays.lmax.generate.model.Profile;
-<<<<<<< HEAD
-
-import com.senacor.hackingdays.lmax.lmax.fraudrule.RuleBasedFraudDetector;
-=======
-import com.senacor.hackingdays.lmax.lmax.fraud.FraudConsumer;
->>>>>>> b1d28cb4ba99be73348f03cd9e9679c443de0524
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
+import static junitparams.JUnitParamsRunner.$;
 
 @RunWith(JUnitParamsRunner.class)
 public class DisruptorTest {
@@ -34,15 +26,15 @@ public class DisruptorTest {
 
     @ClassRule
     public static final ResultCollector resultCollector = new ResultCollector();
+    public static final int POOL_SIZE = 12;
 
     @Test
-    @Parameters(method = "poolSize")
-    public void testDisruptor(int poolSize) throws InterruptedException {
+    public void testDisruptor() throws InterruptedException {
         // Executor that will be used to construct new threads for consumers
-        ExecutorService executor = Executors.newFixedThreadPool(poolSize);
+        ExecutorService executor = Executors.newFixedThreadPool(POOL_SIZE);
 
         // Specify the size of the ring buffer, must be power of 2.
-        int bufferSize = 1024;
+        int bufferSize = 4096 * 2;
         // Construct the Disruptor
 //        Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor, ProducerType.SINGLE, new YieldingWaitStrategy());
         Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor);
@@ -59,15 +51,15 @@ public class DisruptorTest {
 
         Stopwatch stopwatch = Stopwatch.createStarted();
         generator.forEach(prof -> ringBuffer.publishEvent(
-            (envelope, sequence, profile) -> envelope .setProfile(profile), prof)
+                        (envelope, sequence, profile) -> envelope.setProfile(profile), prof)
         );
-        
+
         // wait for termination
         countDownLatch.await();
         stopwatch.stop();
         disruptor.shutdown();
         executor.shutdown();
-        resultCollector.addResult(poolSize, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+        resultCollector.addResult(POOL_SIZE, stopwatch.elapsed(TimeUnit.MILLISECONDS));
     }
 
     private ProfileGenerator setupGenerator() {
@@ -95,13 +87,5 @@ public class DisruptorTest {
         );
         return countDownLatch;
     }
-
-    @SuppressWarnings("unusedDeclaration")
-    static Object[] poolSize() {
-        return $(
-                $(12)
-        );
-    }
-
 
 }
