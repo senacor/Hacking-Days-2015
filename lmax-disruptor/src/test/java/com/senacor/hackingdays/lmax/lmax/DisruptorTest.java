@@ -79,12 +79,10 @@ public class DisruptorTest {
     static Object[] poolSize() {
         return $(
                 $(4),
+                $(6),
                 $(8),
-                $(12),
-                $(16),
-                $(20),
-                $(40),
-                $(80)
+                $(10),
+                $(12)
         );
     }
 
