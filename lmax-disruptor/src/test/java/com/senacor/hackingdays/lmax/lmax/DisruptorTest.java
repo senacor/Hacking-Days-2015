@@ -1,22 +1,25 @@
 package com.senacor.hackingdays.lmax.lmax;
 
-import com.google.common.base.Stopwatch;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
-import com.senacor.hackingdays.lmax.lmax.fraud.FraudConsumer;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static junitparams.JUnitParamsRunner.$;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static junitparams.JUnitParamsRunner.$;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import com.google.common.base.Stopwatch;
+import com.lmax.disruptor.EventTranslatorOneArg;
+import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.dsl.Disruptor;
+import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
+import com.senacor.hackingdays.lmax.generate.model.Profile;
+import com.senacor.hackingdays.lmax.lmax.fraud.FraudConsumer;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 
 @RunWith(JUnitParamsRunner.class)
 public class DisruptorTest {
@@ -50,7 +53,11 @@ public class DisruptorTest {
         ProfileGenerator generator = setupGenerator();
 
         Stopwatch stopwatch = Stopwatch.createStarted();
-        generator.forEach(profile -> ringBuffer.publishEvent((envelope, sequence) -> envelope.setProfile(profile)));
+        generator.forEach(prof -> ringBuffer.publishEvent(
+            (envelope, sequence, profile) -> envelope .setProfile(profile), prof)
+        );
+        
+        // wait for termination
         countDownLatch.await();
         stopwatch.stop();
         disruptor.shutdown();
