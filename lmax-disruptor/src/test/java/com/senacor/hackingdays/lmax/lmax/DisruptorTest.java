@@ -70,13 +70,14 @@ public class DisruptorTest {
         CompletableConsumer loggedInToday = new LoggedInTodayConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer creepyOldMenConsumer = new CreepyOldMenConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer fraudConsumer = new CreepyOldMenConsumer(SAMPLE_SIZE, onComplete);
-        AverageAgeConsumer averageAgeEventHandler = new AverageAgeConsumer(SAMPLE_SIZE, onComplete);
+        CompletableConsumer averageAgeEventHandler = new AverageAgeConsumer(SAMPLE_SIZE, onComplete);
 
         disruptor.handleEventsWith(
                 unisexNameConsumer,
                 loggedInToday,
                 creepyOldMenConsumer,
-                fraudConsumer
+                fraudConsumer,
+                averageAgeEventHandler
         );
         return countDownLatch;
     }
@@ -84,9 +85,6 @@ public class DisruptorTest {
     @SuppressWarnings("unusedDeclaration")
     static Object[] poolSize() {
         return $(
-                $(4),
-                $(6),
-                $(8),
                 $(10),
                 $(12)
         );
