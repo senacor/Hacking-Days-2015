@@ -1,13 +1,9 @@
 package com.senacor.hackingdays.distributedcache;
 
-import com.hazelcast.config.Config;
-import com.hazelcast.config.SerializerConfig;
-import com.hazelcast.config.XmlConfigBuilder;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.senacor.hackingdays.distributedcache.generate.ProfileGenerator;
 import com.senacor.hackingdays.distributedcache.generate.model.Profile;
-import com.senacor.hackingdays.distributedcache.serializer.KryoProfileStreamSerializer;
 
 import java.util.Map;
 import java.util.Queue;
