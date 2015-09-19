@@ -19,14 +19,21 @@ public class GettingStartedClient {
         HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
         IQueue<Profile> queue = client.getQueue("profiles");
         for(Profile profile : queue) {
-            System.out.printf("Q (%s): %s, %d, %s aus %s, %s sucht: ", profile.getId().toString(), profile.getName(), profile.getAge(), toString(profile.getGender()), profile.getLocation().getCity(), profile.getLocation().getState());
+            System.out.printf("Q1 (%s): %s, %d, %s aus %s, %s sucht: ", profile.getId().toString(), profile.getName(), profile.getAge(), toString(profile.getGender()), profile.getLocation().getCity(), profile.getLocation().getState());
             Seeking seeking = profile.getSeeking();
             System.out.printf("%s zwischen %d und %d%n", toString(seeking.getGender()), seeking.getAgeRange().getLower(), seeking.getAgeRange().getUpper());
         }
 
         IMap<UUID, Profile> map = client.getMap("profiles");
         for(Profile profile : map.values()) {
-            System.out.printf("M (%s): %s, %d, %s aus %s, %s sucht: ", profile.getId().toString(), profile.getName(), profile.getAge(), toString(profile.getGender()), profile.getLocation().getCity(), profile.getLocation().getState());
+            System.out.printf("M1 (%s): %s, %d, %s aus %s, %s sucht: ", profile.getId().toString(), profile.getName(), profile.getAge(), toString(profile.getGender()), profile.getLocation().getCity(), profile.getLocation().getState());
+            Seeking seeking = profile.getSeeking();
+            System.out.printf("%s zwischen %d und %d%n", toString(seeking.getGender()), seeking.getAgeRange().getLower(), seeking.getAgeRange().getUpper());
+        }
+
+        IMap<String, Profile> map2 = client.getMap("datingProfiles");
+        for(Profile profile : map2.values()) {
+            System.out.printf("M2 (%s): %s, %d, %s aus %s, %s sucht: ", profile.getId().toString(), profile.getName(), profile.getAge(), toString(profile.getGender()), profile.getLocation().getCity(), profile.getLocation().getState());
             Seeking seeking = profile.getSeeking();
             System.out.printf("%s zwischen %d und %d%n", toString(seeking.getGender()), seeking.getAgeRange().getLower(), seeking.getAgeRange().getUpper());
         }
