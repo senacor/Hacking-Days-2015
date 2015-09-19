@@ -8,6 +8,7 @@ import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
 import com.senacor.hackingdays.lmax.lmax.fraud.FraudConsumer;
 import com.senacor.hackingdays.lmax.generate.model.Profile;
 
+import com.senacor.hackingdays.lmax.lmax.fraudrule.RuleBasedFraudDetector;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.ClassRule;
@@ -70,7 +71,7 @@ public class DisruptorTest {
         CompletableConsumer loggedInToday = new LoggedInTodayConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer creepyOldMenConsumer = new CreepyOldMenConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer averageAgeEventHandler = new AverageAgeConsumer(SAMPLE_SIZE, onComplete);
-        CompletableConsumer fraudConsumer = new FraudConsumer(SAMPLE_SIZE, onComplete);
+        CompletableConsumer fraudConsumer = new RuleBasedFraudDetector(SAMPLE_SIZE, onComplete);
 
         disruptor.handleEventsWith(
                 unisexNameConsumer,
