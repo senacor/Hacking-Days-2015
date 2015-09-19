@@ -12,6 +12,7 @@ class LineReader {
 
     static List<String> readLines(String fileName) {
         try {
+            System.out.println("readLines: " + fileName);
             return Resources.readLines(Thread.currentThread().getContextClassLoader().getResource(fileName), StandardCharsets.UTF_8);
         } catch (IOException e) {
            throw new UncheckedIOException(e);
