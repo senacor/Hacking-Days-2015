@@ -3,6 +3,7 @@ package com.senacor.hackingdays.lmax.generate.model;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public class Profile implements Serializable {
 
@@ -24,6 +25,8 @@ public class Profile implements Serializable {
 
     private Activity activity;
 
+    private final UUID uuid = UUID.randomUUID();
+
     public Profile(
             @JsonProperty("name") String name,
             @JsonProperty("gender") Gender gender) {
@@ -41,6 +44,10 @@ public class Profile implements Serializable {
 
     public int getAge() {
         return age;
+    }
+
+    public UUID getId() {
+        return uuid;
     }
 
     public void setAge(int age) {

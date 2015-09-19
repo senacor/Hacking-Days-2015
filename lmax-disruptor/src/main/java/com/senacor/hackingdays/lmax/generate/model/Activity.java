@@ -19,10 +19,6 @@ public class Activity implements Serializable {
         this.loginCount = loginCount;
     }
 
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
-
     public Date getLastLogin() {
         return lastLogin;
     }

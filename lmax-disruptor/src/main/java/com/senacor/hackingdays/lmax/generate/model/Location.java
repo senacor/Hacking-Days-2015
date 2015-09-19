@@ -3,6 +3,7 @@ package com.senacor.hackingdays.lmax.generate.model;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Location implements Serializable {
 
@@ -31,6 +32,25 @@ public class Location implements Serializable {
 
     public String getZip() {
         return zip;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(state, city, zip);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        final Location other = (Location) obj;
+        return Objects.equals(this.state, other.state)
+                && Objects.equals(this.city, other.city)
+                && Objects.equals(this.zip, other.zip);
     }
 
     @Override
