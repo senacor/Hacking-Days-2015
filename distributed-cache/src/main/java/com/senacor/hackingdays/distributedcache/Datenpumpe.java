@@ -5,6 +5,7 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.config.SerializerConfig;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 import com.hazelcast.security.UsernamePasswordCredentials;
 import com.hazelcast.util.StringUtil;
 import com.senacor.hackingdays.distributedcache.generate.ProfileGenerator;
@@ -55,16 +56,16 @@ public class Datenpumpe {
             System.out.println("OK, " + defaultCount + " nach " + s + ", geht los...");
             System.out.flush();
 
-            Map<String, Profile> profiles = client.getMap(s);
+            IMap<String, Profile> profiles = client.getMap(s);
 
             sw.start();
             ProfileGenerator.newInstance(defaultCount).stream().parallel().forEach(profile -> {
-                if (COUNT % 200 == 0) {
+                if (COUNT % 500 == 0) {
                     System.out.println("Habe bis jetzt " + COUNT + " Saetze nach " + sw.elapsed(TimeUnit.MILLISECONDS) + "ms geschrieben.");
                     System.out.flush();
                 }
                 COUNT++;
-                profiles.put(profile.getId().toString(), profile);
+                profiles.set(profile.getId().toString(), profile);
             });
             sw.stop();
             System.out.println("fertig.");
