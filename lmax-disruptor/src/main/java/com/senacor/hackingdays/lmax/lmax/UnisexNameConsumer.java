@@ -16,8 +16,21 @@ public class UnisexNameConsumer extends CompletableConsumer {
     }
 
     @Override
-    protected void processEvent(Profile event, long sequence, boolean endOfBatch) {
-        String name = event.getProfile().getName();
-        if(event.getProfile().getGender())
+    protected void onComplete() {
+        maleNames.retainAll(femaleNames);
+        System.out.println("A total of " + maleNames.size() + " names can be applied to both men and women");
+    }
+
+    @Override
+    protected void processEvent(Profile profile, long sequence, boolean endOfBatch) {
+        String name = profile.getName();
+        switch (profile.getGender()) {
+            case Male:
+                maleNames.add(name);
+                break;
+            case Female:
+                femaleNames.add(name);
+                break;
+        }
     }
 }

@@ -2,7 +2,10 @@ package com.senacor.hackingdays.lmax.lmax;
 
 import com.google.common.base.Stopwatch;
 import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.WaitStrategy;
+import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
 import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -11,10 +14,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import static junitparams.JUnitParamsRunner.$;
 
@@ -22,7 +28,7 @@ import static junitparams.JUnitParamsRunner.$;
 public class DisruptorTest {
 
 
-    public static final int SAMPLE_SIZE = 100_000;
+    public static final int SAMPLE_SIZE = 500_000;
 
     @ClassRule
     public static final ResultCollector resultCollector = new ResultCollector();
@@ -34,17 +40,16 @@ public class DisruptorTest {
         ExecutorService executor = Executors.newFixedThreadPool(poolSize);
 
         // Specify the size of the ring buffer, must be power of 2.
-        int bufferSize = 1024;
+        int bufferSize = 4096;
         // Construct the Disruptor
+//        Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor, ProducerType.SINGLE, new YieldingWaitStrategy());
         Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor);
 
         // Connect the handler
-        CountDownLatch countDownLatch = new CountDownLatch(2);
+        CountDownLatch countDownLatch = new CountDownLatch(1);
         Runnable onComplete = () -> countDownLatch.countDown();
-        DisruptorConsumer c1 = new DisruptorConsumer(SAMPLE_SIZE, onComplete);
-        DisruptorConsumer c2 = new DisruptorConsumer(SAMPLE_SIZE, onComplete);
-        DisruptorConsumer c3 = new DisruptorConsumer(SAMPLE_SIZE, onComplete);
-        disruptor.handleEventsWith(c1, c2, c3);
+        CompletableConsumer unisexNameConsumer = new UnisexNameConsumer(SAMPLE_SIZE, onComplete);
+        disruptor.handleEventsWith(unisexNameConsumer);
 
         // Start the Disruptor, starts all threads running
         disruptor.start();
@@ -76,5 +81,6 @@ public class DisruptorTest {
                 $(80)
         );
     }
+
 
 }

@@ -1,6 +1,7 @@
 package com.senacor.hackingdays.lmax.lmax;
 
 import com.lmax.disruptor.EventHandler;
+import com.senacor.hackingdays.lmax.generate.model.Profile;
 
 public abstract class CompletableConsumer implements EventHandler<DisruptorEnvelope> {
 
@@ -15,11 +16,14 @@ public abstract class CompletableConsumer implements EventHandler<DisruptorEnvel
     @Override
     public final void onEvent(DisruptorEnvelope event, long sequence, boolean endOfBatch) throws Exception {
 
-        processEvent(event, sequence, endOfBatch);
+        processEvent(event.getProfile(), sequence, endOfBatch);
         if (maxSequence == sequence)
+            onComplete();
             onComplete.run();
 
     }
 
-    protected abstract void processEvent(DisruptorEnvelope event, long sequence, boolean endOfBatch);
+    protected abstract void onComplete();
+
+    protected abstract void processEvent(Profile profile, long sequence, boolean endOfBatch);
 }

@@ -3,6 +3,8 @@ package com.senacor.hackingdays.lmax.lmax;
 import org.junit.rules.ExternalResource;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class ResultCollector extends ExternalResource {
@@ -15,7 +17,12 @@ public class ResultCollector extends ExternalResource {
 
     @Override
     protected void after() {
+        sortByTime();
         printResults();
+    }
+
+    private void sortByTime() {
+        Collections.sort(results, Comparator.comparing(Result::getElapsedMillis));
     }
 
     private void printResults() {
