@@ -13,7 +13,8 @@ import java.io.IOException;
 import static org.junit.Assert.fail;
 
 public class CSVProfileWriterTest {
-    public static final int COUNT = 100_000_000;  // -> 7GB!
+    //public static final int COUNT = 100_000_000;  // -> 7GB!
+    public static final int COUNT = 10; // fuer den build
 
     @Rule
     public final TemporaryFolder tmpFolder = new TemporaryFolder();
