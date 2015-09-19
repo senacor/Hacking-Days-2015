@@ -104,6 +104,12 @@ public class CompactedProfile extends Profile {
         return new CompactedSeeking(this);
     }
 
+    public void setSeeking(Seeking seeking) {
+        setSeekingGender(seeking.getGender());
+        setSeekingAgeLower(seeking.getAgeRange().getLower());
+        setSeekingAgeUpper(seeking.getAgeRange().getUpper());
+    }
+
     public void setSeekingGender(Gender gender) {
         byte g = 0;
         if (gender == Gender.Female) g = 1;
@@ -202,11 +208,11 @@ public class CompactedProfile extends Profile {
      *
      * @return
      */
-    public Predicate<Profile> matcher() {
+    public Predicate<CompactedProfile> compactMatcher() {
         final Gender seeking = this.getSeekingGender();
         final int ageLow = this.getSeekingAgeLower();
         final int ageHigh = this.getSeekingAgeUpper();
-        return (Profile t) -> t.getGender() == seeking
+        return (CompactedProfile t) -> t.getGender() == seeking
                 && t.getAge() <= ageHigh
                 && t.getAge() >= ageLow;
     }
@@ -216,8 +222,8 @@ public class CompactedProfile extends Profile {
      *
      * @return
      */
-    public boolean match(Profile other) {
-        System.out.println(dumpSeeking() + " -> " + ((CompactedProfile) other).dumpSelf());
+    public boolean match(CompactedProfile other) {
+        //System.out.println(dumpSeeking() + " -> " + ((CompactedProfile) other).dumpSelf());
         return other.getGender() == this.getSeekingGender()
                 && other.getAge() <= this.getSeekingAgeUpper()
                 && other.getAge() >= getSeekingAgeLower();
