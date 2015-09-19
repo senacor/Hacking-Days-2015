@@ -19,16 +19,15 @@ import com.senacor.hackingdays.distributedcache.generate.model.Profile;
  */
 public class ProfileMapStore implements MapStore<UUID, Profile>, Closeable {
 
-    private static final String URL = "jdbc:hsqldb:mydatabase";
-    private static final String USER = "SA";
-    private static final String PASSWORD = "";
+    private static final String MAP_ID = "profileMap";
+    private static final String URL = "jdbc:h2:tcp://192.168.220.124/~/test";
 
     private final ProfileMapper mapper;
     private final Connection connection;
 
     public ProfileMapStore() {
         connection = createConnection();
-        mapper = new ProfileMapper(connection);
+        mapper = new ProfileMapper(connection, MAP_ID);
     }
 
     @Override
@@ -84,7 +83,7 @@ public class ProfileMapStore implements MapStore<UUID, Profile>, Closeable {
     private static Connection createConnection() {
         try {
             Class.forName("org.h2.Driver");
-            return DriverManager.getConnection("jdbc:h2:tcp://172.16.13.152/~/test");
+            return DriverManager.getConnection(URL);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
