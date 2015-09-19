@@ -5,6 +5,7 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.ReceiveBuilder;
 import com.senacor.hackingdays.serialization.data.Profile;
+import com.senacor.hackingdays.serialization.data.proto.ProfileProtos;
 import scala.PartialFunction;
 import scala.runtime.BoxedUnit;
 
@@ -20,12 +21,15 @@ public class ConsumerActor extends AbstractActor {
 
     private PartialFunction<Object, BoxedUnit> messageHandler() {
         return ReceiveBuilder
+                // .match(Object.class, profile -> ack(profile))
                 .match(Profile.class, profile -> ack(profile))
+                .match(ProfileProtos.Profile.class, profile -> ack(profile))
+                .match(com.senacor.hackingdays.serialization.data.thrift.Profile.class, profile -> ack(profile))
                 .build();
     }
 
-    private void ack(Profile profile) {
-        receivedCount++;
+    private void ack(Object profile) {
+//        receivedCount++;
 //        if (receivedCount % 100 == 0) {
 //            logger.info(String.format("received profile # %s for %s", receivedCount, profile.getName()));
 //        }

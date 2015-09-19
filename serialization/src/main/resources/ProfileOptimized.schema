@@ -1,0 +1,38 @@
+@0x9eb32e19f86ee174;
+using Java = import "java.capnp";
+$Java.package("com.senacor.hackingdays.serializer");
+$Java.outerClassname("CapnProtoOptimizedProfile");
+
+struct ProfileStruct {
+  age @0 :UInt32;
+  name @1 :Text;
+  gender @2 :Gender;
+  relationShip @3 :RelationShipStatus;
+  smoker @4 :Bool;
+  locationState @5 :Text;
+  locationCity @6 :Text;
+  locationZip @7 :Text;
+  seekingGender @8 :Gender;
+  seekingRangeLower @9 :UInt32;
+  seekingRangeUpper @10 :UInt32;
+  activityLastLogin @11 :UInt64;
+  activityLoginCount @12 :UInt32;
+
+  enum Gender {
+      male @0;
+      female @1;
+      disambiguous @2;
+    }
+
+
+  enum RelationShipStatus {
+      divorced @0;
+      maried @1;
+      single @2;
+    }
+
+
+
+
+
+}

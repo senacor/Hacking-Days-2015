@@ -1,6 +1,7 @@
 package com.senacor.hackingdays.lmax.queue;
 
-import com.senacor.hackingdays.serialization.data.Profile;
+
+import com.senacor.hackingdays.lmax.generate.model.Profile;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;

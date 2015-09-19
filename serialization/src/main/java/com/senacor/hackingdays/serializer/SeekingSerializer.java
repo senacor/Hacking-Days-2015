@@ -14,14 +14,20 @@ import com.senacor.hackingdays.serialization.data.Seeking;
  */
 public class SeekingSerializer extends Serializer<Seeking> {
 
-        public void write (Kryo kryo, Output output, Seeking seeking) {
-            kryo.writeObjectOrNull(output, seeking.getGender(), Gender.class);
-            kryo.writeObjectOrNull(output, seeking.getAgeRange(), Range.class);
-        }
+    public final static SeekingSerializer INSTANCE = new SeekingSerializer();
 
-        public Seeking read (Kryo kryo, Input input, Class<Seeking> type) {
-            return new Seeking(kryo.readObjectOrNull(input, Gender.class),
-                               kryo.readObjectOrNull(input, Range.class)
-            );
-        }
+//    {
+//        setAcceptsNull(true);
+//    }
+
+    public void write(Kryo kryo, Output output, Seeking seeking) {
+        kryo.writeObjectOrNull(output, seeking.getGender(), GenderSerializer.INSTANCE);
+        kryo.writeObjectOrNull(output, seeking.getAgeRange(), RangeSerializer.INSTANCE);
+    }
+
+    public Seeking read(Kryo kryo, Input input, Class<Seeking> type) {
+        return new Seeking(kryo.readObjectOrNull(input, Gender.class, GenderSerializer.INSTANCE),
+                kryo.readObjectOrNull(input, Range.class, RangeSerializer.INSTANCE)
+        );
+    }
 }

@@ -1,14 +1,15 @@
 package com.senacor.hackingdays.serialization.data;
 
-import com.senacor.hackingdays.serialization.data.unsafe.BufferTooSmallException;
-import com.senacor.hackingdays.serialization.data.unsafe.UnsafeMemory;
-import com.senacor.hackingdays.serialization.data.unsafe.UnsafeSerializable;
-import org.codehaus.jackson.annotate.JsonProperty;
+import static com.google.common.base.Preconditions.checkArgument;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import org.codehaus.jackson.annotate.JsonProperty;
+
+import com.senacor.hackingdays.serialization.data.unsafe.BufferTooSmallException;
+import com.senacor.hackingdays.serialization.data.unsafe.UnsafeMemory;
+import com.senacor.hackingdays.serialization.data.unsafe.UnsafeSerializable;
 
 public class Range implements Serializable, UnsafeSerializable {
     private static final long serialVersionUID = 1;
@@ -22,11 +23,13 @@ public class Range implements Serializable, UnsafeSerializable {
     public Range(
             @JsonProperty("lower") int lower,
             @JsonProperty("upper") int upper) {
+
         checkArgument(upper <= MAX_AGE, "upper must be < " + MAX_AGE + " but is " + upper);
         checkArgument(lower >= MIN_AGE, "lower must be > " + MIN_AGE + " but is " + lower);
         checkArgument(lower <= upper);
-        this.upper = upper;
+
         this.lower = lower;
+        this.upper = upper;
     }
 
     public int getUpper() {

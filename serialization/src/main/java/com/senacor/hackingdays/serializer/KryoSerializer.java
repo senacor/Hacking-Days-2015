@@ -1,31 +1,25 @@
 package com.senacor.hackingdays.serializer;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
+import akka.serialization.JSerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.senacor.hackingdays.serialization.data.Activity;
-import com.senacor.hackingdays.serialization.data.Gender;
-import com.senacor.hackingdays.serialization.data.Location;
 import com.senacor.hackingdays.serialization.data.Profile;
-import com.senacor.hackingdays.serialization.data.Range;
-import com.senacor.hackingdays.serialization.data.Seeking;
-
-import akka.serialization.JSerializer;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 public class KryoSerializer extends JSerializer {
 
     private Kryo kryo = new Kryo();
 
     public KryoSerializer() {
-        kryo.addDefaultSerializer(Range.class, new RangeSerializer());
-        kryo.addDefaultSerializer(Location.class, new LocationSerializer());
-        kryo.addDefaultSerializer(Gender.class, new GenderSerializer());
-        kryo.addDefaultSerializer(Seeking.class, new SeekingSerializer());
-        kryo.addDefaultSerializer(Activity.class, new ActivitySerializer());
+//        kryo.addDefaultSerializer(Range.class, new RangeSerializer());
+//        kryo.addDefaultSerializer(Location.class, new LocationSerializer());
+//        kryo.addDefaultSerializer(Gender.class, new GenderSerializer());
+//        kryo.addDefaultSerializer(Seeking.class, new SeekingSerializer());
+//        kryo.addDefaultSerializer(Activity.class, new ActivitySerializer());
         kryo.addDefaultSerializer(Profile.class, new com.senacor.hackingdays.serializer.kryo.sryll.ProfileSerializer());
+        kryo.setReferences(false);
 //        kryo.addDefaultSerializer(Profile.class, new com.senacor.hackingdays.serializer.ProfileSerializer(kryo));
     }
 
