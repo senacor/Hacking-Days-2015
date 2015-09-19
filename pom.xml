@@ -15,7 +15,8 @@
 		<module>lmax-disruptor</module>
 		<module>serialization</module>
 		<module>serialization-benchmark</module>
-		<module>multithreaded-producer</module>
+		<module>parallel-generator</module>
+		<!-- <module>multithreaded-producer</module> -->
 	</modules>
 
 	<repositories>
