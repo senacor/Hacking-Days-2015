@@ -17,12 +17,7 @@ import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
 import com.senacor.hackingdays.lmax.generate.model.Profile;
-<<<<<<< HEAD
-
 import com.senacor.hackingdays.lmax.lmax.fraudrule.RuleBasedFraudDetector;
-=======
-import com.senacor.hackingdays.lmax.lmax.fraud.FraudConsumer;
->>>>>>> b1d28cb4ba99be73348f03cd9e9679c443de0524
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 
