@@ -6,6 +6,8 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -22,6 +24,9 @@ public class DisruptorTest {
 
     public static final int SAMPLE_SIZE = 100_000;
 
+    @ClassRule
+    public static final ResultCollector resultCollector = new ResultCollector();
+
     @Test
     @Parameters(method = "poolSize")
     public void testDisruptor(int poolSize) throws InterruptedException {
@@ -29,16 +34,17 @@ public class DisruptorTest {
         ExecutorService executor = Executors.newFixedThreadPool(poolSize);
 
         // Specify the size of the ring buffer, must be power of 2.
-        int bufferSize = 4096;
+        int bufferSize = 1024;
         // Construct the Disruptor
         Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor);
 
         // Connect the handler
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        DisruptorConsumer c1 = new DisruptorConsumer(SAMPLE_SIZE, () -> countDownLatch.countDown());
-//        DisruptorConsumer c2 = new DisruptorConsumer(SAMPLE_SIZE, () -> countDownLatch.countDown());
-//        DisruptorConsumer c3 = new DisruptorConsumer(SAMPLE_SIZE, () -> countDownLatch.countDown());
-        disruptor.handleEventsWith(c1);
+        CountDownLatch countDownLatch = new CountDownLatch(2);
+        Runnable onComplete = () -> countDownLatch.countDown();
+        DisruptorConsumer c1 = new DisruptorConsumer(SAMPLE_SIZE, onComplete);
+        DisruptorConsumer c2 = new DisruptorConsumer(SAMPLE_SIZE, onComplete);
+        DisruptorConsumer c3 = new DisruptorConsumer(SAMPLE_SIZE, onComplete);
+        disruptor.handleEventsWith(c1, c2, c3);
 
         // Start the Disruptor, starts all threads running
         disruptor.start();
@@ -53,16 +59,14 @@ public class DisruptorTest {
         countDownLatch.await();
         stopwatch.stop();
         disruptor.shutdown();
-        executor.shutdownNow();
-        System.err.println("Pool size: " + poolSize + " Time: " + stopwatch.elapsed(TimeUnit.MILLISECONDS) + " milliseconds.");
+        executor.shutdown();
+        resultCollector.addResult(poolSize, stopwatch.elapsed(TimeUnit.MILLISECONDS));
     }
 
 
     @SuppressWarnings("unusedDeclaration")
     static Object[] poolSize() {
         return $(
-                $(1),
-                $(2),
                 $(4),
                 $(8),
                 $(12),
