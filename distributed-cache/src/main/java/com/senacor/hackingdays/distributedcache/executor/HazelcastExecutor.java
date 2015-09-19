@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class HazelcastExecutor {
     public static void main(String[] args) {
-        HazelcastInstance client = HazelcastClient.newHazelcastClient();
+        final HazelcastInstance client = HazelcastClient.newHazelcastClient();
         IExecutorService executor = client.getExecutorService("execMaxAge");
         executor.submitToAllMembers(new MaxAgeCallable(), new MultiExecutionCallback() {
             @Override
@@ -23,8 +23,10 @@ public class HazelcastExecutor {
 
             @Override
             public void onComplete(Map<Member, Object> values) {
+                System.out.println("onComplete:");
                 values.values().stream()
                         .forEach(System.out::println);
+                client.shutdown();
             }
         });
 //        executor.submit(new MaxAgeCallable(), new ExecutionCallback<MaxAgeCallable.MaxAgeRes>() {
