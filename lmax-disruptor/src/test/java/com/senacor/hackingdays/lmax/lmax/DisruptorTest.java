@@ -37,25 +37,13 @@ public class DisruptorTest {
 
     @ClassRule
     public static final ResultCollector resultCollector = new ResultCollector();
-    private ExecutorService executor;
     public static final int POOL_SIZE = 12;
     public static final int RING_BUFFER_SIZE = 1024 * 2 * 2;
-
-    @Before
-    public void init() {
-        executor = Executors.newFixedThreadPool(POOL_SIZE);
-    }
-
-    @After
-    public void shutdown() {
-        executor.shutdown();
-    }
-
 
     @Test
     @Parameters(method = "disruptorParams")
     public void testDisruptor(ProducerType producerType, WaitStrategy waitStrategy) throws InterruptedException {
-
+        ExecutorService executor = Executors.newFixedThreadPool(POOL_SIZE);
         Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, RING_BUFFER_SIZE, executor, producerType, waitStrategy);
         CountDownLatch countDownLatch = registerConsumers(disruptor);
 
@@ -77,13 +65,13 @@ public class DisruptorTest {
         countDownLatch.await();
         stopwatch.stop();
         disruptor.shutdown();
+        executor.shutdown();
         resultCollector.addResult(producerType, waitStrategy, stopwatch.elapsed(TimeUnit.MILLISECONDS));
     }
 
     @SuppressWarnings("unusedDeclaration")
     private Object[] disruptorParams() {
         return $(
-                $(ProducerType.MULTI, new BlockingWaitStrategy()),        // warm up
                 $(ProducerType.MULTI, new BlockingWaitStrategy()),        // warm up
                 $(ProducerType.MULTI, new BlockingWaitStrategy()),
                 $(ProducerType.SINGLE, new YieldingWaitStrategy()),

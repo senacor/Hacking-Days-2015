@@ -2,7 +2,9 @@ package com.senacor.hackingdays.lmax.lmax;
 
 import com.google.common.base.Stopwatch;
 import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
 import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
 import org.junit.After;
 import org.junit.Before;
@@ -60,7 +62,7 @@ public class MatchMakingConsumerTest {
         generator.forEach(profile -> ringBuffer.publishEvent((envelope, sequence) -> envelope.setProfile(profile)));
         countDownLatch.await();
         stopwatch.stop();
-        resultCollector.addResult(POOL_SIZE, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+        resultCollector.addResult(ProducerType.MULTI, new YieldingWaitStrategy(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
     }
 
     @After
