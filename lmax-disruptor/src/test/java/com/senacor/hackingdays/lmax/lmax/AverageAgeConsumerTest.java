@@ -10,13 +10,13 @@ import org.junit.Test;
 import com.senacor.hackingdays.lmax.generate.model.Gender;
 import com.senacor.hackingdays.lmax.generate.model.Profile;
 
-public class AverageAgeEventHandlerTest {
+public class AverageAgeConsumerTest {
 
-  AverageAgeEventHandler h;
+  private AverageAgeConsumer h;
   private DisruptorEnvelope envl;
 
   public void setUp(int msgCount) {
-    h = new AverageAgeEventHandler(msgCount, () -> System.out.println("Fertig!"));
+    h = new AverageAgeConsumer(msgCount, () -> System.out.println("Fertig!"));
     envl = new DisruptorEnvelope();
   }
 

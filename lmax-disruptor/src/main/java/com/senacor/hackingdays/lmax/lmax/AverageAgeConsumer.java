@@ -9,24 +9,19 @@ import com.google.common.base.Functions;
 import com.lmax.disruptor.EventHandler;
 import com.senacor.hackingdays.lmax.generate.model.Profile;
 
-public class AverageAgeEventHandler implements EventHandler<DisruptorEnvelope> {
+public class AverageAgeConsumer extends CompletableConsumer {
 
-  private final int maxSequence;
-  private final Runnable onComplete;
-  
   private Map<Integer, Long> ageOcurrenceMales = new HashMap<>();
   private Map<Integer, Long> ageOcurrenceFemales = new HashMap<>();
   private Map<Integer, Long> ageOcurrenceDisambiguous = new HashMap<>();
 
-  public AverageAgeEventHandler(int expectedMessages, Runnable onComplete) {
-      this.maxSequence = expectedMessages -1;
-      this.onComplete = onComplete;
+  public AverageAgeConsumer(int expectedMessages, Runnable onComplete) {
+      super(expectedMessages, onComplete);
   }
 
   @Override
-  public void onEvent(DisruptorEnvelope envl, long sequence, boolean endOfBatch) throws Exception {
+  protected void processEvent(Profile profile, long sequence, boolean endOfBatch) {
     Map<Integer, Long> forGender = null;
-    Profile profile = envl.getProfile();
     switch (profile.getGender()) {
     case Male:
       forGender = ageOcurrenceMales;
@@ -46,13 +41,6 @@ public class AverageAgeEventHandler implements EventHandler<DisruptorEnvelope> {
     Long ocurrenceOfAge = forGender.getOrDefault(profile.getAge(), 0L);
     forGender.put(profile.getAge(), ocurrenceOfAge+1);
     
-    // are we done?
-    if (maxSequence == sequence) {
-      System.out.println("Males have an average age of " + determineAverage(ageOcurrenceMales));
-      System.out.println("Females have an average age of " + determineAverage(ageOcurrenceFemales));
-      System.out.println("Transgenders have an average age of " + determineAverage(ageOcurrenceDisambiguous));
-      onComplete.run();
-    }
   }
 
   protected float determineAverage(Map<Integer, Long> ageOcurrence) {
@@ -62,7 +50,7 @@ public class AverageAgeEventHandler implements EventHandler<DisruptorEnvelope> {
     if (numPersons <= 0) { // prevent division by zero
       return -1;
     }
-    return sumOfAges / numPersons;
+    return (float) sumOfAges / numPersons;
   }
 
   public Map<Integer, Long> getAgeOcurrenceMales() {
@@ -75,6 +63,14 @@ public class AverageAgeEventHandler implements EventHandler<DisruptorEnvelope> {
 
   public Map<Integer, Long> getAgeOcurrenceDisambiguous() {
     return ageOcurrenceDisambiguous;
+  }
+
+  @Override
+  protected void onComplete() {
+    System.out.println("Males have an average age of " + determineAverage(ageOcurrenceMales));
+    System.out.println("Females have an average age of " + determineAverage(ageOcurrenceFemales));
+    System.out.println("Transgenders have an average age of " + determineAverage(ageOcurrenceDisambiguous));
+    
   }
 
 }

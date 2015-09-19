@@ -70,7 +70,7 @@ public class DisruptorTest {
         CompletableConsumer loggedInToday = new LoggedInTodayConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer creepyOldMenConsumer = new CreepyOldMenConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer fraudConsumer = new CreepyOldMenConsumer(SAMPLE_SIZE, onComplete);
-        AverageAgeEventHandler averageAgeEventHandler = new AverageAgeEventHandler(SAMPLE_SIZE, onComplete);
+        AverageAgeConsumer averageAgeEventHandler = new AverageAgeConsumer(SAMPLE_SIZE, onComplete);
 
         disruptor.handleEventsWith(
                 unisexNameConsumer,
