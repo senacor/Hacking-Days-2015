@@ -14,4 +14,10 @@ public class DisruptorEnvelope {
     public void setProfile(Profile profile) {
         this.profile = profile;
     }
+
+    public static DisruptorEnvelope wrap(Profile profile) {
+    	final DisruptorEnvelope envelope = new DisruptorEnvelope();
+    	envelope.setProfile(profile);
+    	return envelope;
+	}
 }
