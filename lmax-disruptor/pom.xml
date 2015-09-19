@@ -57,13 +57,11 @@
     </build>
 
     <dependencies>
-
         <dependency>
-            <groupId>com.senacor.hackingdays</groupId>
-            <artifactId>serialization-frenzy</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.13</version>
         </dependency>
-
         <dependency>
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
