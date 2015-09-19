@@ -40,7 +40,7 @@ public class LocationConsumer extends CompletableConsumer {
                 break;
             case Disambiguous:
                 // not yet implemented - only for premium users
-                break;
+                return;
             default:
                 break;
         }
