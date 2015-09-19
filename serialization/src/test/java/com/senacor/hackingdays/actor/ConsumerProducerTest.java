@@ -11,8 +11,11 @@ import akka.util.Timeout;
 import com.google.common.base.Stopwatch;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
+import static com.senacor.hackingdays.config.ConfigHelper.createConfig;
 import com.senacor.hackingdays.serialization.data.Activity;
 import com.senacor.hackingdays.serialization.data.CompactedProfile;
+import com.senacor.hackingdays.serialization.data.Gender;
+import static com.senacor.hackingdays.serialization.data.Gender.Female;
 import com.senacor.hackingdays.serialization.data.Location;
 import com.senacor.hackingdays.serialization.data.Profile;
 import com.senacor.hackingdays.serialization.data.Seeking;
@@ -23,14 +26,6 @@ import com.senacor.hackingdays.serialization.data.generate.ProfileGeneratorThrif
 import com.senacor.hackingdays.serialization.data.generate.ProfileProtoGenerator;
 import com.senacor.hackingdays.serialization.data.proto.ProfileProtos;
 import com.senacor.hackingdays.serializer.ProtoBufSerilalizer;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import scala.concurrent.Await;
-import scala.concurrent.Future;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,15 +34,24 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
-
-import static com.senacor.hackingdays.config.ConfigHelper.createConfig;
-import static com.senacor.hackingdays.serialization.data.Gender.Female;
+import java.util.function.Predicate;
+import junitparams.JUnitParamsRunner;
 import static junitparams.JUnitParamsRunner.$;
+import junitparams.Parameters;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import org.junit.Assert;
+import static org.junit.Assert.assertThat;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
 
 @RunWith(JUnitParamsRunner.class)
 public class ConsumerProducerTest {
 
-    public static final int COUNT = 10_000;
+    public static final int COUNT = 40_000_000;
 
     private static boolean isSerializer(Class<?> cls) {
         return Serializer.class.isAssignableFrom(cls);
@@ -310,5 +314,70 @@ public class ConsumerProducerTest {
         System.gc();
 
         System.out.println("avg size: " + profiles.stream().mapToInt(p -> {return ((CompactedProfile)p).getSize();}).average().getAsDouble());
+    }
+
+    public <T> void findInCompactedMemory(Predicate<? super T> predicate) throws Exception {
+        System.gc();
+        System.out.println("vor find (false) - heap: " + Runtime.getRuntime().freeMemory());
+
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        long count = Arrays.<T>stream((T[])profiles).filter(predicate).count();
+        stopwatch.stop();
+
+        System.out.println("elapsed: " + stopwatch.elapsed(TimeUnit.MILLISECONDS) + "ms found: " + count);
+        System.out.println("nach find:- heap: " + Runtime.getRuntime().freeMemory());
+        System.gc();
+        System.out.println("heap: " + Runtime.getRuntime().freeMemory());
+
+    }
+
+    Object[] profiles;
+
+    @Test
+    public void findMatches() throws Exception {
+        System.gc();
+        System.out.println("vor produce- heap: " + Runtime.getRuntime().freeMemory());
+
+        profiles = CompactedProfileGenerator.newInstance(COUNT).stream().toArray();
+
+        System.out.println(COUNT+" records generated");
+        System.out.println("(verification - count: "+profiles.length+")");
+        assertThat(profiles.length, is(COUNT));
+        System.out.println("nach  produce- heap: " + Runtime.getRuntime().freeMemory());
+
+        findInCompactedMemory((t) -> {
+            return true;
+        });
+
+        CompactedProfile selected = (CompactedProfile) profiles[COUNT/2];
+
+        assertThat(selected.getAge(), is(not(0)));
+        assertThat(selected.getGender(), is(not(nullValue())));
+        assertThat(selected.getSeekingAgeUpper(), is(not(0)));
+        assertThat(selected.getGender(), is(not(nullValue())));
+
+        Gender gender = selected.getSeekingGender();
+        int ageLow = selected.getSeekingAgeLower();
+        int ageHigh = selected.getSeekingAgeUpper();
+
+
+//        findInCompactedMemory((t) -> {
+//            int age = t.getAge();
+//            return seeking.getGender() == t.getGender()
+//                 && ageLow <= age && age <= ageHigh;
+//        });
+
+        System.out.println("******* selected::match ");
+        this.<CompactedProfile>findInCompactedMemory(selected::match);
+
+        System.out.println("******* selected::matcher ");
+        findInCompactedMemory(selected.compactMatcher());
+
+        System.out.println("******* selected::perfectMatch ");
+        this.<CompactedProfile>findInCompactedMemory(selected::perfectMatch);
+
+        System.out.println("******* selected::perfectMatcher ");
+        findInCompactedMemory(selected.perfectCompactMatcher());
+
     }
 }
