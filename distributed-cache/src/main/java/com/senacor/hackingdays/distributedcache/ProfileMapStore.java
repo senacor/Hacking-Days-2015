@@ -12,6 +12,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -20,15 +21,31 @@ import java.util.stream.Collectors;
  */
 public class ProfileMapStore implements MapStore<String, Profile>, Closeable {
 
-    private static final String MAP_ID = "profileMap";
-    private static final String URL = "jdbc:h2:tcp://192.168.220.124/~/test";
+    private static final String DEFAULT_MAP_ID = "profile";
+    private static final String DEFAULT_DB_URL = "jdbc:h2:tcp://192.168.220.124/~/test";
+    public static final String PROPERTY_FILE = "maps.properties.xml";
 
+    private final String mapId;
+    private final String dbUrl;
     private final ProfileMapper mapper;
     private final Connection connection;
 
     public ProfileMapStore() {
+        Properties properties = getProperties();
+        mapId = properties.getProperty("mapName", DEFAULT_MAP_ID);
+        dbUrl = properties.getProperty("db-url", DEFAULT_DB_URL);
         connection = createConnection();
-        mapper = new ProfileMapper(connection, MAP_ID);
+        mapper = new ProfileMapper(connection, mapId);
+    }
+
+    private Properties getProperties() {
+        Properties properties = new Properties();
+        try {
+            properties.loadFromXML(getClass().getClassLoader().getResourceAsStream(PROPERTY_FILE));
+        } catch (IOException e) {
+            System.err.println("Failed to load properties from file, using defaults");
+        }
+        return properties;
     }
 
     @Override
@@ -83,10 +100,10 @@ public class ProfileMapStore implements MapStore<String, Profile>, Closeable {
                 .collect(Collectors.toList());
     }
 
-    private static Connection createConnection() {
+    private Connection createConnection() {
         try {
             Class.forName("org.h2.Driver");
-            return DriverManager.getConnection(URL);
+            return DriverManager.getConnection(dbUrl);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
