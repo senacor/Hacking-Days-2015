@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
-class NameSupplier implements Supplier<String> {
+public class NameSupplier implements Supplier<String> {
     private final List<String> names;
     private final Random rnd = new Random();
 
@@ -14,7 +14,7 @@ class NameSupplier implements Supplier<String> {
         this.names = names;
     }
 
-    static NameSupplier forGender(Gender gender) {
+    public static NameSupplier forGender(Gender gender) {
         switch (gender) {
             case Male:
                 return new NameSupplier(parse("male-firstname.txt"));
