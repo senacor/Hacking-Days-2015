@@ -5,8 +5,8 @@ import com.senacor.hackingdays.lmax.generate.model.Profile;
 
 public abstract class CompletableConsumer implements EventHandler<DisruptorEnvelope> {
 
-    private final int maxSequence;
-    private final Runnable onComplete;
+    protected final int maxSequence;
+    protected final Runnable onComplete;
 
     public CompletableConsumer(int expectedMessages, Runnable onComplete) {
         this.maxSequence = expectedMessages -1;
