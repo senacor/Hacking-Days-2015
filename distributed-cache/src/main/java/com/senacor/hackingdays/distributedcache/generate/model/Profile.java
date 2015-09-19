@@ -3,113 +3,143 @@ package com.senacor.hackingdays.distributedcache.generate.model;
 import java.io.Serializable;
 import java.util.UUID;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 public class Profile implements Serializable {
 
-    private static final long serialVersionUID = 1;
+	private static final long serialVersionUID = 1;
 
-    private final String name;
+	private final String name;
 
-    private final Gender gender;
+	private final Gender gender;
 
-    private int age;
+	private int age;
 
-    private Location location;
+	private Location location;
 
-    private RelationShipStatus relationShip;
+	private RelationShipStatus relationShip;
 
-    private boolean smoker;
+	private boolean smoker;
 
-    private Seeking seeking;
+	private Seeking seeking;
 
-    private Activity activity;
+	private Activity activity;
 
-    private final UUID uuid;
-    
-    public Profile(
-            String name,
-            Gender gender) {
-    	this(name, gender, UUID.randomUUID());
-    }
+	private final UUID uuid;
 
-    public Profile(
-            String name,
-            Gender gender, UUID uuid) {
-        this.name = name;
-        this.gender = gender;
-        this.uuid = uuid;
-    }
-    
-    public String getName() {
-        return name;
-    }
+	public Profile(String name, Gender gender) {
+		this(name, gender, UUID.randomUUID());
+	}
 
-    public Gender getGender() {
-        return gender;
-    }
+	public Profile(String name, Gender gender, UUID uuid) {
+		this.name = name;
+		this.gender = gender;
+		this.uuid = uuid;
+	}
 
-    public int getAge() {
-        return age;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public UUID getId() {
-        return uuid;
-    }
+	public Gender getGender() {
+		return gender;
+	}
 
-    public void setAge(int age) {
-        this.age = age;
-    }
+	public int getAge() {
+		return age;
+	}
 
-    public Location getLocation() {
-        return location;
-    }
+	public UUID getId() {
+		return uuid;
+	}
 
-    public void setLocation(Location location) {
-        this.location = location;
-    }
+	public void setAge(int age) {
+		this.age = age;
+	}
 
-    public RelationShipStatus getRelationShip() {
-        return relationShip;
-    }
+	public Location getLocation() {
+		return location;
+	}
 
-    public void setRelationShip(RelationShipStatus relationShip) {
-        this.relationShip = relationShip;
-    }
+	public void setLocation(Location location) {
+		this.location = location;
+	}
 
-    public boolean isSmoker() {
-        return smoker;
-    }
+	public RelationShipStatus getRelationShip() {
+		return relationShip;
+	}
 
-    public void setSmoker(boolean smoker) {
-        this.smoker = smoker;
-    }
+	public void setRelationShip(RelationShipStatus relationShip) {
+		this.relationShip = relationShip;
+	}
 
-    public Seeking getSeeking() {
-        return seeking;
-    }
+	public boolean isSmoker() {
+		return smoker;
+	}
 
-    public void setSeeking(Seeking seeking) {
-        this.seeking = seeking;
-    }
+	public void setSmoker(boolean smoker) {
+		this.smoker = smoker;
+	}
 
-    public Activity getActivity() {
-        return activity;
-    }
+	public Seeking getSeeking() {
+		return seeking;
+	}
 
-    public void setActivity(Activity activity) {
-        this.activity = activity;
-    }
+	public void setSeeking(Seeking seeking) {
+		this.seeking = seeking;
+	}
 
-    @Override
-    public String toString() {
-        return "DatingProfile{" +
-                "name='" + name + '\'' +
-                ", gender=" + gender +
-                ", age=" + age +
-                ", location=" + location +
-                ", relationShip=" + relationShip +
-                ", smoker=" + smoker +
-                ", seeking=" + seeking +
-                ", activity=" + activity +
-                '}';
-    }
+	public Activity getActivity() {
+		return activity;
+	}
+
+	public void setActivity(Activity activity) {
+		this.activity = activity;
+	}
+
+	@Override
+	public String toString() {
+		return "DatingProfile{" + "name='" + name + '\'' + ", gender=" + gender + ", age=" + age + ", location="
+				+ location + ", relationShip=" + relationShip + ", smoker=" + smoker + ", seeking=" + seeking
+				+ ", activity=" + activity + '}';
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this)
+			return true;
+
+		if (!(obj instanceof Profile))
+			return false;
+
+		Profile rhs = (Profile) obj;
+
+		return new EqualsBuilder() //
+				.append(this.age, rhs.age) //
+				.append(this.smoker, rhs.smoker) //
+				.append(this.activity, rhs.activity) //
+				.append(this.gender, rhs.gender) //
+				.append(this.location, rhs.location) //
+				.append(this.name, rhs.name) //
+				.append(this.relationShip, rhs.relationShip) //
+				.append(this.seeking, rhs.seeking) //
+				.append(this.uuid, rhs.uuid) //
+				.isEquals();
+	}
+	
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder() //
+				.append(this.age) //
+				.append(this.smoker) //
+				.append(this.activity) //
+				.append(this.gender) //
+				.append(this.location) //
+				.append(this.name) //
+				.append(this.relationShip) //
+				.append(this.seeking) //
+				.append(this.uuid) //
+				.toHashCode();
+	}
 }
