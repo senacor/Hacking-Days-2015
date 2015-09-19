@@ -1,10 +1,14 @@
 package com.senacor.hackingdays.lmax.lmax;
 
 import com.google.common.base.Stopwatch;
+import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
 import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
 import com.senacor.hackingdays.lmax.lmax.fraudrule.RuleBasedFraudDetector;
+import com.senacor.hackingdays.lmax.lmax.fraud.FraudConsumer;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.ClassRule;
@@ -36,7 +40,18 @@ public class DisruptorTest {
         // Specify the size of the ring buffer, must be power of 2.
         int bufferSize = 4096 * 2;
         // Construct the Disruptor
-//        Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor, ProducerType.SINGLE, new YieldingWaitStrategy());
+        // single-producer disruptor, yielding wait
+        //        Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor, ProducerType.SINGLE, new YieldingWaitStrategy());
+
+        // single-producer disruptor, blocking wait
+        //        Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(
+        //            DisruptorEnvelope::new, 
+        //            bufferSize, 
+        //            executor,
+        //            ProducerType.SINGLE,
+        //            new BlockingWaitStrategy());
+        
+        // multi-producer, blocking wait
         Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor);
 
         CountDownLatch countDownLatch = registerConsumers(disruptor);
@@ -51,7 +66,8 @@ public class DisruptorTest {
 
         Stopwatch stopwatch = Stopwatch.createStarted();
         generator.forEach(prof -> ringBuffer.publishEvent(
-                        (envelope, sequence, profile) -> envelope.setProfile(profile), prof)
+            (envelope, sequence, profile) -> envelope.setProfile(profile),
+            prof)
         );
 
         // wait for termination
