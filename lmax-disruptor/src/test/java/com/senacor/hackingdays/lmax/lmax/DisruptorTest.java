@@ -1,12 +1,14 @@
 package com.senacor.hackingdays.lmax.lmax;
 
 import com.google.common.base.Stopwatch;
+import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
+import com.senacor.hackingdays.lmax.generate.model.Profile;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.ClassRule;
@@ -46,10 +48,14 @@ public class DisruptorTest {
         Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor);
 
         // Connect the handler
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+        CountDownLatch countDownLatch = new CountDownLatch(2);
+
         Runnable onComplete = () -> countDownLatch.countDown();
         CompletableConsumer unisexNameConsumer = new UnisexNameConsumer(SAMPLE_SIZE, onComplete);
-        disruptor.handleEventsWith(unisexNameConsumer);
+        CompletableConsumer loggedInToday = new LoggedInTodayConsumer(SAMPLE_SIZE, onComplete);
+        disruptor.handleEventsWith(
+                unisexNameConsumer,
+                loggedInToday);
 
         // Start the Disruptor, starts all threads running
         disruptor.start();
@@ -67,7 +73,6 @@ public class DisruptorTest {
         executor.shutdown();
         resultCollector.addResult(poolSize, stopwatch.elapsed(TimeUnit.MILLISECONDS));
     }
-
 
     @SuppressWarnings("unusedDeclaration")
     static Object[] poolSize() {
