@@ -1,5 +1,8 @@
 package com.senacor.hackingdays.lmax.lmax;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.bson.Document;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -34,7 +37,7 @@ public class MongoJournalingDisruptorConsumerTest {
 
 	@Test
 	public void testName() throws Exception {
-		final int sampleSize = 20;
+		final int sampleSize = 200_000;
 
 		final MongoJournalingDisruptorConsumer consumer = new MongoJournalingDisruptorConsumer(sampleSize, () -> {}, profilesCollection, 10);
 
@@ -47,6 +50,7 @@ public class MongoJournalingDisruptorConsumerTest {
 			consumer.onEvent(DisruptorEnvelope.wrap(profile), sequence++, false);
 		}
 
+		assertThat(profilesCollection.count(), is((long)sampleSize));
 	}
 
 }
