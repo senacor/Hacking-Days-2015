@@ -1,17 +1,13 @@
 package com.senacor.hackingdays.distributedcache;
 
 import com.hazelcast.client.HazelcastClient;
-import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.config.SerializerConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IList;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.IQueue;
-import com.hazelcast.security.UsernamePasswordCredentials;
 import com.senacor.hackingdays.distributedcache.generate.model.Gender;
 import com.senacor.hackingdays.distributedcache.generate.model.Profile;
 import com.senacor.hackingdays.distributedcache.generate.model.Seeking;
-import com.senacor.hackingdays.distributedcache.serializer.KryoProfileStreamSerializer;
 
 public class GettingStartedClient {
     public static void main(String[] args) {
