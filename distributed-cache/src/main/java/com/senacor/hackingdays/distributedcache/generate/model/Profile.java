@@ -23,15 +23,22 @@ public class Profile implements Serializable {
 
     private Activity activity;
 
-    private final UUID uuid = UUID.randomUUID();
-
+    private final UUID uuid;
+    
     public Profile(
             String name,
             Gender gender) {
-        this.name = name;
-        this.gender = gender;
+    	this(name, gender, UUID.randomUUID());
     }
 
+    public Profile(
+            String name,
+            Gender gender, UUID uuid) {
+        this.name = name;
+        this.gender = gender;
+        this.uuid = uuid;
+    }
+    
     public String getName() {
         return name;
     }

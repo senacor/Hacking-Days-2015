@@ -4,27 +4,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-//import org.h2.util.IOUtils;
 
-import com.senacor.hackingdays.distributedcache.domain.Stuff;
+import com.google.common.io.Resources;
+import com.senacor.hackingdays.distributedcache.generate.ProfileGenerator;
 
 public class DatabaseServer {
 
 	private static String getResourceAsString(final String resourceName) {
 		InputStream inputStream = null;
 		try {
-			inputStream = Resources.getResourceAsStream(resourceName);
+			inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(resourceName);
 			StringWriter stringWriter = new StringWriter();
 			IOUtils.copy(inputStream, stringWriter);
 			return stringWriter.toString();
@@ -35,23 +31,19 @@ public class DatabaseServer {
 		}
 	}
 
-	private static SqlSessionFactory createSqlSessionFactory() {
-		InputStream inputStream = null;
+	private static Connection createConnection() {
 		try {
-			final String resource = "db/mybatis-config.xml";
-			inputStream = Resources.getResourceAsStream(resource);
-			return new SqlSessionFactoryBuilder().build(inputStream);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		} finally {
-			IOUtils.closeQuietly(inputStream);
+			Class.forName("org.h2.Driver");
+			Connection conn = DriverManager.getConnection("jdbc:h2:tcp://172.16.13.152/~/test");
+			return conn;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-
 	}
 
-	private static void initializeSchema(DataSource ds) {
+	private static void initializeSchema(Connection connection) {
 		final String resource = "db/initialize.sql";
-		try (Connection connection = ds.getConnection()) {
+		try {
 			final String sql = getResourceAsString(resource);
 			for (String statement : sql.split(";")) {
 				PreparedStatement stmt = connection.prepareStatement(statement);
@@ -62,20 +54,17 @@ public class DatabaseServer {
 		}
 	}
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws SQLException {
 
-		SqlSessionFactory sessionFactory = createSqlSessionFactory();
-		DataSource ds = sessionFactory.getConfiguration().getEnvironment().getDataSource();
-		initializeSchema(ds);
-		SqlSession session = sessionFactory.openSession();
-		StuffMapper mapper = session.getMapper(StuffMapper.class);
-		mapper.createStuff(new Stuff("Hans"));
-		mapper.createStuff(new Stuff("Wurst"));
-		mapper.createStuff(new Stuff("Zeug"));
-		mapper.createStuff(new Stuff("Dings"));
-		List<Stuff> allStuff = mapper.getAllStuff();
-		for (Stuff stuff : allStuff) {
-			System.out.println(stuff);
+		try (Connection connection = createConnection()) {
+			initializeSchema(connection);
+			ProfileMapper profileMapper = new ProfileMapper(connection);
+			profileMapper.insertProfile(ProfileGenerator.newProfile());
+			profileMapper.insertProfile(ProfileGenerator.newProfile());
+			profileMapper.insertProfile(ProfileGenerator.newProfile());
+			profileMapper.insertProfile(ProfileGenerator.newProfile());
+			
+			System.out.println(profileMapper.getAllProfiles());
 		}
 
 	}

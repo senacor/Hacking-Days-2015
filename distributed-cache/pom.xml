@@ -134,12 +134,6 @@
 			<version>1.4.189</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.mybatis</groupId>
-			<artifactId>mybatis</artifactId>
-			<version>3.3.0</version>
-		</dependency>
-
 	</dependencies>
 
 </project>

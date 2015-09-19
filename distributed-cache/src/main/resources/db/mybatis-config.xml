@@ -16,5 +16,7 @@
 	</environments>
 	<mappers>
 		<mapper class="com.senacor.hackingdays.distributedcache.db.StuffMapper" />
-	</mappers>
+ 	</mappers>
+	
+
 </configuration>
