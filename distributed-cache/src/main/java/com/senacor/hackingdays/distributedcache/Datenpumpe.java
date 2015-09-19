@@ -59,7 +59,7 @@ public class Datenpumpe {
 
             sw.start();
             ProfileGenerator.newInstance(defaultCount).stream().parallel().forEach(profile -> {
-                if (COUNT % 100 == 0) {
+                if (COUNT % 200 == 0) {
                     System.out.println("Habe bis jetzt " + COUNT + " Saetze nach " + sw.elapsed(TimeUnit.MILLISECONDS) + "ms geschrieben.");
                     System.out.flush();
                 }
