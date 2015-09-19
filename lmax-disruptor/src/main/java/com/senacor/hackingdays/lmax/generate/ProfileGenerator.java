@@ -4,9 +4,7 @@ package com.senacor.hackingdays.lmax.generate;
 import com.senacor.hackingdays.lmax.generate.model.Activity;
 import com.senacor.hackingdays.lmax.generate.model.Gender;
 import com.senacor.hackingdays.lmax.generate.model.Profile;
-import com.senacor.hackingdays.lmax.generate.model.Range;
 import com.senacor.hackingdays.lmax.generate.model.RelationShipStatus;
-import com.senacor.hackingdays.lmax.generate.model.Seeking;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -18,25 +16,41 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static com.senacor.hackingdays.lmax.generate.model.Gender.Disambiguous;
 import static com.senacor.hackingdays.lmax.generate.model.Gender.Female;
-import static com.senacor.hackingdays.lmax.generate.model.Gender.Male;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
 
 public class ProfileGenerator implements Iterable<Profile> {
 
-    private final static NameSupplier femaleNames = NameSupplier.forGender(Female);
-    private final static NameSupplier maleNames = NameSupplier.forGender(Male);
-    private final static NameSupplier transgenderNames = NameSupplier.forGender(Disambiguous);
-    private final static LocationSupplier locationSupplier = LocationSupplier.newInstance();
     private final static Random random = new Random();
     private static final Instant NOW = Instant.now();
 
     private final int sampleSize;
-    private final Supplier<Integer> ageFunction;
+    private final AgeSupplier ageFunction;
     private final Supplier<Gender> genderFunction;
-    private final Function<Gender, String> nameFunction;
+    private final NameSupplier nameFunction;
+    private final Supplier<RelationShipStatus> relationShipStatusFunction;
+    private final Supplier<Activity> activityFunction;
+    private final LocationSupplier locationSupplier;
+    private final SeekingSupplier seekingSupplier;
+
+
+    public ProfileGenerator(int size,
+                            AgeSupplier ageFunction,
+                            Supplier<Gender> genderFunction,
+                            NameSupplier nameFunction,
+                            Supplier<RelationShipStatus> relationShipStatusFunction,
+                            Supplier<Activity> activityFunction,
+                            LocationSupplier locationSupplier,
+                            SeekingSupplier seekingSupplier) {
+        this.sampleSize = size;
+        this.ageFunction = ageFunction;
+        this.genderFunction = genderFunction;
+        this.nameFunction = nameFunction;
+        this.relationShipStatusFunction = relationShipStatusFunction;
+        this.activityFunction = activityFunction;
+        this.locationSupplier = locationSupplier;
+
+        this.seekingSupplier = seekingSupplier;
+    }
 
     public static ProfileGenerator newInstance(int sampleSize) {
         return new Builder(sampleSize).build();
@@ -46,14 +60,6 @@ public class ProfileGenerator implements Iterable<Profile> {
         return newInstance(1).generateProfile();
     }
 
-    private ProfileGenerator(int size, Supplier<Integer> ageFunction, Supplier<Gender> genderFunction, Function<Gender, String> nameFunction, Supplier<Activity> activityFunction, Supplier<RelationShipStatus> relationShipStatusFunction,
-                             long seed) {
-        this.sampleSize = size;
-        this.ageFunction = ageFunction;
-        this.genderFunction = genderFunction;
-        this.nameFunction = nameFunction;
-        random.setSeed(seed);
-    }
 
     public Stream<Profile> stream() {
         return StreamSupport.stream(spliterator(), false);
@@ -78,30 +84,31 @@ public class ProfileGenerator implements Iterable<Profile> {
     private Profile generateProfile() {
         Gender gender = genderFunction.get();
         Profile profile = new Profile(nameFunction.apply(gender), gender);
-        profile.setAge(ageFunction.get());
+        profile.setAge(ageFunction.apply(gender));
         profile.setLocation(locationSupplier.get());
-        profile.setRelationShip(randomRelationShipStatus());
+        profile.setRelationShip(relationShipStatusFunction.get());
         profile.setSmoker(random.nextBoolean());
-        profile.setSeeking(randomSeeking());
-        profile.setActivity(randomActivity());
+        profile.setSeeking(seekingSupplier.apply(gender));
+        profile.setActivity(activityFunction.get());
         return profile;
     }
 
     public static class Builder {
 
-        private Supplier<Integer> ageFunction = ProfileGenerator::randomAge;
+        private final int size;
+        private AgeSupplier ageFunction = AgeSupplier.randomAge();
         private Supplier<Gender> genderFunction = ProfileGenerator::randomGender;
-        private Function<Gender, String> nameFunction = defaultNameFunction();
+        private NameSupplier nameFunction = new DefaultNameSupplier();
         private Supplier<RelationShipStatus> relationShipStatusFunction = ProfileGenerator::randomRelationShipStatus;
         private Supplier<Activity> activityFunction = ProfileGenerator::randomActivity;
-        private long seed = 42L;
-        private final int size;
+        private LocationSupplier locationSupplier = new DefaultLocationSupplier();
+        private SeekingSupplier seekingSupplier = new DefaultSeekingSupplier();
 
         public Builder(int sampleSize) {
             this.size = sampleSize;
         }
 
-        public Builder withAge(Supplier<Integer> ageFunction) {
+        public Builder withAge(AgeSupplier ageFunction) {
             this.ageFunction = ageFunction;
             return this;
         }
@@ -112,7 +119,7 @@ public class ProfileGenerator implements Iterable<Profile> {
             return this;
         }
 
-        public Builder withName(Function<Gender, String> nameFunction) {
+        public Builder withName(NameSupplier nameFunction) {
             this.nameFunction = nameFunction;
             return this;
         }
@@ -127,34 +134,28 @@ public class ProfileGenerator implements Iterable<Profile> {
             return this;
         }
 
-        public Builder withSeed(long seed) {
-            this.seed = seed;
+        public Builder withActivity(LocationSupplier locationSupplier) {
+            this.locationSupplier = locationSupplier;
+            return this;
+        }
+
+        public Builder withASeeking(SeekingSupplier seekingSupplier) {
+            this.seekingSupplier = seekingSupplier;
             return this;
         }
 
         public ProfileGenerator build() {
-            return new ProfileGenerator(size, ageFunction, genderFunction, nameFunction, activityFunction, relationShipStatusFunction, seed);
+            return new ProfileGenerator(
+                    size,
+                    ageFunction,
+                    genderFunction,
+                    nameFunction,
+                    relationShipStatusFunction,
+                    activityFunction,
+                    locationSupplier,
+                    seekingSupplier);
         }
 
-    }
-
-    private static Function<Gender, String> defaultNameFunction() {
-        return gender -> {
-            switch (gender) {
-                case Male:
-                    return maleNames.get();
-                case Female:
-                    return femaleNames.get();
-                case Disambiguous:
-                    return transgenderNames.get();
-                default:
-                    throw new AssertionError();
-            }
-        };
-    }
-
-    private static int randomAge() {
-        return random.nextInt(Range.MAX_AGE - Range.MIN_AGE) + Range.MIN_AGE;
     }
 
     private static Gender randomGender() {
@@ -168,12 +169,6 @@ public class ProfileGenerator implements Iterable<Profile> {
         long toEpochMilli = NOW.minus(random.nextInt(1_000_000), ChronoUnit.MINUTES).toEpochMilli();
         Date lastLogin = new Date(toEpochMilli);
         return new Activity(lastLogin, frequency);
-    }
-
-    private static Seeking randomSeeking() {
-        int bound1 = randomAge();
-        int bound2 = randomAge();
-        return new Seeking(randomGender(), new Range(min(bound1, bound2), max(bound1, bound2)));
     }
 
     private static RelationShipStatus randomRelationShipStatus() {
