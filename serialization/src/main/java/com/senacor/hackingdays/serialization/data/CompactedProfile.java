@@ -1,5 +1,7 @@
 package com.senacor.hackingdays.serialization.data;
 
+import java.util.function.Predicate;
+
 public class CompactedProfile extends Profile {
     private byte[] data;
 
@@ -193,4 +195,67 @@ public class CompactedProfile extends Profile {
     public String getLocationCity() {
         return new String(data, 8+data[4]+data[5]+data[6], data[7]);
     }
+
+    /**
+     * Erzeugt ein Predicate, das genau dann true liefert, wenn das übergebene Profil zu den eigenen Vorstellungen
+     * passt.
+     *
+     * @return
+     */
+    public Predicate<Profile> matcher() {
+        final Gender seeking = this.getSeekingGender();
+        final int ageLow = this.getSeekingAgeLower();
+        final int ageHigh = this.getSeekingAgeUpper();
+        return (Profile t) -> t.getGender() == seeking
+                && t.getAge() <= ageHigh
+                && t.getAge() >= ageLow;
+    }
+
+    /**
+     * Prüft, ob ein gegebenes anderes Profil zu den eignen Suchkriterien passt;
+     *
+     * @return
+     */
+    public boolean match(Profile other) {
+        System.out.println(dumpSeeking() + " -> " + ((CompactedProfile) other).dumpSelf());
+        return other.getGender() == this.getSeekingGender()
+                && other.getAge() <= this.getSeekingAgeUpper()
+                && other.getAge() >= getSeekingAgeLower();
+    }
+
+    /**
+     * Erzeugt ein Predicate, das genau dann true liefert, wenn beide Profile zueinander passen.
+     *
+     * @return
+     */
+    public Predicate<CompactedProfile> perfectCompactMatcher() {
+        final Gender seeking = this.getSeekingGender();
+        final int ageLow = this.getSeekingAgeLower();
+        final int ageHigh = this.getSeekingAgeUpper();
+        return (CompactedProfile t) -> t.getGender() == seeking
+                && t.getAge() <= ageHigh
+                && t.getAge() >= ageLow
+                && t.match(this);
+    }
+
+    /**
+     * Prüft, ob beide Profile zueinander passen;
+     *
+     * @return
+     */
+    public boolean perfectMatch(CompactedProfile other) {
+        return other.getGender() == this.getSeekingGender()
+                && other.getAge() <= getSeekingAgeUpper()
+                && other.getAge() >= getSeekingAgeLower()
+                && other.match(this);
+    }
+
+    String dumpSeeking() {
+        return getSeekingGender() + ", " + getSeekingAgeLower() + "-" + getSeekingAgeUpper();
+    }
+
+    String dumpSelf() {
+        return getGender() + ", " + getAge();
+    }
+
 }
