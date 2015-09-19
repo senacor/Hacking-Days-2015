@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
+import com.hazelcast.config.SerializerConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.IQueue;
@@ -11,10 +12,15 @@ import com.hazelcast.security.UsernamePasswordCredentials;
 import com.senacor.hackingdays.distributedcache.generate.model.Gender;
 import com.senacor.hackingdays.distributedcache.generate.model.Profile;
 import com.senacor.hackingdays.distributedcache.generate.model.Seeking;
+import com.senacor.hackingdays.distributedcache.serializer.KryoProfileStreamSerializer;
 
 public class GettingStartedClient {
     public static void main(String[] args) {
         ClientConfig clientConfig = new ClientConfig();
+        clientConfig.getSerializationConfig().getSerializerConfigs().add(
+                new SerializerConfig().
+                        setTypeClass(Profile.class).
+                        setImplementation(new KryoProfileStreamSerializer()));
         clientConfig.setCredentials(new UsernamePasswordCredentials("sinalco", "sinalco"));
         HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
         IQueue<Profile> queue = client.getQueue("profiles");
