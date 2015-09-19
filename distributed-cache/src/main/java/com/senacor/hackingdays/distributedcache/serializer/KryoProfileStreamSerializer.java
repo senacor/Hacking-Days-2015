@@ -35,7 +35,7 @@ public class KryoProfileStreamSerializer implements StreamSerializer<Profile> {
 
     @Override
     public int getTypeId() {
-        return 0;
+        return 17;
     }
 
     @Override
