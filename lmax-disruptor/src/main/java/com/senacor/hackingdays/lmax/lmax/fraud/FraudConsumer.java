@@ -27,7 +27,6 @@ public class FraudConsumer extends CompletableConsumer {
         super(expectedMessages, onComplete);
     }
 
-
     private static class NameAgeFraudDirectory extends FraudDirectoryWithMap<ListFraudDirectory> {
         public NameAgeFraudDirectory() {
             super(ListFraudDirectory.class, p -> p.getName() + ":" + p.getAge());
@@ -48,9 +47,27 @@ public class FraudConsumer extends CompletableConsumer {
 
     private FraudDirectory locationDirectory = new StateFraudDirectory();
 
+    List<DetectedFraud> detected = new ArrayList<>();
+
+    boolean verbose = false;
+
     @Override
     protected void onComplete() {
-        
+
+      System.out.println("Detected " + detected.size() + " fraud attempts");
+
+      if (verbose) {
+        for(DetectedFraud d: detected) {
+          Profile profile = d.getProfile();
+          String text = MessageFormat.format("data  : name {0}, age {1}, gender {2}, state {3}, city {4}, gender {5}, relationship {6}", profile.getName(), profile.getAge(), profile.getGender().toString(), profile.getLocation().getState(), profile.getLocation().getCity(), profile.getGender().toString(), profile.getRelationShip().toString());
+          System.out.println(text);
+
+          for (FraudEntry q : d.getMatchingEntries()) {
+            String text2 = MessageFormat.format("fraud : name {0}, age {1}, gender {2}, state {3}, city {4}, gender {5}, relationship {6}", q.getName(), q.getAge(), q.getGender().toString(), q.getState(), q.getCity(), q.getGender(), q.getRelationship());
+            System.out.println(text2);
+          }
+        }
+      }
     }
 
     @Override
@@ -73,13 +90,12 @@ public class FraudConsumer extends CompletableConsumer {
             }
 
             if (trueFraud.size() > 0) {
-                String text = MessageFormat.format("data  : name {0}, age {1}, gender {2}, state {3}, city {4}, gender {5}, relationship {6}", profile.getName(), profile.getAge(), profile.getGender().toString(), profile.getLocation().getState(), profile.getLocation().getCity(), profile.getGender().toString(), profile.getRelationShip().toString());
-                System.out.println(text);
-            }
+              DetectedFraud df = new DetectedFraud();
 
-            for (FraudEntry q : trueFraud) {
-                String text2 = MessageFormat.format("fraud : name {0}, age {1}, gender {2}, state {3}, city {4}, gender {5}, relationship {6}", q.getName(), q.getAge(), q.getGender().toString(), q.getState(), q.getCity(), q.getGender(), q.getRelationship());
-                System.out.println(text2);
+              df.setMatchingEntries(trueFraud);
+              df.setProfile(profile);
+
+              detected.add(df);
             }
         }
     }

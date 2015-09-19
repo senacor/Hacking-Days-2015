@@ -67,7 +67,7 @@ public class DisruptorTest {
         CompletableConsumer unisexNameConsumer = new UnisexNameConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer loggedInToday = new LoggedInTodayConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer creepyOldMenConsumer = new CreepyOldMenConsumer(SAMPLE_SIZE, onComplete);
-        CompletableConsumer fraudConsumer = new CreepyOldMenConsumer(SAMPLE_SIZE, onComplete);
+        CompletableConsumer fraudConsumer = new FraudConsumer(SAMPLE_SIZE, onComplete);
 
         disruptor.handleEventsWith(
                 unisexNameConsumer,
