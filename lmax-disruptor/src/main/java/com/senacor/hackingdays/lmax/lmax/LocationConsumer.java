@@ -19,9 +19,12 @@ public class LocationConsumer extends CompletableConsumer {
     }
 
     @Override
-    protected void processEvent(DisruptorEnvelope event, long sequence, boolean endOfBatch) {
+    protected void onComplete() {
 
-        final Profile profile = event.getProfile();
+    }
+
+    @Override
+    protected void processEvent(Profile profile, long sequence, boolean endOfBatch) {
         String genderConsumerString = "MF";
 
         switch (profile.getGender()) {
@@ -43,11 +46,12 @@ public class LocationConsumer extends CompletableConsumer {
         }
 
 
-        CompletableConsumer nextConsumer = consumerMap.get(genderConsumerString);
-        if (nextConsumer == null) {
-            nextConsumer = consumerMap.put(genderConsumerString, new GenderConsumer(maxSequence, onComplete));
+        if (!consumerMap.containsKey(genderConsumerString)) {
+            consumerMap.put(genderConsumerString, new GenderConsumer(maxSequence, onComplete));
         }
 
-        nextConsumer.processEvent(event, sequence, endOfBatch);
+        CompletableConsumer nextConsumer = consumerMap.get(genderConsumerString);
+        nextConsumer.processEvent(profile, sequence, endOfBatch);
     }
+
 }

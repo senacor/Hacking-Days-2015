@@ -24,19 +24,14 @@ public class MatchMakingConsumer extends CompletableConsumer {
 
     @Override
     protected void processEvent(Profile profile, long sequence, boolean endOfBatch) {
+        final String parsedZip = profile.getLocation().getZip().substring(0, 2);
 
-    }
-
-    @Override
-    protected void processEvent(DisruptorEnvelope event, long sequence, boolean endOfBatch) {
-
-        final String parsedZip = event.getProfile().getLocation().getZip().substring(0,2);
-
-        CompletableConsumer nextConsumer = consumerMap.get(parsedZip);
-        if (nextConsumer == null) {
-            nextConsumer = consumerMap.put(parsedZip, new LocationConsumer(maxSequence, onComplete));
+        if (!consumerMap.containsKey(parsedZip)) {
+            consumerMap.put(parsedZip, new LocationConsumer(maxSequence, onComplete));
         }
 
-        nextConsumer.processEvent(event, sequence, endOfBatch);
+        CompletableConsumer nextConsumer = consumerMap.get(parsedZip);
+        nextConsumer.processEvent(profile, sequence, endOfBatch);
     }
+
 }

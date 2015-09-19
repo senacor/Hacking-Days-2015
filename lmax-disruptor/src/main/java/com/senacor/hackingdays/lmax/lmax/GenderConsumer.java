@@ -21,21 +21,25 @@ public class GenderConsumer extends CompletableConsumer {
     }
 
     @Override
-    protected void processEvent(DisruptorEnvelope event, long sequence, boolean endOfBatch) {
+    protected void onComplete() {
 
-        profileList.add(event.getProfile());
+    }
+
+    @Override
+    protected void processEvent(Profile profile, long sequence, boolean endOfBatch) {
+        profileList.add(profile);
 
         if (profileList.size() == LIST_SIZE) {
             Iterator<Profile> iterator = profileList.iterator();
             while (iterator.hasNext()) {
                 Profile currentProfile = iterator.next();
 
-                for (Profile profile : profileList) {
+                for (Profile matchingProfile : profileList) {
 
-                    if (currentProfile.getGender().equals(profile.getSeeking().getGender())
-                            && profile.getGender().equals(currentProfile.getSeeking().getGender())) {
+                    if (currentProfile.getGender().equals(matchingProfile.getSeeking().getGender())
+                            && matchingProfile.getGender().equals(currentProfile.getSeeking().getGender())) {
                         System.out.println(String.format("MATCH!!!! CURRENT: %s, PROFILE: %s",
-                                currentProfile.toString(), profile.toString()));
+                                currentProfile.toString(), matchingProfile.toString()));
                     }
 
                 }
@@ -44,4 +48,5 @@ public class GenderConsumer extends CompletableConsumer {
         }
 
     }
+
 }
