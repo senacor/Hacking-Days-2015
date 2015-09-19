@@ -6,14 +6,12 @@ import com.hazelcast.core.IMap;
 import com.senacor.hackingdays.distributedcache.generate.ProfileGenerator;
 import com.senacor.hackingdays.distributedcache.generate.model.Profile;
 
-import java.util.UUID;
-
 public class GettingStarted {
     public static void main(String[] args) {
         HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance();
-        IMap<String, Profile> profiles = hazelcastInstance.getMap("profiles");
-        ProfileGenerator.newInstance(500).stream()
-                .forEach(profile -> profiles.set(profile.getId().toString(), profile));
+//        IMap<String, Profile> profiles = hazelcastInstance.getMap("profiles");
+//        ProfileGenerator.newInstance(500).stream()
+//                .forEach(profile -> profiles.set(profile.getId().toString(), profile));
 
         // System.out.println("Profile with key 1: " + profiles.get(1));
         // System.out.println("Map Size:" + hazelcastInstance.getMap("profiles").size());
@@ -22,14 +20,14 @@ public class GettingStarted {
         // ProfileGenerator.newInstance(5).stream()
         //         .forEach(profile -> datingProfiles.put(profile.getId().toString(), profile));
 
-        IMap<UUID, Profile> profileMap = hazelcastInstance.getMap("profileMap");
+        IMap<String, Profile> profileMap = hazelcastInstance.getMap("profileMap");
         System.out.println("Profile Map Size:" + profileMap.size());
 
-        // ProfileGenerator.newInstance(5).stream().forEach(profile -> profileMap.put(profile.getId(), profile));
-        // System.out.println("Profile Map Size:" + profileMap.size());
+        ProfileGenerator.newInstance(50000).stream().forEach(profile -> profileMap.put(profile.getId().toString(), profile));
+        System.out.println("Profile Map Size:" + profileMap.size());
 
-        for (IMap.Entry<UUID, Profile> profileEntry : profileMap.entrySet()) {
-            System.out.println(profileEntry.getKey() + " | " + profileEntry.getValue());
+        for (IMap.Entry<String, Profile> profileEntry : profileMap.entrySet()) {
+//            System.out.println(profileEntry.getKey() + " | " + profileEntry.getValue());
         }
     }
 }

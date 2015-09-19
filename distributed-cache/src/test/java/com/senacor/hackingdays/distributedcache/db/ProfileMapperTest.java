@@ -3,14 +3,16 @@ package com.senacor.hackingdays.distributedcache.db;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 
+import javax.sql.DataSource;
+
+import org.h2.jdbcx.JdbcConnectionPool;
+import org.h2.jdbcx.JdbcDataSource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,20 +22,27 @@ import com.senacor.hackingdays.distributedcache.generate.model.Profile;
 
 public class ProfileMapperTest {
 
-	private Connection connection;
+private DataSource dataSource;
 	private ProfileMapper profileMapper;
+
+	private static DataSource createDataSource() {
+		JdbcDataSource dataSource = new JdbcDataSource();
+		dataSource.setURL("jdbc:h2:mem:test");
+		JdbcConnectionPool pool = JdbcConnectionPool.create(dataSource);
+		pool.setMaxConnections(10);
+		return pool;
+	}
 
 	@Before
 	public void initializeConnection() throws ClassNotFoundException, SQLException {
-		Class.forName("org.h2.Driver");
-		connection = DriverManager.getConnection("jdbc:h2:mem:test");
-		profileMapper = new ProfileMapper(connection);
+		dataSource = createDataSource();
+		profileMapper = new ProfileMapper(dataSource);
 	}
 
 	@After
 	public void closeConnection() throws SQLException {
 		profileMapper = null;
-		connection.close();
+		dataSource.getConnection().createStatement().execute("SHUTDOWN");
 	}
 
 	@Test
@@ -124,7 +133,7 @@ public class ProfileMapperTest {
 				return allProfileIds.contains(t.getId());
 			}
 		}));
-		
+
 		assertThat(allProfileIds.size(), equalTo(samples));
 
 	}

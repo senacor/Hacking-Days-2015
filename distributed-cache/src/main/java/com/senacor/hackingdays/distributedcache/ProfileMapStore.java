@@ -1,20 +1,22 @@
 package com.senacor.hackingdays.distributedcache;
 
-import com.google.common.collect.Maps;
-import com.hazelcast.core.MapStore;
-import com.senacor.hackingdays.distributedcache.db.ProfileMapper;
-import com.senacor.hackingdays.distributedcache.generate.model.Profile;
-
 import java.io.Closeable;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import javax.sql.DataSource;
+
+import org.h2.jdbcx.JdbcConnectionPool;
+import org.h2.jdbcx.JdbcDataSource;
+
+import com.google.common.collect.Maps;
+import com.hazelcast.core.MapStore;
+import com.senacor.hackingdays.distributedcache.db.ProfileMapper;
+import com.senacor.hackingdays.distributedcache.generate.model.Profile;
 
 /**
  * @author Alasdair Collinson, Senacor Technologies AG
@@ -22,20 +24,21 @@ import java.util.stream.Collectors;
 public class ProfileMapStore implements MapStore<String, Profile>, Closeable {
 
     private static final String DEFAULT_MAP_ID = "profile";
-    private static final String DEFAULT_DB_URL = "jdbc:h2:tcp://192.168.220.124/~/test";
+//    private static final String DEFAULT_DB_URL = "jdbc:h2:tcp://192.168.220.124/~/test";
+    private static final String DEFAULT_DB_URL = "jdbc:h2:tcp://172.16.13.152/~/test";
     public static final String PROPERTY_FILE = "maps.properties.xml";
 
     private final String mapId;
     private final String dbUrl;
     private final ProfileMapper mapper;
-    private final Connection connection;
+    private final DataSource dataSource;
 
     public ProfileMapStore() {
         Properties properties = getProperties();
         mapId = properties.getProperty("mapName", DEFAULT_MAP_ID);
         dbUrl = properties.getProperty("db-url", DEFAULT_DB_URL);
-        connection = createConnection();
-        mapper = new ProfileMapper(connection, mapId);
+        dataSource = createDataSource();
+        mapper = new ProfileMapper(dataSource, mapId);
     }
 
     private Properties getProperties() {
@@ -99,22 +102,17 @@ public class ProfileMapStore implements MapStore<String, Profile>, Closeable {
                 .map(UUID::toString)
                 .collect(Collectors.toList());
     }
-
-    private Connection createConnection() {
-        try {
-            Class.forName("org.h2.Driver");
-            return DriverManager.getConnection(dbUrl);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    
+	private  DataSource createDataSource() {
+		JdbcDataSource dataSource = new JdbcDataSource();
+		dataSource.setURL(dbUrl);
+		JdbcConnectionPool pool = JdbcConnectionPool.create(dataSource);
+		pool.setMaxConnections(10);
+		return pool;
+	}
 
     @Override
     public void close() throws IOException {
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            throw new IOException("Fehler beim Schließen der Verbindung zur Datenbank", e);
-        }
+    	// noop
     }
 }

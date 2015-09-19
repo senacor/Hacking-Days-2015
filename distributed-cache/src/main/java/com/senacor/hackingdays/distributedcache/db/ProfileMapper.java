@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.io.IOUtils;
 
 import com.senacor.hackingdays.distributedcache.generate.model.Activity;
@@ -24,17 +26,18 @@ import com.senacor.hackingdays.distributedcache.generate.model.Seeking;
 
 public class ProfileMapper {
 
-	private final Connection connection;
+	private final DataSource dataSource;
+//	private final Connection connection;
 	private final String tableName;
 
-	public ProfileMapper(Connection connection) {
-		this(connection, "person");
+	public ProfileMapper(DataSource dataSource) {
+		this(dataSource, "person");
 	}
 
-	public ProfileMapper(Connection connection, String tableName) {
-		this.connection = connection;
+	public ProfileMapper(DataSource dataSource, String tableName) {
+		this.dataSource=dataSource;
 		this.tableName = tableName;
-		initializeSchema(connection, tableName);
+		initializeSchema(dataSource, tableName);
 	}
 	private static String getResourceAsString(final String resourceName) {
 		InputStream inputStream = null;
@@ -50,9 +53,9 @@ public class ProfileMapper {
 		}
 	}
 	
-	private static void initializeSchema(Connection connection, String tableName) {
+	private static void initializeSchema(DataSource dataSource, String tableName) {
 		final String resource = "db/initializeprofiletable.sql";
-		try {
+		try (Connection connection = dataSource.getConnection()) {
 			final String sql = getResourceAsString(resource);
 			for (String statement : sql.split(";")) {
 				statement = statement.replaceAll("\\$PROFILETABLE\\$", tableName);
@@ -147,7 +150,7 @@ public class ProfileMapper {
 	}
 
 	public List<Profile> getAllProfiles() {
-		try (PreparedStatement statement = connection.prepareStatement(createSelectAllStatement())) {
+		try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(createSelectAllStatement())) {
 			ResultSet resultset = statement.executeQuery();
 			List<Profile> result = new ArrayList<>();
 			while (resultset.next()) {
@@ -160,7 +163,7 @@ public class ProfileMapper {
 	}
 
 	public List<UUID> getAllIds() {
-		try (PreparedStatement statement = connection.prepareStatement(createSelectAllUUIDsStatement())) {
+		try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(createSelectAllUUIDsStatement())) {
 			ResultSet resultset = statement.executeQuery();
 			List<UUID> result = new ArrayList<>();
 			while (resultset.next()) {
@@ -173,7 +176,7 @@ public class ProfileMapper {
 	}
 
 	public Profile getProfileById(UUID id) {
-		try (PreparedStatement statement = connection
+		try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection
 				.prepareStatement(createSelectByIdStatement())) {
 			statement.setString(1, id.toString());
 			ResultSet resultset = statement.executeQuery();
@@ -187,7 +190,7 @@ public class ProfileMapper {
 	}
 
 	public boolean insertProfile(Profile profile) {
-		try (PreparedStatement statement = connection.prepareStatement(createInsertStatement())) {
+		try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(createInsertStatement())) {
 			mapProfileToStatement(statement, profile);
 			return statement.execute();
 
@@ -198,7 +201,7 @@ public class ProfileMapper {
 	}
 
 	public boolean updateProfile(Profile profile) {
-		try (PreparedStatement statement = connection.prepareStatement(createUpdateStatement())) {
+		try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(createUpdateStatement())) {
 			mapProfileToStatement(statement, profile);
 			return statement.executeUpdate() == 1;
 
@@ -208,7 +211,7 @@ public class ProfileMapper {
 	}
 
 	public boolean deleteProfile(UUID id) {
-		try (PreparedStatement statement = connection.prepareStatement(createDeleteStatement())) {
+		try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(createDeleteStatement())) {
 			statement.setString(1, id.toString());
 			return statement.executeUpdate() == 1;
 
