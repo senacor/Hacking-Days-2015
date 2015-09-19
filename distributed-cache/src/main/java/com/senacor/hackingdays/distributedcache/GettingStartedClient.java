@@ -9,7 +9,7 @@ public class GettingStartedClient {
     public static void main(String[] args) {
         ClientConfig clientConfig = new ClientConfig();
         HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
-        IMap map = client.getMap("customers");
+        IMap map = client.getMap("profiles");
         System.out.println("Map Size:" + map.size());
     }
 }
