@@ -2,6 +2,7 @@ package com.senacor.hackingdays.lmax.lmax;
 
 import com.senacor.hackingdays.lmax.generate.model.Profile;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,8 +18,9 @@ public class UnisexNameConsumer extends CompletableConsumer {
 
     @Override
     protected void onComplete() {
+        int totalNames = maleNames.size() + femaleNames.size();
         maleNames.retainAll(femaleNames);
-        System.out.println("A total of " + maleNames.size() + " names can be applied to both men and women");
+        System.out.println("A total of " + maleNames.size() + " names can be applied to both men and women. Total names: " + totalNames);
     }
 
     @Override
