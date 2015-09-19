@@ -4,6 +4,7 @@ import com.google.common.base.Stopwatch;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
+import com.senacor.hackingdays.lmax.lmax.fraud.FraudConsumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.ClassRule;
@@ -33,7 +34,7 @@ public class DisruptorTest {
         ExecutorService executor = Executors.newFixedThreadPool(poolSize);
 
         // Specify the size of the ring buffer, must be power of 2.
-        int bufferSize = 4096;
+        int bufferSize = 1024;
         // Construct the Disruptor
 //        Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor, ProducerType.SINGLE, new YieldingWaitStrategy());
         Disruptor<DisruptorEnvelope> disruptor = new Disruptor<>(DisruptorEnvelope::new, bufferSize, executor);
@@ -60,17 +61,19 @@ public class DisruptorTest {
 
     private CountDownLatch registerConsumers(Disruptor<DisruptorEnvelope> disruptor) {
         // Connect the handler
-        CountDownLatch countDownLatch = new CountDownLatch(3);
+        CountDownLatch countDownLatch = new CountDownLatch(4);
 
         Runnable onComplete = () -> countDownLatch.countDown();
         CompletableConsumer unisexNameConsumer = new UnisexNameConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer loggedInToday = new LoggedInTodayConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer creepyOldMenConsumer = new CreepyOldMenConsumer(SAMPLE_SIZE, onComplete);
+        CompletableConsumer fraudConsumer = new CreepyOldMenConsumer(SAMPLE_SIZE, onComplete);
 
         disruptor.handleEventsWith(
                 unisexNameConsumer,
                 loggedInToday,
-                creepyOldMenConsumer
+                creepyOldMenConsumer,
+                fraudConsumer
         );
         return countDownLatch;
     }
