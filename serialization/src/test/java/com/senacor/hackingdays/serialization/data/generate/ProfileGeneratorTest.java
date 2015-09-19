@@ -4,10 +4,30 @@ import com.senacor.hackingdays.serialization.data.CompactedProfile;
 import com.senacor.hackingdays.serialization.data.Gender;
 import com.senacor.hackingdays.serialization.data.Location;
 import com.senacor.hackingdays.serialization.data.RelationShipStatus;
+import com.senacor.hackingdays.serialization.data.Profile;
+import com.senacor.hackingdays.serialization.data.unsafe.BufferTooSmallException;
+import com.senacor.hackingdays.serialization.data.unsafe.UnsafeMemory;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import sun.misc.Unsafe;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.HashSet;
 
 public class ProfileGeneratorTest {
+
+    private static final Unsafe unsafe;
+
+    static {
+        try {
+            Field field = Unsafe.class.getDeclaredField("theUnsafe");
+            field.setAccessible(true);
+            unsafe = (Unsafe) field.get(null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     @Test
@@ -100,6 +120,48 @@ public class ProfileGeneratorTest {
         cp.getCompactedActivity().setLoginCount(loginCount);
         assertEquals(loginCount, cp.getCompactedActivity().getLoginCount());
 
+    }
+
+    @Test
+    public void profileSizes() throws BufferTooSmallException {
+        final Profile profile = ProfileGenerator.newProfile();
+        long totalSize = 0;
+        totalSize += sizeOf(profile);
+        totalSize += sizeOf(profile.getLocation());
+        totalSize += sizeOf(profile.getActivity());
+        totalSize += sizeOf(profile.getSeeking());
+        totalSize += sizeOf(profile.getSeeking().getAgeRange());
+        System.out.println("size of profile: " + totalSize);
+
+        final byte[] buffer = new byte[1000];
+        final UnsafeMemory memory = new UnsafeMemory(buffer);
+        profile.serializeUnsafe(memory);
+        System.out.println("size of profile serialization: " + memory.getPos());
+    }
+
+    public static long sizeOf(Object o) {
+        Unsafe u = unsafe;
+        HashSet<Field> fields = new HashSet<Field>();
+        Class c = o.getClass();
+        while (c != Object.class) {
+            for (Field f : c.getDeclaredFields()) {
+                if ((f.getModifiers() & Modifier.STATIC) == 0) {
+                    fields.add(f);
+                }
+            }
+            c = c.getSuperclass();
+        }
+
+        // get offset
+        long maxSize = 0;
+        for (Field f : fields) {
+            long offset = u.objectFieldOffset(f);
+            if (offset > maxSize) {
+                maxSize = offset;
+            }
+        }
+
+        return ((maxSize/8) + 1) * 8;   // padding
     }
 
 }

@@ -66,6 +66,10 @@ public class UnsafeMemory {
     this.buffer = buffer;
   }
 
+  public int getPos() {
+    return pos;
+  }
+
   public void putBoolean(final boolean value) throws BufferTooSmallException {
     if (pos + SIZE_OF_BOOLEAN > buffer.length) {
       throw new BufferTooSmallException();
