@@ -25,10 +25,10 @@
     </group>
     <network>
         <cluster-members>
-            <!--<address>127.0.0.1</address>-->
+            <address>127.0.0.1</address>
             <address>172.16.231.233</address>
-            <!--<address>172.16.222.247</address>-->
-            <!--<address>172.16.236.207</address>-->
+            <address>172.16.222.247</address>
+            <address>172.16.236.207</address>
         </cluster-members>
         <smart-routing>true</smart-routing>
         <redo-operation>true</redo-operation>
