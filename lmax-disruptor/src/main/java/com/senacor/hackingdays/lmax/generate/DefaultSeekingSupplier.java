@@ -10,11 +10,13 @@ import static java.lang.Math.min;
 public class DefaultSeekingSupplier implements SeekingSupplier {
 
     private final AgeSupplier ageSupplier = AgeSupplier.randomAge();
+    private final GenderSupplier genderSupplier = GenderSupplier.randomGender();
 
     private Seeking randomSeeking(Gender gender) {
         int bound1 = ageSupplier.apply(gender);
         int bound2 = ageSupplier.apply(gender);
-        return new Seeking(gender, new Range(min(bound1, bound2), max(bound1, bound2)));
+
+        return new Seeking(genderSupplier.get(), new Range(min(bound1, bound2), max(bound1, bound2)));
     }
 
     @Override

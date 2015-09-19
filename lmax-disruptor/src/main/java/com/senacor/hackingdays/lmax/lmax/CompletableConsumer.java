@@ -9,7 +9,7 @@ public abstract class CompletableConsumer implements EventHandler<DisruptorEnvel
     protected final Runnable onComplete;
 
     public CompletableConsumer(int expectedMessages, Runnable onComplete) {
-        this.maxSequence = expectedMessages -1;
+        this.maxSequence = expectedMessages - 1;
         this.onComplete = onComplete;
     }
 

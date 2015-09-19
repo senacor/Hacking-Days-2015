@@ -97,7 +97,7 @@ public class ProfileGenerator implements Iterable<Profile> {
 
         private final int size;
         private AgeSupplier ageFunction = AgeSupplier.randomAge();
-        private Supplier<Gender> genderFunction = ProfileGenerator::randomGender;
+        private GenderSupplier genderFunction = GenderSupplier.randomGender();
         private NameSupplier nameFunction = new DefaultNameSupplier();
         private Supplier<RelationShipStatus> relationShipStatusFunction = ProfileGenerator::randomRelationShipStatus;
         private Supplier<Activity> activityFunction = ProfileGenerator::randomActivity;
@@ -114,7 +114,7 @@ public class ProfileGenerator implements Iterable<Profile> {
         }
 
 
-        public Builder withGender(Supplier<Gender> genderFunction) {
+        public Builder withGender(GenderSupplier genderFunction) {
             this.genderFunction = genderFunction;
             return this;
         }
@@ -155,12 +155,6 @@ public class ProfileGenerator implements Iterable<Profile> {
                     locationSupplier,
                     seekingSupplier);
         }
-
-    }
-
-    private static Gender randomGender() {
-        int i = random.nextInt(100);
-        return i < 45 ? Gender.Male : i > 95 ? Gender.Disambiguous : Female;
 
     }
 
