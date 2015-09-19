@@ -4,8 +4,13 @@ import com.senacor.hackingdays.lmax.generate.model.Profile;
 import com.senacor.hackingdays.lmax.generate.model.Range;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by mhaunolder on 19.09.15.
@@ -14,11 +19,21 @@ public class GenderConsumer extends CompletableConsumer {
 
     private static final int LIST_SIZE = 100;
 
-    private final List<Profile> profileList;
+    private final Collection<Profile> profileList;
+    private static final int MAXIMUM = 10000;
 
     public GenderConsumer(int expectedMessages, Runnable onComplete) {
         super(expectedMessages, onComplete);
-        profileList = new ArrayList<>();
+        profileList = mostRecentList();
+    }
+
+    private Set<Profile> mostRecentList() {
+        return Collections.newSetFromMap(new LinkedHashMap<Profile, Boolean>(32, 0.7f, true) {
+            protected boolean removeEldestEntry(
+                    Map.Entry<Profile, Boolean> eldest) {
+                return size() > MAXIMUM;
+            }
+        });
     }
 
     @Override
@@ -40,7 +55,7 @@ public class GenderConsumer extends CompletableConsumer {
                 boolean match = false;
                 for (Profile matchingProfile : matchingProfileList) {
 
-                    if( currentProfile.getId().equals(matchingProfile.getId()))
+                    if (currentProfile.getId().equals(matchingProfile.getId()))
                         continue;
 
                     if (!(currentProfile.getGender().equals(matchingProfile.getSeeking().getGender())
@@ -48,9 +63,8 @@ public class GenderConsumer extends CompletableConsumer {
                         continue;
 
 
-
-                    if ( !(isInRange(currentProfile.getAge(), matchingProfile.getSeeking().getAgeRange())
-                            && isInRange(matchingProfile.getAge(), currentProfile.getSeeking().getAgeRange()) )) {
+                    if (!(isInRange(currentProfile.getAge(), matchingProfile.getSeeking().getAgeRange())
+                            && isInRange(matchingProfile.getAge(), currentProfile.getSeeking().getAgeRange()))) {
                         continue;
                     }
 
@@ -71,13 +85,13 @@ public class GenderConsumer extends CompletableConsumer {
                 }
 
             }
-           // System.out.println(profileList.size() + " entries left after matching.");
+            // System.out.println(profileList.size() + " entries left after matching.");
         }
 
     }
 
-    private boolean isInRange(int value, Range range){
-        return (value >= range.getLower() && value <=range.getLower());
+    private boolean isInRange(int value, Range range) {
+        return (value >= range.getLower() && value <= range.getLower());
     }
 
 }
