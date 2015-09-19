@@ -41,9 +41,8 @@ public class RuleBasedFraudDetector extends CompletableConsumer {
 
     if (verbose) {
       for(FraudRule r: fraudRules) {
-        for(RuleViolation d: r.getDetected()) {
-          Profile profile = d.getProfile();
-          String violation = d.getMessage();
+        for(Profile profile: r.getDetected()) {
+          String violation = r.getMessage();
 
           String text = MessageFormat.format(" name {0}, age {1}, gender {2}, state {3}, city {4}, gender {5}, relationship {6}, seeking {7}", profile.getName(), profile.getAge(), profile.getGender().toString(), profile.getLocation().getState(), profile.getLocation().getCity(), profile.getGender().toString(), profile.getRelationShip().toString(), profile.getSeeking().getAgeRange().getLower());
           System.out.println(violation + ": " + text);
@@ -52,16 +51,22 @@ public class RuleBasedFraudDetector extends CompletableConsumer {
     }
   }
 
+  private List<Profile> batch = new ArrayList<>();
+
   @Override
   protected void processEvent(Profile profile, long sequence, boolean endOfBatch) {
-    if (endOfBatch) {
-      // System.out.println("End of batch fraud");
+
+    if (!endOfBatch) {
+      batch.add(profile);
     }
 
-    fraudRules.stream().filter(p -> p.getRule().test(profile)).forEach(r -> {
-      r.setCount(r.getCount() + 1);
-      r.getDetected().add(new RuleViolation(profile, r.getMessage()));
-    });
+    if (endOfBatch) {
+      fraudRules.parallelStream().forEach(r -> {
+        batch.stream().filter(p -> r.getRule().test(p)).forEach(p -> r.addDetected(p));
+      });
+
+      batch.clear();
+    }
   }
 }
 

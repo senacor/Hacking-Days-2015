@@ -14,17 +14,17 @@ import java.util.function.Predicate;
  * To change this template use File | Settings | File Templates.
  */
 public class FraudRule {
-  Predicate<Profile> rule;
-  String message;
-  int count;
-  List<RuleViolation> detected = new ArrayList<>();
-
-  public List<RuleViolation> getDetected() {
+  public List<Profile> getDetected() {
     return detected;
   }
 
-  public void setDetected(List<RuleViolation> detected) {
-    this.detected = detected;
+  Predicate<Profile> rule;
+  String message;
+  int count;
+  List<Profile> detected = new ArrayList<>();
+
+  public void addDetected(Profile p) {
+    detected.add(p);
   }
 
   public Predicate<Profile> getRule() {
@@ -36,11 +36,7 @@ public class FraudRule {
   }
 
   public int getCount() {
-    return count;
-  }
-
-  public void setCount(int count) {
-    this.count = count;
+    return detected.size();
   }
 
   public FraudRule(Predicate<Profile> rule, String message) {
