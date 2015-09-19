@@ -1,26 +1,16 @@
 package com.senacor.hackingdays.distributedcache;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.senacor.hackingdays.distributedcache.generate.model.Activity;
-import com.senacor.hackingdays.distributedcache.generate.model.Gender;
-import com.senacor.hackingdays.distributedcache.generate.model.Location;
-import com.senacor.hackingdays.distributedcache.generate.model.Profile;
-import com.senacor.hackingdays.distributedcache.generate.model.Range;
-import com.senacor.hackingdays.distributedcache.generate.model.RelationShipStatus;
-import com.senacor.hackingdays.distributedcache.generate.model.Seeking;
+import com.senacor.hackingdays.distributedcache.generate.model.*;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author Alasdair Collinson, Senacor Technologies AG
@@ -37,9 +27,9 @@ public class ProfileMapStoreTest {
 
         Profile loadedProfile;
         try (ProfileMapStore mapStore = new ProfileMapStore()) {
-            mapStore.store(inputProfile.getId(), inputProfile);
+            mapStore.store(inputProfile.getId().toString(), inputProfile);
 
-            loadedProfile = mapStore.load(inputProfile.getId());
+            loadedProfile = mapStore.load(inputProfile.getId().toString());
         }
         Assert.assertEquals(inputProfile.getName(), loadedProfile.getName());
         Assert.assertEquals(inputProfile.getGender(), loadedProfile.getGender());
@@ -54,10 +44,10 @@ public class ProfileMapStoreTest {
 
         Profile loadedProfile;
         try (ProfileMapStore mapStore = new ProfileMapStore()) {
-            mapStore.store(inputProfile.getId(), inputProfile);
+            mapStore.store(inputProfile.getId().toString(), inputProfile);
             inputProfile.setAge(31);
-            mapStore.store(inputProfile.getId(), inputProfile);
-            loadedProfile = mapStore.load(inputProfile.getId());
+            mapStore.store(inputProfile.getId().toString(), inputProfile);
+            loadedProfile = mapStore.load(inputProfile.getId().toString());
         }
         Assert.assertEquals(31, inputProfile.getAge());
         Assert.assertEquals(31, loadedProfile.getAge());
@@ -68,18 +58,20 @@ public class ProfileMapStoreTest {
         Profile profile1 = createProfile("Hans Wurst", Gender.Male);
         Profile profile2 = createProfile("Brat Wurst", Gender.Disambiguous);
         Profile profile3 = createProfile("Leber Wurst", Gender.Female);
-        Map<UUID, Profile> inputProfiles = Maps.newHashMap();
-        inputProfiles.put(profile1.getId(), profile1);
-        inputProfiles.put(profile2.getId(), profile2);
-        inputProfiles.put(profile3.getId(), profile3);
+        Map<String, Profile> inputProfiles = Maps.newHashMap();
+        inputProfiles.put(profile1.getId().toString(), profile1);
+        inputProfiles.put(profile2.getId().toString(), profile2);
+        inputProfiles.put(profile3.getId().toString(), profile3);
 
-        Map<UUID, Profile> loadedProfiles;
+        Map<String, Profile> loadedProfiles;
         try (ProfileMapStore mapStore = new ProfileMapStore()) {
             mapStore.storeAll(inputProfiles);
 
-            loadedProfiles = mapStore.loadAll(Lists.newArrayList(profile1.getId(), profile2.getId(), profile3.getId()));
+            loadedProfiles = mapStore.loadAll(Lists.newArrayList(profile1.getId().toString(),
+                    profile2.getId().toString(),
+                    profile3.getId().toString()));
         }
-        for(Map.Entry<UUID, Profile> profileEntry : inputProfiles.entrySet()) {
+        for (Map.Entry<String, Profile> profileEntry : inputProfiles.entrySet()) {
             Profile loadedProfile = loadedProfiles.get(profileEntry.getKey());
             Assert.assertEquals(profileEntry.getValue().getName(), loadedProfile.getName());
             Assert.assertEquals(profileEntry.getValue().getGender(), loadedProfile.getGender());
@@ -93,11 +85,11 @@ public class ProfileMapStoreTest {
 
         Profile loadedProfile;
         try (ProfileMapStore mapStore = new ProfileMapStore()) {
-            mapStore.store(profile.getId(), profile);
+            mapStore.store(profile.getId().toString(), profile);
 
-            mapStore.delete(profile.getId());
+            mapStore.delete(profile.getId().toString());
 
-            loadedProfile = mapStore.load(profile.getId());
+            loadedProfile = mapStore.load(profile.getId().toString());
         }
         Assert.assertNull(loadedProfile);
     }
@@ -107,16 +99,18 @@ public class ProfileMapStoreTest {
         Profile profile1 = createProfile("Hans Wurst", Gender.Male);
         Profile profile2 = createProfile("Brat Wurst", Gender.Disambiguous);
         Profile profile3 = createProfile("Leber Wurst", Gender.Female);
-        Map<UUID, Profile> inputProfiles = Maps.newHashMap();
-        inputProfiles.put(profile1.getId(), profile1);
-        inputProfiles.put(profile2.getId(), profile2);
-        inputProfiles.put(profile3.getId(), profile3);
+        Map<String, Profile> inputProfiles = Maps.newHashMap();
+        inputProfiles.put(profile1.getId().toString(), profile1);
+        inputProfiles.put(profile2.getId().toString(), profile2);
+        inputProfiles.put(profile3.getId().toString(), profile3);
 
-        Map<UUID, Profile> loadedProfiles;
+        Map<String, Profile> loadedProfiles;
         try (ProfileMapStore mapStore = new ProfileMapStore()) {
             mapStore.storeAll(inputProfiles);
 
-            ArrayList<UUID> ids = Lists.newArrayList(profile1.getId(), profile2.getId(), profile3.getId());
+            ArrayList<String> ids = Lists.newArrayList(profile1.getId().toString(),
+                    profile2.getId().toString(),
+                    profile3.getId().toString());
             mapStore.deleteAll(ids);
 
             loadedProfiles = mapStore.loadAll(ids);
@@ -129,13 +123,15 @@ public class ProfileMapStoreTest {
         Profile profile1 = createProfile("Hans Wurst", Gender.Male);
         Profile profile2 = createProfile("Brat Wurst", Gender.Disambiguous);
         Profile profile3 = createProfile("Leber Wurst", Gender.Female);
-        Map<UUID, Profile> inputProfiles = Maps.newHashMap();
-        inputProfiles.put(profile1.getId(), profile1);
-        inputProfiles.put(profile2.getId(), profile2);
-        inputProfiles.put(profile3.getId(), profile3);
-        ArrayList<UUID> ids = Lists.newArrayList(profile1.getId(), profile2.getId(), profile3.getId());
+        Map<String, Profile> inputProfiles = Maps.newHashMap();
+        inputProfiles.put(profile1.getId().toString(), profile1);
+        inputProfiles.put(profile2.getId().toString(), profile2);
+        inputProfiles.put(profile3.getId().toString(), profile3);
+        ArrayList<String> ids = Lists.newArrayList(profile1.getId().toString(),
+                profile2.getId().toString(),
+                profile3.getId().toString());
 
-        Iterable<UUID> keys;
+        Iterable<String> keys;
         try (ProfileMapStore mapStore = new ProfileMapStore()) {
             mapStore.storeAll(inputProfiles);
 
@@ -158,20 +154,20 @@ public class ProfileMapStoreTest {
         return profile;
     }
 
-    private static class ContainsMatcher extends BaseMatcher<Iterable<UUID>> {
-        private final Collection<UUID> compareAgainst;
+    private static class ContainsMatcher extends BaseMatcher<Iterable<String>> {
+        private final Collection<String> compareAgainst;
 
-        public ContainsMatcher(Iterable<UUID> compareAgainst) {
+        public ContainsMatcher(Iterable<String> compareAgainst) {
             this.compareAgainst = Lists.newArrayList(compareAgainst);
         }
 
         @Override
         public boolean matches(Object items) {
-            if(!(items instanceof Iterable)) {
+            if (!(items instanceof Iterable)) {
                 return false;
             }
             boolean result = true;
-            for(Object item : (Iterable) items) {
+            for (Object item : (Iterable) items) {
                 result &= compareAgainst.contains(item);
             }
             return result;

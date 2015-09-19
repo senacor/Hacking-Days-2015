@@ -1,5 +1,10 @@
 package com.senacor.hackingdays.distributedcache;
 
+import com.google.common.collect.Maps;
+import com.hazelcast.core.MapStore;
+import com.senacor.hackingdays.distributedcache.db.ProfileMapper;
+import com.senacor.hackingdays.distributedcache.generate.model.Profile;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.Connection;
@@ -8,16 +13,12 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
-
-import com.google.common.collect.Maps;
-import com.hazelcast.core.MapStore;
-import com.senacor.hackingdays.distributedcache.db.ProfileMapper;
-import com.senacor.hackingdays.distributedcache.generate.model.Profile;
+import java.util.stream.Collectors;
 
 /**
  * @author Alasdair Collinson, Senacor Technologies AG
  */
-public class ProfileMapStore implements MapStore<UUID, Profile>, Closeable {
+public class ProfileMapStore implements MapStore<String, Profile>, Closeable {
 
     private static final String MAP_ID = "profileMap";
     private static final String URL = "jdbc:h2:tcp://192.168.220.124/~/test";
@@ -31,8 +32,8 @@ public class ProfileMapStore implements MapStore<UUID, Profile>, Closeable {
     }
 
     @Override
-    public synchronized void store(UUID key, Profile value) {
-        if (mapper.getProfileById(key) == null) {
+    public synchronized void store(String key, Profile value) {
+        if (mapper.getProfileById(UUID.fromString(key)) == null) {
             mapper.insertProfile(value);
         } else {
             mapper.updateProfile(value);
@@ -40,44 +41,46 @@ public class ProfileMapStore implements MapStore<UUID, Profile>, Closeable {
     }
 
     @Override
-    public synchronized void storeAll(Map<UUID, Profile> map) {
-        for (Map.Entry<UUID, Profile> entry : map.entrySet()) {
+    public synchronized void storeAll(Map<String, Profile> map) {
+        for (Map.Entry<String, Profile> entry : map.entrySet()) {
             store(entry.getKey(), entry.getValue());
         }
     }
 
     @Override
-    public synchronized void delete(UUID key) {
-        mapper.deleteProfile(key);
+    public synchronized void delete(String key) {
+        mapper.deleteProfile(UUID.fromString(key));
     }
 
     @Override
-    public synchronized void deleteAll(Collection<UUID> keys) {
-        for (UUID key : keys) {
+    public synchronized void deleteAll(Collection<String> keys) {
+        for (String key : keys) {
             delete(key);
         }
     }
 
     @Override
-    public synchronized Profile load(UUID key) {
-        return mapper.getProfileById(key);
+    public synchronized Profile load(String key) {
+        return mapper.getProfileById(UUID.fromString(key));
     }
 
     @Override
-    public synchronized Map<UUID, Profile> loadAll(Collection<UUID> keys) {
-        Map<UUID, Profile> result = Maps.newHashMap();
+    public synchronized Map<String, Profile> loadAll(Collection<String> keys) {
+        Map<String, Profile> result = Maps.newHashMap();
         keys.stream().forEach(key -> {
             Profile profile = load(key);
             if (profile != null) {
-                result.put(profile.getId(), profile);
+                result.put(profile.getId().toString(), profile);
             }
         });
         return result;
     }
 
     @Override
-    public synchronized Iterable<UUID> loadAllKeys() {
-        return mapper.getAllIds();
+    public synchronized Iterable<String> loadAllKeys() {
+        return mapper.getAllIds().stream()
+                .map(UUID::toString)
+                .collect(Collectors.toList());
     }
 
     private static Connection createConnection() {
