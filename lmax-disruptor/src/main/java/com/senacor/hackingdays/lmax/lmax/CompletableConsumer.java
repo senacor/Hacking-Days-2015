@@ -17,10 +17,10 @@ public abstract class CompletableConsumer implements EventHandler<DisruptorEnvel
     public final void onEvent(DisruptorEnvelope event, long sequence, boolean endOfBatch) throws Exception {
 
         processEvent(event.getProfile(), sequence, endOfBatch);
-        if (maxSequence == sequence)
+        if (maxSequence == sequence) {
             onComplete();
             onComplete.run();
-
+        }
     }
 
     protected abstract void onComplete();
