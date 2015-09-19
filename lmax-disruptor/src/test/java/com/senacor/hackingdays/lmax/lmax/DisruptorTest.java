@@ -1,10 +1,13 @@
 package com.senacor.hackingdays.lmax.lmax;
 
 import com.google.common.base.Stopwatch;
+import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
 import com.senacor.hackingdays.lmax.lmax.fraud.FraudConsumer;
+import com.senacor.hackingdays.lmax.generate.model.Profile;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.ClassRule;
@@ -41,7 +44,6 @@ public class DisruptorTest {
 
         CountDownLatch countDownLatch = registerConsumers(disruptor);
 
-
         // Start the Disruptor, starts all threads running
         disruptor.start();
 
@@ -68,6 +70,7 @@ public class DisruptorTest {
         CompletableConsumer loggedInToday = new LoggedInTodayConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer creepyOldMenConsumer = new CreepyOldMenConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer fraudConsumer = new CreepyOldMenConsumer(SAMPLE_SIZE, onComplete);
+        AverageAgeEventHandler averageAgeEventHandler = new AverageAgeEventHandler(SAMPLE_SIZE, onComplete);
 
         disruptor.handleEventsWith(
                 unisexNameConsumer,
