@@ -29,6 +29,7 @@
             <address>192.168.220.190</address>      <!-- ago -->
             <address> 192.168.220.103</address> <!-- al -->
             <address> 192.168.220.119</address> <!-- andreas -->
+            <address> 192.168.220.176</address>
         </cluster-members>
         <smart-routing>true</smart-routing>
         <redo-operation>true</redo-operation>
