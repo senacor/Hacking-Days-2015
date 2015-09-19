@@ -61,8 +61,8 @@ public class MatchFinderExecutor {
 		};
         
         Profile newCustomer = ProfileGenerator.newProfile();
-        Seeking seeking = new Seeking(Gender.Female, new Range(23, 60));
-        newCustomer.setSeeking(seeking);
+//        Seeking seeking = new Seeking(Gender.Female, new Range(23, 60));
+//        newCustomer.setSeeking(seeking);
         System.out.println("MatchingProfiles for " + newCustomer);
 		ex.submitToAllMembers(new MatchFinderCallable(newCustomer), new MultiExecutionCallback() {
 			
@@ -79,6 +79,7 @@ public class MatchFinderExecutor {
 						System.out.println(profile);
 					}
 				}
+				client.shutdown();
 			}
 		});
     }

@@ -15,8 +15,7 @@ public class ProfileMatcher {
 			return false;
 		if (!firstSeeking.getGender().equals(second.getGender()))
 			return false;
-		if (!(firstSeeking.getAgeRange().getLower() <= second.getAge()) && second.getAge() <= firstSeeking.getAgeRange().getUpper())
-			return false;
-		return true;
+		return firstSeeking.getAgeRange().getLower() <= second.getAge() && 
+				second.getAge() <= firstSeeking.getAgeRange().getUpper();
 	}
 }
