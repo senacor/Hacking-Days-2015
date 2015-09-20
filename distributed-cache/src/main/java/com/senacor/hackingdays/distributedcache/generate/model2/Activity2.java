@@ -35,10 +35,10 @@ public class Activity2 implements Serializable {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof Activity))
+		if (!(obj instanceof Activity2))
 			return false;
 
-		Activity rhs = (Activity) obj;
+		Activity2 rhs = (Activity2) obj;
 
 		return new EqualsBuilder() //
 				.append(this.loginCount, rhs.loginCount) //
