@@ -24,7 +24,7 @@ public class MongoJournalingDisruptorConsumer extends CompletableConsumer implem
 	private final MongoCollection<Document> profilesCollection;
 	private final Profile[] buffer;
 	private final int batchSize;
-	private int lastIndex;
+	private final int lastIndex;
 	private int index;
 
 	public MongoJournalingDisruptorConsumer(int expectedMessages, Runnable onComplete, MongoCollection<Document> mongoCollection, final int batchSize) {

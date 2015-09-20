@@ -1,5 +1,15 @@
 package com.senacor.hackingdays.lmax.lmax;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
+import org.bson.Document;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
+
+import com.google.common.base.Stopwatch;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
@@ -45,14 +55,17 @@ public class MongoJournalingDisruptorConsumerTest {
 
         final ProfileGenerator profileGenerator = ProfileGenerator.newInstance(sampleSize);
 
-        int sequence = 0;
-//		profileGenerator.stream().map(DisruptorEnvelope::wrap).forEach(envelope -> consumer.onEvent(envelope, sequence, false));
+		int sequence = 0;
+		final Stopwatch stopwatch = Stopwatch.createStarted();
 
         for (final Profile profile : profileGenerator) {
             consumer.onEvent(DisruptorEnvelope.wrap(profile), sequence++, false);
         }
 
-        assertThat(profilesCollection.count(), is((long) sampleSize));
-    }
+		stopwatch.stop();
+		System.out.println(String.format("processed %1$s events in %2$s millis", profilesCollection.count(), stopwatch.elapsed(MILLISECONDS)));
+
+		assertThat(profilesCollection.count(), is((long)sampleSize));
+	}
 
 }
