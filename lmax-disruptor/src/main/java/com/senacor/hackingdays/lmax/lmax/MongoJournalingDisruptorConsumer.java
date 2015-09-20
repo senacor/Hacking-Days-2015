@@ -18,6 +18,8 @@ import com.senacor.hackingdays.lmax.generate.model.Profile;
 
 public class MongoJournalingDisruptorConsumer extends CompletableConsumer implements EventHandler<DisruptorEnvelope>, LifecycleAware {
 
+	public static final String COLLECTION_NAME_PROFILES = "profiles";
+
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	private final MongoCollection<Document> profilesCollection;
 	private final Profile[] buffer;
@@ -53,10 +55,10 @@ public class MongoJournalingDisruptorConsumer extends CompletableConsumer implem
 			profilesCollection.insertMany(range(0, index + 1).mapToObj(i -> toDocument(buffer[i])).collect(toList()));
 		}
 
-		System.out.println("saved " + profilesCollection.count() + " profiles:");
-		for (final Document profile : profilesCollection.find()) {
-			System.out.println(profile);
-		}
+		System.out.println("saved " + profilesCollection.count() + " profiles to mongo journal");
+//		for (final Document profile : profilesCollection.find()) {
+//			System.out.println(profile);
+//		}
 	}
 
 	@Override

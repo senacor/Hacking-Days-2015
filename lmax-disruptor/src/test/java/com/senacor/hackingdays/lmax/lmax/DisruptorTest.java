@@ -12,12 +12,19 @@ import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
+import com.mongodb.MongoClient;
+import com.mongodb.WriteConcern;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
 import com.senacor.hackingdays.lmax.lmax.fraudrule.RuleBasedFraudDetector;
+import com.senacor.hackingdays.lmax.rule.EmbeddedMongoRule;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.bson.Document;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,9 +43,23 @@ public class DisruptorTest {
     public static final int SAMPLE_SIZE = 1_000_000;
 
     @ClassRule
+    public static final EmbeddedMongoRule embeddedMongoRule = new EmbeddedMongoRule("localhost", 65000);
+    private static MongoCollection<Document> profilesCollection;
+
+    @ClassRule
     public static final ResultCollector resultCollector = new ResultCollector();
     public static final int POOL_SIZE = 12;
-    public static final int RING_BUFFER_SIZE = 1024 * 2 * 2;
+    public static final int RING_BUFFER_SIZE = 1024 * 2 * 2 * 2 * 2;
+
+    @BeforeClass
+    public static void setupClass() throws Exception {
+        MongoClient mongoClient = embeddedMongoRule.getClient();
+        mongoClient.setWriteConcern(WriteConcern.UNACKNOWLEDGED);
+
+        MongoDatabase database = mongoClient.getDatabase("MongoJournalingDisruptorConsumerTest");
+        database.createCollection(MongoJournalingDisruptorConsumer.COLLECTION_NAME_PROFILES);
+        profilesCollection = database.getCollection(MongoJournalingDisruptorConsumer.COLLECTION_NAME_PROFILES, Document.class);
+    }
 
     @Test
     @Parameters(method = "disruptorParams")
@@ -91,7 +112,7 @@ public class DisruptorTest {
 
     private CountDownLatch registerConsumers(Disruptor<DisruptorEnvelope> disruptor) {
         // Connect the handler
-        CountDownLatch countDownLatch = new CountDownLatch(7);
+        CountDownLatch countDownLatch = new CountDownLatch(8);
 
         Runnable onComplete = () -> countDownLatch.countDown();
         CompletableConsumer unisexNameConsumer = new UnisexNameConsumer(SAMPLE_SIZE, onComplete);
@@ -101,6 +122,7 @@ public class DisruptorTest {
         CompletableConsumer fraudConsumer = new RuleBasedFraudDetector(SAMPLE_SIZE, onComplete);
         CompletableConsumer homosexualCountingConsumer = new HomosexualCountingConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer matchMakingConsumer = new MatchMakingConsumer(SAMPLE_SIZE, onComplete);
+        CompletableConsumer mongoConsumer = new MongoJournalingDisruptorConsumer(SAMPLE_SIZE, onComplete, profilesCollection, 50_000);
 
         disruptor.handleEventsWith(
                 unisexNameConsumer,
@@ -109,7 +131,8 @@ public class DisruptorTest {
                 fraudConsumer,
                 averageAgeEventHandler,
                 homosexualCountingConsumer,
-                matchMakingConsumer
+                matchMakingConsumer,
+                mongoConsumer
         );
         return countDownLatch;
     }
