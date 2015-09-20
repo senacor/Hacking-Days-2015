@@ -8,8 +8,13 @@ import com.senacor.hackingdays.lmax.lmax.matchmaking.GenderSeekingType;
 import com.senacor.hackingdays.lmax.lmax.matchmaking.Match;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by mhaunolder on 19.09.15.
@@ -19,13 +24,24 @@ public class GenderConsumer extends CompletableConsumer {
     private static final int LIST_SIZE = 100;
 
     private final GenderSeekingType type;
-    private final List<Profile> profileList;
+    private final Collection<Profile> profileList;
+    private static final int MAXIMUM = 10000;
 
     public GenderConsumer(int expectedMessages, Runnable onComplete, GenderSeekingType type) {
         super(expectedMessages, onComplete);
+
         this.type = type;
-        profileList = new ArrayList<>();
         matchList = new ArrayList<>();
+        profileList = mostRecentList();
+    }
+
+    private Set<Profile> mostRecentList() {
+        return Collections.newSetFromMap(new LinkedHashMap<Profile, Boolean>(32, 0.7f, true) {
+            protected boolean removeEldestEntry(
+                    Map.Entry<Profile, Boolean> eldest) {
+                return size() > MAXIMUM;
+            }
+        });
     }
 
     @Override
