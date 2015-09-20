@@ -7,8 +7,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.h2.jdbcx.JdbcConnectionPool;
-import org.h2.jdbcx.JdbcDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 import com.senacor.hackingdays.distributedcache.generate.ProfileGenerator;
 import com.senacor.hackingdays.distributedcache.generate.model.Profile;
@@ -16,13 +15,11 @@ import com.senacor.hackingdays.distributedcache.generate.model.Profile;
 public class DatabaseServerTester {
 
 	private static DataSource createDataSource() {
-		JdbcDataSource dataSource = new JdbcDataSource();
-		 dataSource.setURL("jdbc:h2:tcp://192.168.220.124/~/test");
-//		dataSource.setURL("jdbc:h2:tcp://172.16.13.152/~/test");
-
-		JdbcConnectionPool pool = JdbcConnectionPool.create(dataSource);
-		pool.setMaxConnections(10);
-		return pool;
+		BasicDataSource dataSource = new BasicDataSource();
+		dataSource.setDriverClassName("org.h2.Driver");
+		dataSource.setUrl(com.senacor.hackingdays.distributedcache.ProfileMapStore.DEFAULT_DB_URL);
+		dataSource.setInitialSize(10);
+		return dataSource;
 	}
 
 	public static void main(String[] args) throws SQLException {
@@ -35,7 +32,7 @@ public class DatabaseServerTester {
 //			System.out.println(mapper.getAllProfiles());
 //			System.out.println(mapper.getAllIds().size());
 
-			PreparedStatement statement = connection.prepareStatement("select * from profilemap");
+			PreparedStatement statement = connection.prepareStatement("select count(*) from profilemap");
 			// statement.execute();
 			ResultSet rs = statement.executeQuery();
 			int i = 0;
