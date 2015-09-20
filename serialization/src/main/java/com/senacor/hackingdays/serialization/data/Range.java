@@ -15,7 +15,7 @@ public class Range implements Serializable, UnsafeSerializable, SizeAware {
     private static final long serialVersionUID = 1;
 
     public static final int MAX_AGE = 75;
-    public static final int MIN_AGE = 21;
+    public static final int MIN_AGE = 16;
 
     private final int lower;
     private final int upper;
