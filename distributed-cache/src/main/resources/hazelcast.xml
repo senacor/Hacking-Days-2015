@@ -148,7 +148,7 @@
     <min-eviction-check-millis>100</min-eviction-check-millis>
     <merge-policy>com.hazelcast.map.merge.LatestUpdateMapMergePolicy</merge-policy>
     <map-store enabled="true">
-      <factory-class-name>com.senacor.hackingdays.distributedcache.ProfileMapStore</factory-class-name>
+      <factory-class-name>com.senacor.hackingdays.distributedcache.ProfileMapStoreFactory</factory-class-name>
     </map-store>
   </map>
 
@@ -162,7 +162,7 @@
         <min-eviction-check-millis>100</min-eviction-check-millis>
         <merge-policy>com.hazelcast.map.merge.LatestUpdateMapMergePolicy</merge-policy>
         <map-store enabled="true">
-            <factory-class-name>com.senacor.hackingdays.distributedcache.ProfileMapStore</factory-class-name>
+            <factory-class-name>com.senacor.hackingdays.distributedcache.ProfileMapStoreFactory</factory-class-name>
         </map-store>
     </map>
 
