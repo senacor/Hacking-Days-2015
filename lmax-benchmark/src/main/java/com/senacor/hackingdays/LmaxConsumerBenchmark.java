@@ -32,10 +32,30 @@ import com.senacor.hackingdays.lmax.lmax.CompletableConsumer;
 import com.senacor.hackingdays.lmax.lmax.CreepyOldMenConsumer;
 import com.senacor.hackingdays.lmax.lmax.DisruptorEnvelope;
 import com.senacor.hackingdays.lmax.lmax.HomosexualCountingConsumer;
+import com.senacor.hackingdays.lmax.lmax.KeepInRamConsumer;
 import com.senacor.hackingdays.lmax.lmax.LoggedInTodayConsumer;
 import com.senacor.hackingdays.lmax.lmax.MatchMakingConsumer;
 import com.senacor.hackingdays.lmax.lmax.UnisexNameConsumer;
 import com.senacor.hackingdays.lmax.lmax.fraudrule.RuleBasedFraudDetector;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.infra.Blackhole;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Warmup(iterations = 2, time = 10, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 5, time = 15, timeUnit = TimeUnit.SECONDS)
@@ -117,7 +137,7 @@ public class LmaxConsumerBenchmark {
     @SuppressWarnings("unchecked")
     private CountDownLatch registerConsumers(Disruptor<DisruptorEnvelope> disruptor) {
       // Connect the handler
-      CountDownLatch countDownLatch = new CountDownLatch(7);
+      CountDownLatch countDownLatch = new CountDownLatch(8);
 
       Runnable onComplete = () -> countDownLatch.countDown();
       CompletableConsumer unisexNameConsumer = new UnisexNameConsumer(SAMPLE_SIZE, onComplete);
@@ -127,6 +147,7 @@ public class LmaxConsumerBenchmark {
       CompletableConsumer fraudConsumer = new RuleBasedFraudDetector(SAMPLE_SIZE, onComplete);
       CompletableConsumer homosexualCountingConsumer = new HomosexualCountingConsumer(SAMPLE_SIZE, onComplete);
       CompletableConsumer matchMakingConsumer = new MatchMakingConsumer(SAMPLE_SIZE, onComplete);
+      CompletableConsumer keepInRamConsumer = new KeepInRamConsumer(SAMPLE_SIZE, onComplete);
 
       disruptor.handleEventsWith(
           unisexNameConsumer,
@@ -135,7 +156,8 @@ public class LmaxConsumerBenchmark {
           fraudConsumer,
           averageAgeEventHandler,
           homosexualCountingConsumer,
-          matchMakingConsumer);
+          matchMakingConsumer,
+          keepInRamConsumer);
       return countDownLatch;
     }
 
