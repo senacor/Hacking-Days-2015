@@ -22,8 +22,6 @@ import com.senacor.hackingdays.lmax.rule.EmbeddedMongoRule;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.bson.Document;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -112,7 +110,7 @@ public class DisruptorTest {
 
     private CountDownLatch registerConsumers(Disruptor<DisruptorEnvelope> disruptor) {
         // Connect the handler
-        CountDownLatch countDownLatch = new CountDownLatch(8);
+        CountDownLatch countDownLatch = new CountDownLatch(9);
 
         Runnable onComplete = () -> countDownLatch.countDown();
         CompletableConsumer unisexNameConsumer = new UnisexNameConsumer(SAMPLE_SIZE, onComplete);
@@ -123,6 +121,7 @@ public class DisruptorTest {
         CompletableConsumer homosexualCountingConsumer = new HomosexualCountingConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer matchMakingConsumer = new MatchMakingConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer mongoConsumer = new MongoJournalingDisruptorConsumer(SAMPLE_SIZE, onComplete, profilesCollection, 50_000);
+        CompletableConsumer keepInRamConsumer = new KeepInRamConsumer(SAMPLE_SIZE, onComplete);
 
         disruptor.handleEventsWith(
                 unisexNameConsumer,
@@ -132,7 +131,8 @@ public class DisruptorTest {
                 averageAgeEventHandler,
                 homosexualCountingConsumer,
                 matchMakingConsumer,
-                mongoConsumer
+                mongoConsumer,
+                keepInRamConsumer
         );
         return countDownLatch;
     }

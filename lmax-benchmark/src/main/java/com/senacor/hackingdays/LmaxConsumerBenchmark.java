@@ -17,6 +17,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
@@ -37,16 +38,14 @@ import com.senacor.hackingdays.lmax.lmax.UnisexNameConsumer;
 import com.senacor.hackingdays.lmax.lmax.fraudrule.RuleBasedFraudDetector;
 
 @Warmup(iterations = 2, time = 10, timeUnit = TimeUnit.SECONDS)
-@Measurement(iterations = 5, time = 10, timeUnit = TimeUnit.SECONDS)
-@Fork(3)
+@Measurement(iterations = 5, time = 15, timeUnit = TimeUnit.SECONDS)
+@Fork(2)
+@Threads(1)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class LmaxConsumerBenchmark {
 
   public static final int POOL_SIZE = 12;
-  public static final int RING_BUFFER_SIZE = 1024 * 2 * 2;
-  public static final int SAMPLE_SIZE = 500_00; // ;1_000_000;
-
 
   @State(Scope.Benchmark)
   public static class TestState {
@@ -58,17 +57,25 @@ public class LmaxConsumerBenchmark {
 
     Disruptor<DisruptorEnvelope> disruptor;
 
-    @Param({ "com.lmax.disruptor.BlockingWaitStrategy",
+    @Param({
+        // "com.lmax.disruptor.BlockingWaitStrategy",
         "com.lmax.disruptor.YieldingWaitStrategy"
         // ,"com.lmax.disruptor.BusySpinWaitStrategy"
-        // ,"com.lmax.disruptor.SleepingWaitStrategy"
+        , "com.lmax.disruptor.SleepingWaitStrategy"
     })
     private String disruptorWaitStratConfig;
 
-    @Param
-    private ProducerType producerType;
+    @Param({ "500000" })
+    public int SAMPLE_SIZE;
+
+    @Param({ "2048", "1024" })
+    public int RING_BUFFER_SIZE;
+
+    private ProducerType producerType = ProducerType.SINGLE;
 
     public TestState() {
+      executor = Executors.newCachedThreadPool();
+      stopwatch = Stopwatch.createUnstarted();
     }
 
     private ProfileGenerator setupGenerator() {
@@ -76,36 +83,38 @@ public class LmaxConsumerBenchmark {
 
     }
 
-    @Setup(Level.Iteration)
+    @Setup(Level.Invocation)
     public void foo() throws Exception {
-      executor = Executors.newFixedThreadPool(POOL_SIZE);
-
       System.out.println("--- instantiate " + disruptorWaitStratConfig);
       WaitStrategy waitStrategy = (WaitStrategy) Class.forName(disruptorWaitStratConfig).newInstance();
 
       disruptor = new Disruptor<>(DisruptorEnvelope::new, RING_BUFFER_SIZE, executor,
           producerType, waitStrategy);
       countDownLatch = registerConsumers(disruptor);
-
       // Start the Disruptor, starts all threads running
       disruptor.start();
 
       generator = setupGenerator();
 
-      stopwatch = Stopwatch.createUnstarted();
+      stopwatch.reset();
       stopwatch.start();
     }
 
-    @TearDown(Level.Iteration)
+    @TearDown(Level.Invocation)
     public void tearDown() {
       stopwatch.stop();
       disruptor.shutdown();
 
-      executor.shutdown();
-
-      System.out.println("--- execution took " + stopwatch.toString());
+      System.out.println(
+          "--- processing took " + stopwatch);
     }
 
+    @TearDown(Level.Trial)
+    public void shutdownThreadPool() {
+      executor.shutdown();
+    }
+
+    @SuppressWarnings("unchecked")
     private CountDownLatch registerConsumers(Disruptor<DisruptorEnvelope> disruptor) {
       // Connect the handler
       CountDownLatch countDownLatch = new CountDownLatch(7);
@@ -143,6 +152,7 @@ public class LmaxConsumerBenchmark {
 
     // wait for termination
     state.countDownLatch.await();
+
   }
 
 }
