@@ -43,11 +43,7 @@ public class ProfileMapStore implements MapStore<String, Profile>, Closeable {
 
     @Override
     public void store(String key, Profile value) {
-        if (mapper.getProfileById(UUID.fromString(key)) == null) {
-            mapper.insertProfile(value);
-        } else {
-            mapper.updateProfile(value);
-        }
+            mapper.mergeProfile(value);
     }
 
     @Override

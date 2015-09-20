@@ -22,7 +22,7 @@ import com.senacor.hackingdays.distributedcache.generate.model.Profile;
 
 public class ProfileMapperTest {
 
-private DataSource dataSource;
+	private DataSource dataSource;
 	private ProfileMapper profileMapper;
 
 	private static DataSource createDataSource() {
@@ -108,7 +108,7 @@ private DataSource dataSource;
 		profile.setAge(profile.getAge() + 10);
 		assertThat(profile, is(not(equalTo(reloadedProfile))));
 
-		profileMapper.updateProfile(profile);
+		profileMapper.mergeProfile(profile);
 		reloadedProfile = profileMapper.getProfileById(profile.getId());
 		assertThat(reloadedProfile, is(equalTo(profile)));
 		assertThat(profileMapper.getAllProfiles().size(), is(equalTo(1)));

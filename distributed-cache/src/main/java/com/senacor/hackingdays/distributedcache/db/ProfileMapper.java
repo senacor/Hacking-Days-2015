@@ -27,7 +27,7 @@ import com.senacor.hackingdays.distributedcache.generate.model.Seeking;
 public class ProfileMapper {
 
 	private final DataSource dataSource;
-//	private final Connection connection;
+	// private final Connection connection;
 	private final String tableName;
 
 	public ProfileMapper(DataSource dataSource) {
@@ -35,10 +35,11 @@ public class ProfileMapper {
 	}
 
 	public ProfileMapper(DataSource dataSource, String tableName) {
-		this.dataSource=dataSource;
+		this.dataSource = dataSource;
 		this.tableName = tableName;
 		initializeSchema(dataSource, tableName);
 	}
+
 	private static String getResourceAsString(final String resourceName) {
 		InputStream inputStream = null;
 		try {
@@ -52,7 +53,7 @@ public class ProfileMapper {
 			IOUtils.closeQuietly(inputStream);
 		}
 	}
-	
+
 	private static void initializeSchema(DataSource dataSource, String tableName) {
 		final String resource = "db/initializeprofiletable.sql";
 		try (Connection connection = dataSource.getConnection()) {
@@ -102,13 +103,20 @@ public class ProfileMapper {
 	private String createSelectAllUUIDsStatement() {
 		return "select uuid from " + tableName;
 	}
-	
+
 	private String createSelectByIdStatement() {
 		return "select * from " + tableName + " where uuid = ?";
 	}
 
 	private String createInsertStatement() {
 		return "insert into " //
+				+ this.tableName //
+				+ "(uuid, name, gender, age, location_state, location_city, location_zip, relationship, smoker, seeking_gender, seeking_age_min, seeking_age_max, activity_logincount, activity_lastlogin) "
+				+ "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	}
+
+	private String createMergeStatement() {
+		return "merge into " //
 				+ this.tableName //
 				+ "(uuid, name, gender, age, location_state, location_city, location_zip, relationship, smoker, seeking_gender, seeking_age_min, seeking_age_max, activity_logincount, activity_lastlogin) "
 				+ "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -150,7 +158,8 @@ public class ProfileMapper {
 	}
 
 	public List<Profile> getAllProfiles() {
-		try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(createSelectAllStatement())) {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(createSelectAllStatement())) {
 			ResultSet resultset = statement.executeQuery();
 			List<Profile> result = new ArrayList<>();
 			while (resultset.next()) {
@@ -163,7 +172,8 @@ public class ProfileMapper {
 	}
 
 	public List<UUID> getAllIds() {
-		try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(createSelectAllUUIDsStatement())) {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(createSelectAllUUIDsStatement())) {
 			ResultSet resultset = statement.executeQuery();
 			List<UUID> result = new ArrayList<>();
 			while (resultset.next()) {
@@ -176,8 +186,8 @@ public class ProfileMapper {
 	}
 
 	public Profile getProfileById(UUID id) {
-		try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection
-				.prepareStatement(createSelectByIdStatement())) {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(createSelectByIdStatement())) {
 			statement.setString(1, id.toString());
 			ResultSet resultset = statement.executeQuery();
 			if (resultset.next()) {
@@ -190,7 +200,8 @@ public class ProfileMapper {
 	}
 
 	public boolean insertProfile(Profile profile) {
-		try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(createInsertStatement())) {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(createInsertStatement())) {
 			mapProfileToStatement(statement, profile);
 			return statement.execute();
 
@@ -200,8 +211,9 @@ public class ProfileMapper {
 
 	}
 
-	public boolean updateProfile(Profile profile) {
-		try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(createUpdateStatement())) {
+	public boolean mergeProfile(Profile profile) {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(createMergeStatement())) {
 			mapProfileToStatement(statement, profile);
 			return statement.executeUpdate() == 1;
 
@@ -211,7 +223,8 @@ public class ProfileMapper {
 	}
 
 	public boolean deleteProfile(UUID id) {
-		try (Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(createDeleteStatement())) {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(createDeleteStatement())) {
 			statement.setString(1, id.toString());
 			return statement.executeUpdate() == 1;
 
