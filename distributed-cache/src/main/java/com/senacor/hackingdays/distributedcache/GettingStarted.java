@@ -23,7 +23,7 @@ public class GettingStarted {
         IMap<String, Profile> profileMap = hazelcastInstance.getMap("profileMap");
         System.out.println("Profile Map Size:" + profileMap.size());
 
-        ProfileGenerator.newInstance(50000).stream().forEach(profile -> profileMap.put(profile.getId().toString(), profile));
+   //     ProfileGenerator.newInstance(50000).stream().forEach(profile -> profileMap.put(profile.getId().toString(), profile));
         System.out.println("Profile Map Size:" + profileMap.size());
 
         for (IMap.Entry<String, Profile> profileEntry : profileMap.entrySet()) {
