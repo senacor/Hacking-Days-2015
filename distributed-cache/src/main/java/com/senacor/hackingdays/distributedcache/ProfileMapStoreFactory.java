@@ -1,4 +1,4 @@
-package com.senacor.hackingdays.distributedcache.db;
+package com.senacor.hackingdays.distributedcache;
 
 import com.hazelcast.core.MapLoader;
 import com.hazelcast.core.MapStoreFactory;
@@ -13,7 +13,7 @@ import java.util.Properties;
  *
  * @author andre.goliath@senacor.com
  */
-public class ProfileMapperFactory implements MapStoreFactory<String,Profile> {
+public class ProfileMapStoreFactory implements MapStoreFactory<String,Profile> {
     @Override
     public MapLoader<String, Profile> newMapStore(String mapname, Properties properties) {
         return new ProfileMapStore(mapname,"jdbc:h2:tcp://192.168.220.124/~/test");
