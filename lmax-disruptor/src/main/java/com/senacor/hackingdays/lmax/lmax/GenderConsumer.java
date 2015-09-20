@@ -76,8 +76,6 @@ public class GenderConsumer extends CompletableConsumer {
                         continue;
                     }
 
-<<<<<<< HEAD
-=======
                     /*System.out.println("    Age MATCH:" +
                             " C: " + currentProfile.getAge()+ " seeking" + currentProfile.getSeeking().getAgeRange().toString() +
                             " P: " + matchingProfile.getAge()+ " seeking" + matchingProfile.getSeeking().getAgeRange().toString());
@@ -87,7 +85,6 @@ public class GenderConsumer extends CompletableConsumer {
 //                            + " C: " + currentProfile.getGender() + " seeking " + currentProfile.getSeeking().getGender() +
 //                            " P: " + matchingProfile.getGender() + " seeking " + matchingProfile.getSeeking().getGender() + " END MATCH");
 
->>>>>>> 23151705c8ed6c8effd15a2e36ac15f521592ce1
                     match = true;
                     Match matchPairs = new Match(currentProfile, matchingProfile);
                     if (!matchList.contains(matchPairs)) {
