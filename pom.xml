@@ -17,7 +17,8 @@
 		<module>serialization-benchmark</module>
 		<module>parallel-generator</module>
 		<!-- <module>multithreaded-producer</module> -->
-	</modules>
+    <module>lmax-benchmark</module>
+  </modules>
 
 	<repositories>
 		<repository>

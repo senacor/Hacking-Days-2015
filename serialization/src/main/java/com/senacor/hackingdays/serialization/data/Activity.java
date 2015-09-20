@@ -1,6 +1,7 @@
 package com.senacor.hackingdays.serialization.data;
 
 import com.senacor.hackingdays.serialization.data.unsafe.BufferTooSmallException;
+import com.senacor.hackingdays.serialization.data.unsafe.SizeAware;
 import com.senacor.hackingdays.serialization.data.unsafe.UnsafeMemory;
 import com.senacor.hackingdays.serialization.data.unsafe.UnsafeSerializable;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -8,7 +9,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.io.Serializable;
 import java.util.Date;
 
-public class Activity implements Serializable, UnsafeSerializable {
+public class Activity implements Serializable, UnsafeSerializable, SizeAware {
 
     private static final long serialVersionUID = 1;
 
@@ -53,5 +54,18 @@ public class Activity implements Serializable, UnsafeSerializable {
     final Date lastLogin = new Date(lastLoginUnixTime);
     final int loginCount = memory.getInt();
     return new Activity(lastLogin, loginCount);
+  }
+
+  @Override
+  public long getDeepSize() {
+    final long activityShallowSize = getShallowSize();
+    final long activityLastLoginSize = UnsafeMemory.sizeOf(lastLogin);
+    // loginCount is native int, already accounted for
+    return activityShallowSize + activityLastLoginSize;
+  }
+
+  @Override
+  public long getShallowSize() {
+    return UnsafeMemory.sizeOf(this);
   }
 }

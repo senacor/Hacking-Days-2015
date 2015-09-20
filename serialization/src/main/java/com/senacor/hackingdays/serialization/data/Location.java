@@ -1,13 +1,14 @@
 package com.senacor.hackingdays.serialization.data;
 
 import com.senacor.hackingdays.serialization.data.unsafe.BufferTooSmallException;
+import com.senacor.hackingdays.serialization.data.unsafe.SizeAware;
 import com.senacor.hackingdays.serialization.data.unsafe.UnsafeMemory;
 import com.senacor.hackingdays.serialization.data.unsafe.UnsafeSerializable;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.io.Serializable;
 
-public class Location implements Serializable, UnsafeSerializable {
+public class Location implements Serializable, UnsafeSerializable, SizeAware {
 
     private static final long serialVersionUID = 1;
 
@@ -57,5 +58,19 @@ public class Location implements Serializable, UnsafeSerializable {
     final String city = new String(memory.getByteArray());
     final String zip = new String(memory.getByteArray());
     return new Location(state, city, zip);
+  }
+
+  @Override
+  public long getDeepSize() {
+    final long locationShallowSize = getShallowSize();
+    final long locationStateSize = UnsafeMemory.sizeOf(state);
+    final long locationCitySize = UnsafeMemory.sizeOf(city);
+    final long locationZipSize = UnsafeMemory.sizeOf(zip);
+    return locationShallowSize + locationStateSize + locationCitySize + locationZipSize;
+  }
+
+  @Override
+  public long getShallowSize() {
+    return UnsafeMemory.sizeOf(this);
   }
 }

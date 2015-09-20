@@ -5,101 +5,117 @@ import com.senacor.hackingdays.serialization.data.Gender;
 import com.senacor.hackingdays.serialization.data.Location;
 import com.senacor.hackingdays.serialization.data.RelationShipStatus;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import sun.misc.Unsafe;
+
+import java.lang.reflect.Field;
+
+import static org.junit.Assert.assertEquals;
 
 public class ProfileGeneratorTest {
 
+  private static final Unsafe unsafe;
 
-    @Test
-    public void thatProfilesAreGenerated() {
-        ProfileGenerator generator = ProfileGenerator.newInstance(100);
-        generator.stream().forEach(System.out::println);
+  static {
+    try {
+      Field field = Unsafe.class.getDeclaredField("theUnsafe");
+      field.setAccessible(true);
+      unsafe = (Unsafe) field.get(null);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Test
-    public void testCompactedProfile() {
-        String name = "Bibi Blocksberg";
-        String state = "BY";
-        String zip = "90410";
-        String city = "Nuernberg";
 
-        CompactedProfile cp = new CompactedProfile(name, new Location(state, city, zip));
-        assertEquals(name, cp.getName());
-        assertEquals(state, cp.getCompactedLocation().getState());
-        assertEquals(zip, cp.getCompactedLocation().getZip());
-        assertEquals(city, cp.getCompactedLocation().getCity());
+  @Test
+  public void thatProfilesAreGenerated() {
+    ProfileGenerator generator = ProfileGenerator.newInstance(100);
+    generator.stream().forEach(System.out::println);
+  }
 
-        Gender gender = Gender.Disambiguous;
-        cp.setGender(gender);
-        assertEquals(gender, cp.getGender());
+  @Test
+  public void testCompactedProfile() {
+    String name = "Bibi Blocksberg";
+    String state = "BY";
+    String zip = "90410";
+    String city = "Nuernberg";
 
-        gender = Gender.Female;
-        cp.setGender(gender);
-        assertEquals(gender, cp.getGender());
+    CompactedProfile cp = new CompactedProfile(name, new Location(state, city, zip));
+    assertEquals(name, cp.getName());
+    assertEquals(state, cp.getCompactedLocation().getState());
+    assertEquals(zip, cp.getCompactedLocation().getZip());
+    assertEquals(city, cp.getCompactedLocation().getCity());
 
-        gender = Gender.Male;
-        cp.setGender(gender);
-        assertEquals(gender, cp.getGender());
+    Gender gender = Gender.Disambiguous;
+    cp.setGender(gender);
+    assertEquals(gender, cp.getGender());
 
-        RelationShipStatus rss = RelationShipStatus.Single;
-        cp.setRelationShipStatus(rss);
-        assertEquals(rss, cp.getRelationShipStatus());
+    gender = Gender.Female;
+    cp.setGender(gender);
+    assertEquals(gender, cp.getGender());
 
-        rss = RelationShipStatus.Maried;
-        cp.setRelationShipStatus(rss);
-        assertEquals(rss, cp.getRelationShipStatus());
+    gender = Gender.Male;
+    cp.setGender(gender);
+    assertEquals(gender, cp.getGender());
 
-        rss = RelationShipStatus.Divorced;
-        cp.setRelationShipStatus(rss);
-        assertEquals(rss, cp.getRelationShipStatus());
+    RelationShipStatus rss = RelationShipStatus.Single;
+    cp.setRelationShipStatus(rss);
+    assertEquals(rss, cp.getRelationShipStatus());
 
-        boolean smoker = false;
-        cp.setSmoker(smoker);
-        assertEquals(smoker, cp.isSmoker());
+    rss = RelationShipStatus.Maried;
+    cp.setRelationShipStatus(rss);
+    assertEquals(rss, cp.getRelationShipStatus());
 
-        smoker = true;
-        cp.setSmoker(smoker);
-        assertEquals(smoker, cp.isSmoker());
+    rss = RelationShipStatus.Divorced;
+    cp.setRelationShipStatus(rss);
+    assertEquals(rss, cp.getRelationShipStatus());
 
-        int age = 34;
-        cp.setAge(age);
-        assertEquals(age, cp.getAge());
+    boolean smoker = false;
+    cp.setSmoker(smoker);
+    assertEquals(smoker, cp.isSmoker());
 
-        // Seeking
+    smoker = true;
+    cp.setSmoker(smoker);
+    assertEquals(smoker, cp.isSmoker());
 
-        gender = Gender.Disambiguous;
-        cp.getCompactedSeeking().setGender(gender);
-        assertEquals(gender, cp.getCompactedSeeking().getGender());
+    int age = 34;
+    cp.setAge(age);
+    assertEquals(age, cp.getAge());
 
-        gender = Gender.Female;
-        cp.getCompactedSeeking().setGender(gender);
-        assertEquals(gender, cp.getCompactedSeeking().getGender());
+    // Seeking
 
-        gender = Gender.Male;
-        cp.getCompactedSeeking().setGender(gender);
-        assertEquals(gender, cp.getCompactedSeeking().getGender());
+    gender = Gender.Disambiguous;
+    cp.getCompactedSeeking().setGender(gender);
+    assertEquals(gender, cp.getCompactedSeeking().getGender());
 
-        age = 27;
-        cp.getCompactedSeeking().getCompactedRange().setLower(age);
-        assertEquals(age, cp.getCompactedSeeking().getCompactedRange().getLower());
-        age = 64;
-        cp.getCompactedSeeking().getCompactedRange().setUpper(age);
-        assertEquals(age, cp.getCompactedSeeking().getCompactedRange().getUpper());
+    gender = Gender.Female;
+    cp.getCompactedSeeking().setGender(gender);
+    assertEquals(gender, cp.getCompactedSeeking().getGender());
 
-        // Activity
+    gender = Gender.Male;
+    cp.getCompactedSeeking().setGender(gender);
+    assertEquals(gender, cp.getCompactedSeeking().getGender());
 
-        int loginCount = 2;
-        cp.getCompactedActivity().setLoginCount(loginCount);
-        assertEquals(loginCount, cp.getCompactedActivity().getLoginCount());
+    age = 27;
+    cp.getCompactedSeeking().getCompactedRange().setLower(age);
+    assertEquals(age, cp.getCompactedSeeking().getCompactedRange().getLower());
+    age = 64;
+    cp.getCompactedSeeking().getCompactedRange().setUpper(age);
+    assertEquals(age, cp.getCompactedSeeking().getCompactedRange().getUpper());
 
-        loginCount = 7;
-        cp.getCompactedActivity().setLoginCount(loginCount);
-        assertEquals(loginCount, cp.getCompactedActivity().getLoginCount());
+    // Activity
 
-        loginCount = 9;
-        cp.getCompactedActivity().setLoginCount(loginCount);
-        assertEquals(loginCount, cp.getCompactedActivity().getLoginCount());
+    int loginCount = 2;
+    cp.getCompactedActivity().setLoginCount(loginCount);
+    assertEquals(loginCount, cp.getCompactedActivity().getLoginCount());
 
-    }
+    loginCount = 7;
+    cp.getCompactedActivity().setLoginCount(loginCount);
+    assertEquals(loginCount, cp.getCompactedActivity().getLoginCount());
+
+    loginCount = 9;
+    cp.getCompactedActivity().setLoginCount(loginCount);
+    assertEquals(loginCount, cp.getCompactedActivity().getLoginCount());
+
+  }
 
 }
