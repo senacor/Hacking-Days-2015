@@ -188,7 +188,7 @@
     <portable-version>0</portable-version>
     <serializers>
       <serializer type-class="com.senacor.hackingdays.distributedcache.generate.model.Profile" class-name="com.senacor.hackingdays.distributedcache.serializer.KryoProfileStreamSerializer" />
-      <serializer type-class="com.senacor.hackingdays.distributedcache.generate.model2.Profile2" class-name="akka.serialization.JavaSerializer" />
+      <!--serializer type-class="com.senacor.hackingdays.distributedcache.generate.model2.Profile2" class-name="akka.serialization.JavaSerializer" /-->
     </serializers>
   </serialization>
 
