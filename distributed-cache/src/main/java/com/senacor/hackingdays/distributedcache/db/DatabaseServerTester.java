@@ -17,8 +17,8 @@ public class DatabaseServerTester {
 
 	private static DataSource createDataSource() {
 		JdbcDataSource dataSource = new JdbcDataSource();
-		// dataSource.setURL("jdbc:h2:tcp://192.168.220.124/~/test");
-		dataSource.setURL("jdbc:h2:tcp://172.16.13.152/~/test");
+		 dataSource.setURL("jdbc:h2:tcp://192.168.220.124/~/test");
+//		dataSource.setURL("jdbc:h2:tcp://172.16.13.152/~/test");
 
 		JdbcConnectionPool pool = JdbcConnectionPool.create(dataSource);
 		pool.setMaxConnections(10);

@@ -24,8 +24,8 @@ import com.senacor.hackingdays.distributedcache.generate.model.Profile;
 public class ProfileMapStore implements MapStore<String, Profile>, Closeable {
 
     private static final String DEFAULT_MAP_ID = "profile";
-//    private static final String DEFAULT_DB_URL = "jdbc:h2:tcp://192.168.220.124/~/test";
-    private static final String DEFAULT_DB_URL = "jdbc:h2:tcp://172.16.13.152/~/test";
+    private static final String DEFAULT_DB_URL = "jdbc:h2:tcp://192.168.220.124/~/test";
+//    private static final String DEFAULT_DB_URL = "jdbc:h2:tcp://172.16.13.152/~/test";
     public static final String PROPERTY_FILE = "maps.properties.xml";
 
     private final String mapId;
