@@ -26,7 +26,7 @@ public class ProfileMapStoreTest {
         Profile inputProfile = createProfile("Hans Wurst", Gender.Male);
 
         Profile loadedProfile;
-        try (ProfileMapStore mapStore = new ProfileMapStore()) {
+        try (   ProfileMapStore mapStore = new ProfileMapStore( ) ) {
             mapStore.store(inputProfile.getId().toString(), inputProfile);
 
             loadedProfile = mapStore.load(inputProfile.getId().toString());
