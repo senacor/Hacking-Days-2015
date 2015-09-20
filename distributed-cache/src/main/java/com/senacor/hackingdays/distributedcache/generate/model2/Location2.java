@@ -42,7 +42,7 @@ public class Location2 implements Serializable {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final Location other = (Location) obj;
+        final Location2 other = (Location2) obj;
         return Objects.equals(this.state, other.state)
                 && Objects.equals(this.city, other.city)
                 && Objects.equals(this.zip, other.zip);
