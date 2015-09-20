@@ -4,6 +4,7 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.senacor.hackingdays.distributedcache.generate.model.Profile;
+import com.senacor.hackingdays.distributedcache.generate.model2.Profile2;
 
 public class GettingStarted {
     public static void main(String[] args) {
@@ -24,6 +25,9 @@ public class GettingStarted {
 
         IMap<String, Profile> kryoMap = hazelcastInstance.getMap("kryoMap");
         System.out.println("Kryo Map Size:" + kryoMap.size());
+
+        IMap<String, Profile2> profile2Map = hazelcastInstance.getMap("profile2Map");
+        System.out.println("Profile 2 Map Size:" + profile2Map.size());
 
         // ProfileGenerator.newInstance(50000).stream().forEach(profile -> profileMap.put(profile.getId().toString(), profile));
         // System.out.println("Profile Map Size:" + profileMap.size());

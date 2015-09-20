@@ -152,28 +152,40 @@
     </map-store>
   </map>
 
+  <map name="profileMap">
+    <in-memory-format>BINARY</in-memory-format>
+    <backup-count>1</backup-count>
+    <async-backup-count>2</async-backup-count>
+    <eviction-policy>LFU</eviction-policy>
+    <eviction-percentage>25</eviction-percentage>
+    <min-eviction-check-millis>100</min-eviction-check-millis>
+    <merge-policy>com.hazelcast.map.merge.LatestUpdateMapMergePolicy</merge-policy>
+    <map-store enabled="true">
+      <factory-class-name>com.senacor.hackingdays.distributedcache.ProfileMapStoreFactory</factory-class-name>
+    </map-store>
+  </map>
 
-    <map name="profileMap">
-        <in-memory-format>BINARY</in-memory-format>
-        <backup-count>1</backup-count>
-        <async-backup-count>2</async-backup-count>
-        <eviction-policy>LFU</eviction-policy>
-        <eviction-percentage>25</eviction-percentage>
-        <min-eviction-check-millis>100</min-eviction-check-millis>
-        <merge-policy>com.hazelcast.map.merge.LatestUpdateMapMergePolicy</merge-policy>
-        <map-store enabled="true">
-            <factory-class-name>com.senacor.hackingdays.distributedcache.ProfileMapStoreFactory</factory-class-name>
-        </map-store>
-    </map>
+  <map name="profile2Map">
+    <in-memory-format>BINARY</in-memory-format>
+    <backup-count>1</backup-count>
+    <async-backup-count>2</async-backup-count>
+    <eviction-policy>LFU</eviction-policy>
+    <eviction-percentage>25</eviction-percentage>
+    <min-eviction-check-millis>100</min-eviction-check-millis>
+    <merge-policy>com.hazelcast.map.merge.LatestUpdateMapMergePolicy</merge-policy>
+    <map-store enabled="true">
+      <factory-class-name>com.senacor.hackingdays.distributedcache.Profile2MapStoreFactory</factory-class-name>
+    </map-store>
+  </map>
 
+  <serialization>
+    <portable-version>0</portable-version>
+    <serializers>
+      <serializer type-class="com.senacor.hackingdays.distributedcache.generate.model.Profile" class-name="com.senacor.hackingdays.distributedcache.serializer.KryoProfileStreamSerializer" />
+      <serializer type-class="com.senacor.hackingdays.distributedcache.generate.model2.Profile2" class-name="akka.serialization.JavaSerializer" />
+    </serializers>
+  </serialization>
 
-    <serialization>
-        <portable-version>0</portable-version>
-        <serializers>
-            <serializer type-class="com.senacor.hackingdays.distributedcache.generate.model.Profile" class-name="com.senacor.hackingdays.distributedcache.serializer.KryoProfileStreamSerializer" />
-        </serializers>
-    </serialization>
-
-    <services enable-defaults="true"/>
+  <services enable-defaults="true"/>
 
 </hazelcast>
