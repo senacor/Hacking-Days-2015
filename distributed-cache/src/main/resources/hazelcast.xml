@@ -149,6 +149,8 @@
     <merge-policy>com.hazelcast.map.merge.LatestUpdateMapMergePolicy</merge-policy>
     <map-store enabled="true">
       <factory-class-name>com.senacor.hackingdays.distributedcache.ProfileMapStoreFactory</factory-class-name>
+      <write-delay-seconds>5</write-delay-seconds>
+      <write-batch-size>100</write-batch-size>
     </map-store>
   </map>
 
@@ -162,6 +164,8 @@
     <merge-policy>com.hazelcast.map.merge.LatestUpdateMapMergePolicy</merge-policy>
     <map-store enabled="true">
       <factory-class-name>com.senacor.hackingdays.distributedcache.ProfileMapStoreFactory</factory-class-name>
+      <write-delay-seconds>5</write-delay-seconds>
+      <write-batch-size>100</write-batch-size>
     </map-store>
   </map>
 
@@ -175,6 +179,8 @@
     <merge-policy>com.hazelcast.map.merge.LatestUpdateMapMergePolicy</merge-policy>
     <map-store enabled="true">
       <factory-class-name>com.senacor.hackingdays.distributedcache.Profile2MapStoreFactory</factory-class-name>
+      <write-delay-seconds>5</write-delay-seconds>
+      <write-batch-size>100</write-batch-size>
     </map-store>
   </map>
 
