@@ -25,7 +25,7 @@ public class DefaultSeekingSupplier implements SeekingSupplier {
         Gender seekingGender = null;
         if (gender.equals(Gender.Male)) {
             seekingGender = rnd.nextInt(10) % GAY_RATIO == 0 ? Gender.Female : Gender.Male;
-        } else if(gender.equals(Gender.Male)) {
+        } else if(gender.equals(Gender.Female)) {
             seekingGender = rnd.nextInt(10) % GAY_RATIO == 0 ? Gender.Male : Gender.Female;
         } else {
             genderSupplier.get();

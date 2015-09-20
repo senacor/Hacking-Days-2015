@@ -16,8 +16,6 @@ import com.senacor.hackingdays.lmax.generate.ProfileGenerator;
 import com.senacor.hackingdays.lmax.lmax.fraudrule.RuleBasedFraudDetector;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -91,7 +89,7 @@ public class DisruptorTest {
 
     private CountDownLatch registerConsumers(Disruptor<DisruptorEnvelope> disruptor) {
         // Connect the handler
-        CountDownLatch countDownLatch = new CountDownLatch(7);
+        CountDownLatch countDownLatch = new CountDownLatch(8);
 
         Runnable onComplete = () -> countDownLatch.countDown();
         CompletableConsumer unisexNameConsumer = new UnisexNameConsumer(SAMPLE_SIZE, onComplete);
@@ -101,6 +99,7 @@ public class DisruptorTest {
         CompletableConsumer fraudConsumer = new RuleBasedFraudDetector(SAMPLE_SIZE, onComplete);
         CompletableConsumer homosexualCountingConsumer = new HomosexualCountingConsumer(SAMPLE_SIZE, onComplete);
         CompletableConsumer matchMakingConsumer = new MatchMakingConsumer(SAMPLE_SIZE, onComplete);
+        CompletableConsumer keepInRamConsumer = new KeepInRamConsumer(SAMPLE_SIZE, onComplete);
 
         disruptor.handleEventsWith(
                 unisexNameConsumer,
@@ -109,7 +108,8 @@ public class DisruptorTest {
                 fraudConsumer,
                 averageAgeEventHandler,
                 homosexualCountingConsumer,
-                matchMakingConsumer
+                matchMakingConsumer,
+                keepInRamConsumer
         );
         return countDownLatch;
     }
