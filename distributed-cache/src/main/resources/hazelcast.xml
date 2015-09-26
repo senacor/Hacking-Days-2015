@@ -7,7 +7,7 @@
     <name>sinalco</name>
     <password>sinalco</password>
   </group>
-  <management-center enabled="true">http://192.168.220.190:8080/mancenter</management-center>
+  <management-center enabled="false">http://192.168.220.190:8080/mancenter</management-center>
   <network>
     <port auto-increment="true" port-count="100">5701</port>
     <outbound-ports>

@@ -22,7 +22,7 @@ public class ProfileMapStore implements MapStore<String, Profile>, Closeable {
 
     // private static final String DEFAULT_MAP_ID = "profile";
     public static final String DEFAULT_MAP_ID = "unittestTable";
-    public static final String DEFAULT_DB_URL = "jdbc:h2:tcp://192.168.220.124/~/test";
+    public static final String DEFAULT_DB_URL = "jdbc:h2:tcp://localhost/~/test";
     // public static final String DEFAULT_DB_URL = "jdbc:h2:tcp://172.16.13.152/~/test";
 
     private final String dbUrl;
