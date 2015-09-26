@@ -58,16 +58,30 @@ public class ProfileMapperTest {
 	}
 
 	@Test
-	public void testCreateManyProfiles() {
-		final int samples = 10000;
+	public void testMergeManyProfilesOne() {
+		final int samples = 1;
 		ProfileGenerator profileGenerator = ProfileGenerator.newInstance(samples);
 
 		List<Profile> profiles = new ArrayList<>(samples);
-		profileGenerator.stream().forEach(profile -> {
-			profiles.add(profile);
-			profileMapper.insertProfile(profile);
-		});
+		profileGenerator.stream().forEach(profiles::add);
 
+		profileMapper.mergeProfiles(profiles);
+		
+		List<Profile> allProfiles = profileMapper.getAllProfiles();
+		assertThat(allProfiles.size(), is(equalTo(samples)));
+		assertThat(allProfiles, is(equalTo(profiles)));
+	}
+
+	@Test
+	public void testCreateManyProfilesMany() {
+		final int samples = 1000;
+		ProfileGenerator profileGenerator = ProfileGenerator.newInstance(samples);
+
+		List<Profile> profiles = new ArrayList<>(samples);
+		profileGenerator.stream().forEach(profiles::add);
+
+		profileMapper.mergeProfiles(profiles);
+		
 		List<Profile> allProfiles = profileMapper.getAllProfiles();
 		assertThat(allProfiles.size(), is(equalTo(samples)));
 		assertThat(allProfiles, is(equalTo(profiles)));
@@ -113,7 +127,7 @@ public class ProfileMapperTest {
 		assertThat(reloadedProfile, is(equalTo(profile)));
 		assertThat(profileMapper.getAllProfiles().size(), is(equalTo(1)));
 	}
-
+	
 	@Test
 	public void testGetAllIds() {
 		final int samples = 1000;

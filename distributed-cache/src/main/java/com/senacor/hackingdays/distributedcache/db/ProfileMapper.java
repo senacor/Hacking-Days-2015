@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -115,6 +116,23 @@ public class ProfileMapper {
 				+ "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	}
 
+	private String createMultiMergeStatement(final int count) {
+		if (count < 1) {
+			throw new IllegalArgumentException("count too small");
+		}
+		final String prefix = "merge into " //
+				+ this.tableName //
+				+ "(uuid, name, gender, age, location_state, location_city, location_zip, relationship, smoker, seeking_gender, seeking_age_min, seeking_age_max, activity_logincount, activity_lastlogin) values ";
+		final String values ="(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		final int builderSize = prefix.length() + count * (values.length()+1);
+		final StringBuilder builder = new StringBuilder(builderSize);
+		builder.append(prefix);
+		for (int i = 0; i < count-1; i++)
+			builder.append(values).append(',');
+		builder.append(values);
+		return builder.toString();
+	}
+
 	private String createMergeStatement() {
 		return "merge into " //
 				+ this.tableName //
@@ -122,20 +140,12 @@ public class ProfileMapper {
 				+ "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	}
 
-	private String createUpdateStatement() {
-		return "update " //
-				+ this.tableName //
-				+ " set " //
-				+ "uuid=?, name=?, gender=?, age=?, location_state=?, location_city=?, location_zip=?, relationship=?, smoker=?, seeking_gender=?, seeking_age_min=?, seeking_age_max=?, activity_logincount=?, activity_lastlogin=? "
-				+ "where uuid=?";
-	}
-
 	private String createDeleteStatement() {
 		return "delete from " + tableName + " where uuid = ?";
 	}
-
-	private void mapProfileToStatement(PreparedStatement statement, Profile profile) throws SQLException {
-		int i = 1;
+	
+	private int mapProfileToStatement(PreparedStatement statement, Profile profile, int startIndex, boolean isUpdate) throws SQLException {
+		int i = startIndex;
 		statement.setString(i++, profile.getId().toString());
 		statement.setString(i++, profile.getName());
 		statement.setInt(i++, profile.getGender().ordinal());
@@ -150,12 +160,19 @@ public class ProfileMapper {
 		statement.setInt(i++, profile.getSeeking().getAgeRange().getUpper());
 		statement.setInt(i++, profile.getActivity().getLoginCount());
 		statement.setLong(i++, profile.getActivity().getLastLogin().getTime());
-		if (statement.getParameterMetaData().getParameterCount() >= i) {
-			// for update
+		if (isUpdate) {
+			// set where for update
 			statement.setString(i++, profile.getId().toString());
 		}
-		assert(i == statement.getParameterMetaData().getParameterCount() + 1);
+		return i;
+//		assert(i == statement.getParameterMetaData().getParameterCount() + 1);
 	}
+
+	private int mapProfileToStatement(PreparedStatement statement, Profile profile, boolean isUpdate) throws SQLException {
+		return mapProfileToStatement(statement, profile, 1, isUpdate);
+	}
+	
+//	private 
 
 	public List<Profile> getAllProfiles() {
 		try (Connection connection = dataSource.getConnection();
@@ -202,7 +219,7 @@ public class ProfileMapper {
 	public boolean insertProfile(Profile profile) {
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement statement = connection.prepareStatement(createInsertStatement())) {
-			mapProfileToStatement(statement, profile);
+			mapProfileToStatement(statement, profile, false);
 			return statement.execute();
 
 		} catch (SQLException ex) {
@@ -214,12 +231,27 @@ public class ProfileMapper {
 	public boolean mergeProfile(Profile profile) {
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement statement = connection.prepareStatement(createMergeStatement())) {
-			mapProfileToStatement(statement, profile);
+			mapProfileToStatement(statement, profile, false);
 			return statement.executeUpdate() == 1;
 
 		} catch (SQLException ex) {
 			throw new RuntimeException("SQLException when updating profile.", ex);
 		}
+	}
+	
+	public boolean mergeProfiles(Collection<Profile> profiles) {
+		int count = profiles.size();
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(createMultiMergeStatement(count))) {
+			int offset = 1;
+			for (Profile profile: profiles) {
+				offset = mapProfileToStatement(statement, profile, offset, false);
+			}
+			return statement.executeUpdate() == 1;
+		} catch (SQLException ex) {
+			throw new RuntimeException("SQLException when updating profiles.", ex);
+		}
+		
 	}
 
 	public boolean deleteProfile(UUID id) {
@@ -227,7 +259,6 @@ public class ProfileMapper {
 				PreparedStatement statement = connection.prepareStatement(createDeleteStatement())) {
 			statement.setString(1, id.toString());
 			return statement.executeUpdate() == 1;
-
 		} catch (SQLException ex) {
 			throw new RuntimeException("SQLException when updating profile.", ex);
 		}
